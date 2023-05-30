@@ -116,11 +116,9 @@ def privatesongs():
                 currentsongdata=select(q)
                 data['currentsongdata']=currentsongdata[0]
                 if action.startswith('update_song'):
-                    flash('updatesong')
-                    return render_template('uploader/private_songs.html', data=data)
+                    return render_template('uploader/private_songs.html', data=data, value='updatesong')
                 elif action.startswith('view_song'):
-                    flash('viewsong')
-                    return render_template('uploader/private_songs.html', data=data)
+                    return render_template('uploader/private_songs.html', data=data, value='viewsong')
                 elif action.startswith('delete_song'):
                     # Delete song action
                     # Handle the delete song functionality

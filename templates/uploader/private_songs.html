@@ -268,6 +268,10 @@
                 <img src="{{ url_for('static', filename=data['currentsongdata']['image_loc']) }}" alt="SongImage" class="rounded-circle" style="max-width: 200px; max-height: 200px;">
                 <h4><b>{{data['currentsongdata']['song_name']}}</b></h4>
                 <h5>{{data['currentsongdata']['album_name']}}</h5>
+                <audio controls>
+                  <source src="{{ url_for('static', filename=data['currentsongdata']['song_loc']) }}" type="audio/mpeg">
+                  Your browser does not support the audio element.
+                </audio>
               </div>
             </div>
   
@@ -323,9 +327,7 @@
                       <div class="col-lg-3 col-md-4 label">Language</div>
                       <div class="col-lg-9 col-md-8">{{data['currentsongdata']['language']}}</div>
                     </div>
-  
                   </div>
-  
                 </div><!-- End Bordered Tabs -->
   
               </div>
@@ -333,8 +335,6 @@
   
           </div>
         </div>
-        
-        <!-- Song details Form -->
 
       </div>
       <div class="modal-footer">
@@ -372,12 +372,7 @@
 
   </main><!-- End #main -->
 
-
-
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-            {% for message in messages %}
-                {% if message == 'updatesong' %}
+  {% if value == 'updatesong' %}
                 <script>
                   // Function to open the modal on page load
                   document.addEventListener('DOMContentLoaded', function() {
@@ -386,7 +381,7 @@
                   });
               </script>
                 {% endif %}
-                {% if message == 'viewsong' %}
+                {% if value == 'viewsong' %}
                 <script>
                   // Function to open the modal on page load
                   document.addEventListener('DOMContentLoaded', function() {
@@ -395,10 +390,6 @@
                   });
               </script>
                 {% endif %}
-            {% endfor %}
-    {% endif %}
-{% endwith %}
-
 <script>
   function openUploadModal() {
     document.getElementById('imageuploadModal').style.display = 'block';

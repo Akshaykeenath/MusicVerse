@@ -46,7 +46,7 @@ def approvedsongs():
     else:
         return redirect(url_for('public.home'))
 
-@uploader.route('/pendingsongs')
+@uploader.route('/pendingsongs' , methods=['GET', 'POST'])
 def pendingsongs():
     if 'uid' in session:
         uid = session['uid']
@@ -57,6 +57,29 @@ def pendingsongs():
         q="SELECT s.song_id,s.song_name,al.album_name,ar.artist_name,s.date FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.status='pending' AND s.privacy='public' AND s.user_id ='%s'"%(uid)
         pendingsongdata=select(q)
         data['pendingsongdata']=pendingsongdata
+        q="select * from artist"
+        artistdata=select(q)
+        data['artistdata'] = artistdata
+        q="select * from album"
+        albumdata=select(q)
+        data['albumdata']=albumdata
+        data['currentsongdata']=0
+
+        if request.method == 'POST':
+                action = request.form.get('action')
+                song_id = action.split('_')[-1]
+                q="SELECT s.song_id,s.song_name,al.album_id,al.album_name,ar.artist_id,ar.artist_name,s.date,s.image_loc,s.song_loc,s.genre,s.language,s.privacy FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.status='pending' AND s.privacy='public' AND s.song_id='%s'"%(song_id)
+                currentsongdata=select(q)
+                print('Song id =',song_id)
+                data['currentsongdata']=currentsongdata[0]
+                if action.startswith('update_song'):
+                    return render_template('uploader/pending_songs.html', data=data, value='updatesong')
+                elif action.startswith('view_song'):
+                    return render_template('uploader/pending_songs.html', data=data, value='viewsong')
+                elif action.startswith('delete_song'):
+                    # Delete song action
+                    # Handle the delete song functionality
+                    return 'Delete Song'
         return render_template('uploader/pending_songs.html', data=data)
     else:
         return redirect(url_for('public.home'))
@@ -79,6 +102,7 @@ def updatesong():
         if 'uploadimage' in request.form:
             songname=request.form['songname']
             songid=request.form['songid']
+            pagename=request.form['pagename']
             songimage=request.files['songimage']
             filename = songimage.filename
             extension = os.path.splitext(filename)[1] 
@@ -87,6 +111,29 @@ def updatesong():
             q="update songs set image_loc='%s' where song_id='%s'"%(imgpath,songid)
             update(q)
             flash('success: Image updated successfully')
+            if pagename == 'privatesongs':
+                return redirect(url_for('uploader.privatesongs'))
+            elif pagename == 'pendingsongs':
+                return redirect(url_for('uploader.pendingsongs'))
+        if 'songupdate' in request.form:
+            songname=request.form['songname']
+            songid=request.form['songid']
+            album=request.form['album']
+            artist=request.form['artist']
+            privacy=request.form['privacy']
+            genre=request.form['genre']
+            date=request.form['date']
+            language=request.form['language']
+            pagename=request.form['pagename']
+            q="update songs set artist_id='%s', album_id='%s', song_name='%s', genre='%s', date='%s',language='%s', privacy='%s' where song_id='%s'"%(artist,album,songname,genre,date,language,privacy,songid)
+            update(q)
+            flash('success: Song Details updated successfully')
+            if pagename == 'privatesongs':
+                return redirect(url_for('uploader.privatesongs'))
+            elif pagename == 'pendingsongs':
+                return redirect(url_for('uploader.pendingsongs'))
+            
+        
     return redirect(url_for('uploader.allsongs'))
 
 
@@ -311,16 +358,16 @@ def uploadsong():
             song_image_extension = os.path.splitext(image.filename)[1]
 
             # Specify the path where you want to save the uploaded files
-            upload_folder = 'static/uploads/album'  # Update the path according to your setup
+            upload_folder = 'static/uploads/songs/image'  # Update the path according to your setup
 
             # Create the upload folder if it doesn't exist
             os.makedirs(upload_folder, exist_ok=True)
 
             # Customize the filenames
-            song_image_filename = songname + 'image' + song_image_extension
+            song_image_filename = songname + song_image_extension
 
             # Saving the path for database
-            songimagepath='uploads/songs/image/' + songname + 'image' + song_image_extension
+            songimagepath='uploads/songs/image/' + songname + song_image_extension
 
             # Save the uploaded files with the customized filenames
             image.save(os.path.join(upload_folder, song_image_filename))

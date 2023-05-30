@@ -130,22 +130,33 @@
             </div>
             <div style="margin: 0 40px;"></div>
             <div class="mr-4">
-              <form action="{{ url_for('uploader.updatesong') }}" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="songname" value="{{data['currentsongdata']['song_name']}}">
-                <input type="hidden" name="songid" value="{{data['currentsongdata']['song_id']}}">
-                <div class="form-group">
-                  <label for="image" class="text-muted">Select Image:</label>
-                  <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="image" name="songimage">
+              <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.updatesong') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="songname" value="{{ data['currentsongdata']['song_name'] }}">
+                <input type="hidden" name="songid" value="{{ data['currentsongdata']['song_id'] }}">
+                <input type="hidden" name="pagename" value="privatesongs">
+                <div class="col-md-12">
+                  <div class="row mb-3 align-items-center">
+                    <label for="formFile" class="col-sm-2 col-form-label">Song Image</label>
+                    <div class="col-sm-10 position-relative">
+                      <div class="form-control">
+                        <input class="form-control" type="file" name="songimage" id="formFile" accept="image/*" required>
+                        <div class="invalid-tooltip">
+                          Please choose an image file to upload.
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
+                
                 <button type="submit" name="uploadimage" class="btn btn-success rounded-pill">Upload</button>
               </form>
             </div>
           </div>
         </div>
         <!-- Song details Form -->
-<form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.uploadsong') }}" method="POST" enctype="multipart/form-data">
+<form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.updatesong') }}" method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="songid" value="{{ data['currentsongdata']['song_id'] }}">
+  <input type="hidden" name="pagename" value="privatesongs">
   <div class="col-md-12">
     <div class="form-floating">
       <input type="text" class="form-control" id="songname" placeholder="Your Name" name="songname" value="{{data['currentsongdata']['song_name']}}" required>
@@ -174,7 +185,7 @@
   <div class="col-md-6">
     <div class="form-floating mb-3">
         <select class="form-select" name="artist" id="artistselect" aria-label="State" required>
-          <option selected value=">{{data['currentsongdata']['artist_id']}}">{{data['currentsongdata']['artist_name']}}</option>
+          <option selected value="{{data['currentsongdata']['artist_id']}}">{{data['currentsongdata']['artist_name']}}</option>
           {% for row in data['artistdata'] %}
           <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
           {% endfor %}
@@ -203,8 +214,8 @@
   <div class="col-md-6">
     <div class="col-md-12">
       <div class="form-floating">
-        <input type="text" class="form-control" id="floatingGenre" placeholder="genre" name="genre" required>
-        <label for="floatingGenre">{{data['currentsongdata']['genre']}}</label>
+        <input type="text" class="form-control" value="{{data['currentsongdata']['genre']}}" id="floatingGenre" placeholder="genre" name="genre" required>
+        <label for="floatingGenre">Genre</label>
         <div class="invalid-tooltip">
           Please provide a genre.
         </div>
@@ -228,8 +239,8 @@
 
   <div class="col-md-2">
     <div class="form-floating">
-      <input type="text" class="form-control" id="floatingLanguage" placeholder="Language" name="language" required>
-      <label for="floatingLanguage">{{data['currentsongdata']['language']}}</label>
+      <input type="text" class="form-control" value="{{data['currentsongdata']['language']}}" id="floatingLanguage" placeholder="Language" name="language" required>
+      <label for="floatingLanguage">Language</label>
       <div class="invalid-tooltip">
         Please provide a valid language.
       </div>
@@ -237,7 +248,7 @@
   </div>
 
   <div class="text-center">
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" name="songupdate" class="btn btn-primary">Submit</button>
   </div>
 </form>
       </div>
@@ -372,24 +383,24 @@
 
   </main><!-- End #main -->
 
-  {% if value == 'updatesong' %}
-                <script>
-                  // Function to open the modal on page load
-                  document.addEventListener('DOMContentLoaded', function() {
-                      var modal = new bootstrap.Modal(document.getElementById('updatesong'));
-                      modal.show();
-                  });
-              </script>
-                {% endif %}
-                {% if value == 'viewsong' %}
-                <script>
-                  // Function to open the modal on page load
-                  document.addEventListener('DOMContentLoaded', function() {
-                      var modal = new bootstrap.Modal(document.getElementById('viewsong'));
-                      modal.show();
-                  });
-              </script>
-                {% endif %}
+{% if value == 'updatesong' %}
+<script>
+// Function to open the modal on page load
+document.addEventListener('DOMContentLoaded', function() {
+var modal = new bootstrap.Modal(document.getElementById('updatesong'));
+modal.show();
+});
+</script>
+{% endif %}
+{% if value == 'viewsong' %}
+<script>
+// Function to open the modal on page load
+document.addEventListener('DOMContentLoaded', function() {
+var modal = new bootstrap.Modal(document.getElementById('viewsong'));
+modal.show();
+});
+</script>
+{% endif %}
 <script>
   function openUploadModal() {
     document.getElementById('imageuploadModal').style.display = 'block';

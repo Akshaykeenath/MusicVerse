@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>
+    MusicVerse
+  </title>
+  <!-- CSS Files -->
+  <link href="{{ url_for('static', filename='public/css/blk-design-system.css')}}" rel="stylesheet" />
+</head>
+<body class="index-page">
+  <div class="wrapper">
+    <div class="page-header header-filter">
+      <div class="squares square1"></div>
+      <div class="squares square2"></div>
+      <div class="squares square3"></div>
+      <div class="squares square4"></div>
+      <div class="squares square5"></div>
+      <div class="squares square6"></div>
+      <div class="squares square7"></div>
+    </div>
+    <div class="main">
+      <!-- Typography -->
+      <!-- Start Modal -->
+      <div class="modal fade" id="wrongcred" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header justify-content-center">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <h4 class="title title-up">Wrong Credentials</h4>
+            </div>
+            <div class="modal-body">
+              <p>You have entered the wrong username or password. Please login again
+              </p>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ url_for('public.home') }}" class="btn btn-default">Home</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Modal -->
+      <!-- Admin Redirect -->
+      <div class="modal fade" id="adminredirect" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header justify-content-center">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <h4 class="title title-up">Select Page</h4>
+            </div>
+            <div class="modal-body">
+              <p> Please select to which page you want to go
+              </p>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ url_for('user.user_home') }}" class="btn btn-primary btn-round">Music Player</a>
+                <a href="{{ url_for('admin.admin_home') }}" class="btn btn-success btn-round">Admin Panel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Admin Redirect -->
+
+    </div>
+  </div>
+
+  <!-- Script to automatically call the modal -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  {% if value == "LoginError" %}
+  <script>
+    $(document).ready(function () {
+      $('#wrongcred').modal('show');
+    });
+  </script>
+  {% endif %}
+
+  {% if value == "AdminRedirect" %}
+  <script>
+    $(document).ready(function () {
+      $('#adminredirect').modal('show');
+    });
+  </script>
+  {% endif %}
+</body>
+
+</html>

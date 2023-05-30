@@ -1,0 +1,214 @@
+{% include 'public/public_header.html'%}
+  <div class="wrapper">
+    <div class="page-header header-filter">
+      <div class="squares square1"></div>
+      <div class="squares square2"></div>
+      <div class="squares square3"></div>
+      <div class="squares square4"></div>
+      <div class="squares square5"></div>
+      <div class="squares square6"></div>
+      <div class="squares square7"></div>
+      <div class="container">
+        <div class="content-center brand">
+          <h1 class="h1-seo">MusicVerse</h1>
+          <h3>Welcome to the world of music.</h3>
+          <div class="row" id="modals">
+            <table align="Center">
+              <td>
+                <div>
+                  <a href="{{ url_for('uploader.home') }}" class="btn btn-warning" name="musicplayer">
+                    Music Player
+                  </a>
+                </div>                
+              </td>
+              <td>
+                <div class="col-md-4">
+                  <button type="submit" class="btn btn-success" data-toggle="modal" data-target="#myModal2">
+                    Login
+                  </button>
+                </div>
+              </td>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signin page -->
+    <div class="modal fade modal-black" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header justify-content-center">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="tim-icons icon-simple-remove text-white"></i>
+            </button>
+            <div class="text-muted text-center ml-auto mr-auto">
+              <h3 class="mb-0">Sign in</h3>
+            </div>
+          </div>
+          <div class="modal-body">
+            <form role="form" method="post" action="/login">
+              <div class="form-group mb-3">
+                <div class="input-group input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="tim-icons icon-email-85"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" placeholder="Email" name="uname" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="tim-icons icon-key-25"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" placeholder="Password" type="password" name="pwd" required>
+                </div>
+              </div>
+              <div class="form-check mt-3">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="checkbox" checked>
+                  <span class="form-check-sign"></span>
+                  Remember me!
+                </label>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary my-4" name="signin">Sign in</button>
+              </div>
+            </form>
+            <div class="text-center text-muted mb-4 mt-3">
+              <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#myModal3">Sign Up</a></small>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    <!-- End Signin page -->
+
+    <!-- Signup Area -->
+    <form method="post" action="/signup">
+      <div class="modal fade modal-black" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content" style="margin-top: -100px;">
+            <div class="modal-header justify-content-center">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <i class="tim-icons icon-simple-remove text-white"></i>
+              </button>
+              <div class="text-muted text-center ml-auto mr-auto">
+                <h3 class="mb-0">Sign Up</h3>
+              </div>
+            </div>
+            <div class="modal-body">
+              <form role="form" method="post">
+                <div class="form-group mb-3">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="tim-icons icon-single-02"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" placeholder="First Name" type="text" id="regfname" name="regfname">
+                  </div>
+                </div>
+                <div class="form-group mb-3">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="tim-icons icon-single-02"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" placeholder="Last Name" type="text" id="reglname" name="reglname">
+                  </div>
+                </div>
+                <div class="form-group mb-3">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="tim-icons icon-email-85"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" placeholder="Email" type="email" id="regemail" name="regemail">
+                  </div>
+                </div>           
+                <div class="form-group">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="tim-icons icon-mobile"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" placeholder="Mobile Number" type="text" id="regmobile" name="regmobile">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="tim-icons icon-key-25"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" placeholder="Password" type="password" id="regpass1" name="regpass1">
+                  </div>
+                </div>   
+                <div class="form-group">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="tim-icons icon-key-25"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" placeholder="Confirm Password" type="password" id="regpass2" name="regpass2">
+                  </div>
+                </div>
+  
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary my-4">Sign Up</button>
+                </div>
+              <div class="text-center text-muted mb-4 mt-3">
+                <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#myModal2"> Sign In</a></small>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <!-- End Signup Area -->
+        <!-- Update Success -->
+{% with messages = get_flashed_messages() %}
+{% if messages[0]=='Insertion Successfull' %}
+<div class="alert alert-success alert-with-icon fixed-bottom">
+  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="tim-icons icon-simple-remove"></i>
+  </button>
+  <span data-notify="icon" class="tim-icons icon-trophy"></span>
+  <span>{{ messages[0] }}</span>
+</div>
+{% endif %}
+{% if messages[0]=='Username already exist' %}
+<div class="alert alert-danger alert-with-icon fixed-bottom">
+  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="tim-icons icon-simple-remove"></i>
+  </button>
+  <span data-notify="icon" class="tim-icons icon-alert-circle-exc"></span>
+  <span>{{ messages[0] }}</span>
+</div>
+{% endif %}
+{% if messages[0]=='Invalid username or password' %}
+<div class="alert alert-danger alert-with-icon fixed-bottom">
+  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="tim-icons icon-simple-remove"></i>
+  </button>
+  <span data-notify="icon" class="tim-icons icon-alert-circle-exc"></span>
+  <span>{{ messages[0] }}</span>
+</div>
+{% endif %}
+{% endwith %}
+
+    {% include 'public/public_footer.html'%}
+
+

@@ -1,0 +1,496 @@
+*:focus {
+  outline: none;
+}
+
+body {
+  font-family: Helvetica, Arial;
+  margin: 0;
+  background-color: #ffeff5;
+}
+
+#app-cover {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100vw;
+  height: 100px;
+  margin: -4px auto;
+}
+
+#bg-artwork {
+  position: fixed;
+  top: -30px;
+  right: -30px;
+  bottom: -30px;
+  left: -30px;
+  background-image: url("https://raw.githubusercontent.com/himalayasingh/music-player-1/master/img/_1.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50%;
+  filter: blur(40px);
+  -webkit-filter: blur(40px);
+  z-index: 1;
+}
+
+#bg-layer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #fff;
+  opacity: 0.51;
+  z-index: 2;
+}
+
+#player {
+  position: relative;
+  height: 100%;
+  z-index: 3;
+}
+
+#player-track {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  left: 15px;
+  padding: 13px 22px 10px 184px;
+  background-color: #561874;
+  border-radius: 15px 15px 0 0;
+  transition: 0.3s ease top;
+  z-index: 1;
+}
+
+#player-track.active {
+  top: -92px;
+}
+
+#album-name {
+  color: #bec0cc;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+#track-name {
+  color: #acaebd;
+  font-size: 13px;
+  margin: 2px 0 13px 0;
+}
+
+#track-time {
+  height: 12px;
+  margin-bottom: 3px;
+  overflow: hidden;
+}
+
+#current-time {
+  float: left;
+}
+
+#track-length {
+  float: right;
+}
+
+#current-time,
+#track-length {
+  color: transparent;
+  font-size: 11px;
+  background-color: #ffe8ee;
+  border-radius: 10px;
+  transition: 0.3s ease all;
+}
+
+#track-time.active #current-time,
+#track-time.active #track-length {
+  color: #f86d92;
+  background-color: transparent;
+}
+
+#s-area,
+#seek-bar {
+  position: relative;
+  height: 4px;
+  border-radius: 4px;
+}
+
+#s-area {
+  background-color: #ffe8ee;
+  cursor: pointer;
+}
+
+#ins-time {
+  position: absolute;
+  top: -29px;
+  color: #fff;
+  font-size: 12px;
+  white-space: pre;
+  padding: 5px 6px;
+  border-radius: 4px;
+  display: none;
+}
+
+#s-hover {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0.2;
+  z-index: 2;
+}
+
+#ins-time,
+#s-hover {
+  background-color: #3b3d50;
+}
+
+#seek-bar {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  background-color: #fd6d94;
+  transition: 0.2s ease width;
+  z-index: 1;
+}
+
+#player-content {
+  position: relative;
+  height: 100%;
+  background-color: #171941;
+  box-shadow: 0 30px 80px #656565;
+  border-radius: 15px;
+  z-index: 2;
+}
+
+#album-art {
+  position: absolute;
+  top: -40px;
+  width: 115px;
+  height: 115px;
+  margin-left: 40px;
+  transform: rotateZ(0);
+  transition: 0.3s ease all;
+  box-shadow: 0 0 0 10px #fff;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+#album-art.active {
+  top: -60px;
+  box-shadow: 0 0 0 4px #fff7f7, 0 30px 50px -15px #afb7c1;
+}
+
+#album-art:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  margin: -10px auto 0 auto;
+  background-color: #d6dee7;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #fff;
+  z-index: 2;
+}
+
+#album-art img {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: -1;
+}
+
+#album-art img.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+#album-art.active img.active {
+  z-index: 1;
+  -webkit-animation: rotateAlbumArt 3s linear 0s infinite forwards;
+          animation: rotateAlbumArt 3s linear 0s infinite forwards;
+}
+
+@-webkit-keyframes rotateAlbumArt {
+  0% {
+    transform: rotateZ(0);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+@keyframes rotateAlbumArt {
+  0% {
+    transform: rotateZ(0);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+#buffer-box {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 13px;
+  color: #1f1f1f;
+  font-size: 13px;
+  font-family: Helvetica;
+  text-align: center;
+  font-weight: bold;
+  line-height: 1;
+  padding: 6px;
+  margin: -12px auto 0 auto;
+  background-color: rgba(255, 255, 255, 0.19);
+  opacity: 0;
+  z-index: 2;
+}
+
+#album-art img,
+#buffer-box {
+  transition: 0.1s linear all;
+}
+
+#album-art.buffering img {
+  opacity: 0.25;
+}
+
+#album-art.buffering img.active {
+  opacity: 0.8;
+  filter: blur(2px);
+  -webkit-filter: blur(2px);
+}
+
+#album-art.buffering #buffer-box {
+  opacity: 1;
+}
+
+#player-controls {
+  width: auto;
+  height: 100%;
+  float: right;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.control {
+  padding: 12px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button {
+  width: 26px;
+  height: 26px;
+  padding: 25px;
+  background-color: #BA4CD2;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button i {
+  display: block;
+  color: #d6dee7;
+  font-size: 26px;
+  text-align: center;
+  line-height: 1;
+}
+
+.button,
+.button i {
+  transition: 0.2s ease all;
+}
+
+.button:hover {
+  background-color: #d6d6de;
+}
+
+.button:hover i {
+  color: #fff;
+}
+
+#wave-container {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Adjust the height as desired */
+}
+
+#wave-pattern {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+#equalizer {
+  position: relative;
+  top: 50px;
+  left: 200px;
+  /* generates a random number in the range 430 - 500*/
+  /* adds random animation durations to for up 20 bars; for more, change 20 to a higer value (below) */
+}
+#equalizer .bar {
+  position: relative;
+  float: left;
+  background: linear-gradient(to top, rgb(61, 21, 130), rgb(240, 27, 255));
+  height: 10px;
+  margin-left: 1px;
+  width: 3px;
+  animation: jump 0ms -800ms linear infinite alternate;
+}
+@keyframes jump {
+  0% {
+    height: 10px;
+    top: -5px;
+  }
+  100% {
+    top: -15px;
+    height: 30px;
+  }
+}
+#equalizer .bar:nth-child(1) {
+  animation-duration: 456ms;
+}
+#equalizer .bar:nth-child(2) {
+  animation-duration: 436ms;
+}
+#equalizer .bar:nth-child(3) {
+  animation-duration: 462ms;
+}
+#equalizer .bar:nth-child(4) {
+  animation-duration: 439ms;
+}
+#equalizer .bar:nth-child(5) {
+  animation-duration: 455ms;
+}
+#equalizer .bar:nth-child(6) {
+  animation-duration: 471ms;
+}
+#equalizer .bar:nth-child(7) {
+  animation-duration: 460ms;
+}
+#equalizer .bar:nth-child(8) {
+  animation-duration: 437ms;
+}
+#equalizer .bar:nth-child(9) {
+  animation-duration: 444ms;
+}
+#equalizer .bar:nth-child(10) {
+  animation-duration: 464ms;
+}
+#equalizer .bar:nth-child(11) {
+  animation-duration: 463ms;
+}
+#equalizer .bar:nth-child(12) {
+  animation-duration: 473ms;
+}
+#equalizer .bar:nth-child(13) {
+  animation-duration: 446ms;
+}
+#equalizer .bar:nth-child(14) {
+  animation-duration: 481ms;
+}
+#equalizer .bar:nth-child(15) {
+  animation-duration: 460ms;
+}
+#equalizer .bar:nth-child(16) {
+  animation-duration: 447ms;
+}
+#equalizer .bar:nth-child(17) {
+  animation-duration: 491ms;
+}
+#equalizer .bar:nth-child(18) {
+  animation-duration: 500ms;
+}
+#equalizer .bar:nth-child(19) {
+  animation-duration: 454ms;
+}
+#equalizer .bar:nth-child(20) {
+  animation-duration: 468ms;
+}
+#equalizer.paused .bar {
+  animation-play-state: paused;
+}
+
+.hidden {
+  display: none;
+}
+
+/* CSS for the volume slider */
+.volume-slider {
+  position: relative;
+  display: inline-block;
+  width: 150px;
+}
+
+.volume-slider input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background-color: #ccc;
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.volume-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volume-slider input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volume-slider input[type="range"]:focus {
+  outline: none;
+}
+
+.volume-slider input[type="range"]:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.volume-slider input[type="range"]:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.volumecontainer {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2); /* Transparent black background */
+  border-radius: 50px; /* Increased border radius for more rounded edges */
+  padding: 10px 22px;
+  border-width: 1px;
+  border-radius: 30px;
+  border: 2px solid #e14eca;
+  /* border-color: #e14eca; */
+}

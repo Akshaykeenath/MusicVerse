@@ -1,0 +1,408 @@
+{% include 'uploader/uploader_header.html'%}
+{% include 'uploader/uploader_sidebar.html'%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<main id="main" class="main">
+
+        <!-- (success:, info:, warning:, danger:) -->
+        {% with messages = get_flashed_messages() %} 
+        {% for message in messages %}
+          {% set alert_class = '' %}
+          {% if message.startswith('success:') %}
+            {% set alert_class = 'alert-success bg-success text-light' %}
+            {% set message = message.split(':')[1] %}
+          {% elif message.startswith('info:') %}
+            {% set alert_class = 'alert-info bg-info text-light' %}
+            {% set message = message.split(':')[1] %}
+          {% elif message.startswith('warning:') %}
+            {% set alert_class = 'alert-warning bg-warning text-dark' %}
+            {% set message = message.split(':')[1] %}
+          {% elif message.startswith('danger:') %}
+            {% set alert_class = 'alert-danger bg-danger text-light' %}
+            {% set message = message.split(':')[1] %}
+          {% endif %}
+          <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endwith %}
+      <!-- End flash message alert -->
+
+    <div class="pagetitle">
+      <h1>Private Songs</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
+          <li class="breadcrumb-item">Songs</li>
+          <li class="breadcrumb-item active">Private Songs</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+<!-- Recent Songs -->
+<div class="col-12">
+    <div class="card recent-sales overflow-auto">
+
+      <div class="filter">
+        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+          <li class="dropdown-header text-start">
+            <h6>Filter</h6>
+          </li>
+
+          <li><a class="dropdown-item" href="#">Today</a></li>
+          <li><a class="dropdown-item" href="#">This Month</a></li>
+          <li><a class="dropdown-item" href="#">This Year</a></li>
+        </ul>
+      </div>
+
+      <div class="card-body">
+        <h5 class="card-title">Private Songs <span>| Today</span></h5>
+
+        <table class="table table-borderless datatable">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Song name</th>
+              <th scope="col">Album</th>
+              <th scope="col">Artist</th>
+              <th scope="col">Release Date</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data['privatesongdata'] %}
+            <tr>
+              <th scope="row"><a href="#">{{ loop.index }}</a></th>
+              <td>{{ row['song_name'] }}</td>
+              <td><a href="#" class="text-primary">{{ row['album_name'] }}</a></td>
+              <td>{{ row['artist_name'] }}</td>
+              <td>{{ row['date'] }}</td>
+              <td>
+                <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
+                <form action="{{ url_for('uploader.privatesongs') }}" method="POST">
+                  <button type="submit" class="btn btn-success rounded-pill" name="action" value="update_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Update Song">
+                    <i class="bi bi-arrow-up-circle"></i>
+                  </button>
+                  <button type="submit" class="btn btn-primary rounded-pill" name="action" value="view_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Song Details">
+                    <i class="bi bi-view-list"></i>
+                  </button>
+                  <button type="submit" class="btn btn-danger rounded-pill" name="action" value="delete_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Song">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </form>                
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          
+        </table>
+
+      </div>
+
+    </div>
+  </div><!-- End Recent Songs -->
+
+
+
+      </div>
+    </section>
+
+<!-- Update Song Modal -->
+<div class="modal fade" id="updatesong" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Song Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Song image -->
+        <div class="card">
+          <div class="card-body profile-card pt-4 d-flex align-items-center justify-content-center">
+            <div class="mr-4">
+              <img src="{{ url_for('static', filename=data['currentsongdata']['image_loc']) }}" alt="SongImage" class="rounded-circle" style="max-width: 200px; max-height: 200px;">
+            </div>
+            <div style="margin: 0 40px;"></div>
+            <div class="mr-4">
+              <form action="{{ url_for('uploader.updatesong') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="songname" value="{{data['currentsongdata']['song_name']}}">
+                <input type="hidden" name="songid" value="{{data['currentsongdata']['song_id']}}">
+                <div class="form-group">
+                  <label for="image" class="text-muted">Select Image:</label>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="image" name="songimage">
+                  </div>
+                </div>
+                <button type="submit" name="uploadimage" class="btn btn-success rounded-pill">Upload</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- Song details Form -->
+<form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.uploadsong') }}" method="POST" enctype="multipart/form-data">
+  <div class="col-md-12">
+    <div class="form-floating">
+      <input type="text" class="form-control" id="songname" placeholder="Your Name" name="songname" value="{{data['currentsongdata']['song_name']}}" required>
+      <label for="songname">Song Name</label>
+      <div class="invalid-tooltip">
+        Please provide a song name.
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="form-floating mb-3">
+        <select class="form-select" name="album" id="albumselect" aria-label="Album" required>
+          <option selected value="{{data['currentsongdata']['album_id']}}">{{data['currentsongdata']['album_name']}}</option>
+          {% for row in data['albumdata'] %}
+          <option value="{{ row['album_id'] }}">{{ row['album_name'] }}</option>
+          {% endfor %}
+        </select>
+        <label for="albumselect">Album</label>
+        <div class="invalid-tooltip">
+          Please select an album.
+        </div>
+      </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="form-floating mb-3">
+        <select class="form-select" name="artist" id="artistselect" aria-label="State" required>
+          <option selected value=">{{data['currentsongdata']['artist_id']}}">{{data['currentsongdata']['artist_name']}}</option>
+          {% for row in data['artistdata'] %}
+          <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
+          {% endfor %}
+        </select>
+        <label for="artistselect">Artist</label>
+        <div class="invalid-tooltip">
+          Please select an artist.
+        </div>
+      </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="form-floating mb-3">
+        <select class="form-select" name="privacy" id="privacyselect" aria-label="State" required>
+          <option selected value="{{data['currentsongdata']['privacy']}}">{{data['currentsongdata']['privacy']}}</option>
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+        </select>
+        <label for="privacyselect">Privacy</label>
+        <div class="invalid-tooltip">
+          Please select the privacy of song.
+        </div>
+      </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="col-md-12">
+      <div class="form-floating">
+        <input type="text" class="form-control" id="floatingGenre" placeholder="genre" name="genre" required>
+        <label for="floatingGenre">{{data['currentsongdata']['genre']}}</label>
+        <div class="invalid-tooltip">
+          Please provide a genre.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="row mb-3 align-items-center">
+      <label for="inputDate" class="col-sm-2 col-form-label">Date</label>
+      <div class="col-sm-10 position-relative">
+        <div class="form-control">
+          <input type="date" class="form-control" value="{{data['currentsongdata']['date']}}" id="inputDate" name="date" required>
+          <div class="invalid-tooltip">
+            Please provide a valid date.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="form-floating">
+      <input type="text" class="form-control" id="floatingLanguage" placeholder="Language" name="language" required>
+      <label for="floatingLanguage">{{data['currentsongdata']['language']}}</label>
+      <div class="invalid-tooltip">
+        Please provide a valid language.
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Update Song Modal -->
+
+<!-- View Song Modal -->
+<div class="modal fade" id="viewsong" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">View Song Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Song Details -->
+        <div class="row">
+          <div class="col-xl-4">
+  
+            <div class="card">
+              <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+  
+                <img src="{{ url_for('static', filename=data['currentsongdata']['image_loc']) }}" alt="SongImage" class="rounded-circle" style="max-width: 200px; max-height: 200px;">
+                <h4><b>{{data['currentsongdata']['song_name']}}</b></h4>
+                <h5>{{data['currentsongdata']['album_name']}}</h5>
+              </div>
+            </div>
+  
+          </div>
+  
+          <div class="col-xl-8">
+  
+            <div class="card">
+              <div class="card-body pt-3">
+                <!-- Bordered Tabs -->
+                <ul class="nav nav-tabs nav-tabs-bordered">
+  
+                  <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+                  </li>
+  
+                </ul>
+                <div class="tab-content pt-2">
+                  <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                    <h5 class="card-title">Song Details</h5>
+  
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label ">Song Name</div>
+                      <div class="col-lg-9 col-md-8">{{data['currentsongdata']['song_name']}}</div>
+                    </div>
+  
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Album</div>
+                      <div class="col-lg-9 col-md-8">{{data['currentsongdata']['album_name']}}</div>
+                    </div>
+  
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Artist</div>
+                      <div class="col-lg-9 col-md-8">{{data['currentsongdata']['artist_name']}}</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Privacy</div>
+                      <div class="col-lg-9 col-md-8">{{data['currentsongdata']['privacy']}}</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Genre</div>
+                      <div class="col-lg-9 col-md-8">{{data['currentsongdata']['genre']}}</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Date</div>
+                      <div class="col-lg-9 col-md-8">{{data['currentsongdata']['date']}}</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Language</div>
+                      <div class="col-lg-9 col-md-8">{{data['currentsongdata']['language']}}</div>
+                    </div>
+  
+                  </div>
+  
+                </div><!-- End Bordered Tabs -->
+  
+              </div>
+            </div>
+  
+          </div>
+        </div>
+        
+        <!-- Song details Form -->
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End View Song Modal -->
+
+<!-- Image Upload Modal -->
+<div class="modal fade" id="imageuploadModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Small Modal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="#" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="image">Select Image:</label>
+            <input type="file" class="form-control-file" id="image" name="image">
+          </div>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </main><!-- End #main -->
+
+
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+            {% for message in messages %}
+                {% if message == 'updatesong' %}
+                <script>
+                  // Function to open the modal on page load
+                  document.addEventListener('DOMContentLoaded', function() {
+                      var modal = new bootstrap.Modal(document.getElementById('updatesong'));
+                      modal.show();
+                  });
+              </script>
+                {% endif %}
+                {% if message == 'viewsong' %}
+                <script>
+                  // Function to open the modal on page load
+                  document.addEventListener('DOMContentLoaded', function() {
+                      var modal = new bootstrap.Modal(document.getElementById('viewsong'));
+                      modal.show();
+                  });
+              </script>
+                {% endif %}
+            {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<script>
+  function openUploadModal() {
+    document.getElementById('imageuploadModal').style.display = 'block';
+  }
+</script>
+  
+              {% include 'uploader/uploader_footer.html'%}

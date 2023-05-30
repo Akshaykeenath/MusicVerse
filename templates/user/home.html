@@ -1,0 +1,92 @@
+{% include 'user/user_header.html'%}
+
+<style>
+  /* Hide scroll bars */
+  .section::-webkit-scrollbar {
+    display: none;
+  }
+  .section {
+    overflow: -moz-scrollbars-none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<div class="page-header header-filter">
+
+  <!-- Side Bar -->
+  <div class="myfixleft sidebar">
+    <div style="margin-top: 100px;">
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="nav nav-pills nav-pills-info flex-column">
+                <li class="nav-item"><a class="nav-link active" href="{{ url_for('user.user_home') }}">Home</a></li>
+               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Trending</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
+            </ul>
+        </div>
+    </div>
+    </div>
+  
+  </div>
+  <!-- End Side Bar -->
+
+  <!-- Trendings -->
+  <div class="section" style="margin-top: 50px; margin-left: 250px; overflow-y: scroll; max-height: 660px;">
+    <h3>Trending</h3>
+    <div>
+        <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
+            <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
+<li class="nav-item">
+  <form action="{{ url_for('user.play') }}" method="POST" role="tab">
+    <input type="hidden" name="song_id" value="YOUR_SONG_ID">
+    <button class="btn btn-default btn-round" type="submit" class="nav-link">
+      <div class="d-flex flex-column align-items-center" style="width: 150px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <div style="padding-top: 10px;">
+          <img src="{{ url_for('static', filename='user/img/neha.jpg')}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="max-width: 100%; max-height: 100%;">
+        </div>
+        <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis; padding-top: 10px;">
+          <span>Song Name</span>
+        </div>
+        <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis;">
+          <span>Song Description</span>
+        </div>
+      </div>
+    </button>
+  </form>
+</li>
+
+          </ul>
+    </div>
+    <div style="margin-top: 20px;">
+        <h3>Suggestions</h3>
+        <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
+          <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
+          <li class="nav-item">
+            <button class="btn btn-default btn-round" type="button" role="tab" data-toggle="tab">
+              <div class="d-flex flex-column align-items-center" style="width: 150px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <div style="padding-top: 10px;">
+                  <img src="{{ url_for('static', filename='user/img/neha.jpg')}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="max-width: 100%; max-height: 100%;">
+                </div>
+                <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis; padding-top: 10px;">
+                  <span>Song Name</span>
+                </div>
+                <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis;">
+                  <span>Song Description</span>
+                </div>
+              </div>
+            </button>
+          </li>
+          
+          <!-- Add more list items as needed -->
+        </ul>
+    </div>
+    
+  </div>
+
+  <!-- Suggestions -->
+  <div style="margin-top: 150px; margin-left: 250px; overflow-y: scroll; max-height: 400px;">
+  </div>
+</div>
+
+{% include 'user/user_footer.html'%}

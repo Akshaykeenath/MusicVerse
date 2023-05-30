@@ -1,0 +1,114 @@
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link " href="{{ url_for('uploader.home') }}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-music-note-beamed"></i><span>Songs</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('uploader.allsongs') }}">
+              <i class="bi bi-circle"></i><span>All Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.approvedsongs') }}">
+              <i class="bi bi-circle"></i><span>Approved Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.pendingsongs') }}">
+              <i class="bi bi-circle"></i><span>Pending Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.rejectedsongs') }}">
+              <i class="bi bi-circle"></i><span>Rejected Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.privatesongs') }}">
+              <i class="bi bi-circle"></i><span>Private Songs</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Songs Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('uploader.artist') }}">
+          <i class="bi bi-person-lines-fill"></i>
+          <span>Artist</span>
+        </a>
+      </li><!-- End Artist Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('uploader.album') }}">
+          <i class="bi bi-file-earmark-music-fill"></i>
+          <span>Album</span>
+        </a>
+      </li><!-- End Album Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#uploadmusic">
+          <i class="bi bi-upload"></i>
+          <span>Upload Music</span>
+        </a>
+      </li><!-- End Upload Music Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="users-profile.html">
+          <i class="bi bi-file-bar-graph"></i>
+          <span>Analytics</span>
+        </a>
+      </li><!-- End Analytics Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="users-profile.html">
+          <i class="bi bi-emoji-frown"></i>
+          <span>Complaints</span>
+        </a>
+      </li><!-- End Analytics Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('uploader.profile') }}">
+          <i class="bi bi-person-circle"></i>
+          <span>Profile</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+  
+<!-- Music Upload Modal -->
+<div class="modal fade" id="uploadmusic" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Music Upload</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div style="border: 2px dashed #ccc; padding: 30px;">
+          <form method="POST" action="{{ url_for('uploader.uploadmusic') }}" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".mp3">
+            <input type="submit" value="Upload">
+        </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Music Upload Modal -->

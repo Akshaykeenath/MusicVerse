@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='user/assets/img/apple-icon.png')}}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='public/img/music.png')}}">
+  <title>
+    MusicVerse 🎵
+  </title>
+  <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.3.1/css/all.css'><link rel="stylesheet" href="{{ url_for('static', filename='user/style.css')}}">
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
+  <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+  <!-- Nucleo Icons -->
+  <link href="{{ url_for('static', filename='user/assets/css/nucleo-icons.css')}}" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link href="{{ url_for('static', filename='user/assets/css/blk-design-system.css')}}" rel="stylesheet" />
+  <style>
+    .sidebar {
+      display: block; /* Initially hide the sidebar */
+}
+
+.show-sidebar .sidebar {
+  display: none;/* Show the sidebar when the show-sidebar class is applied */
+}
+</style>
+</head>
+
+<body class="index-page">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-primary fixed-top">
+    <div class="container" style="margin-left: 130px;">
+      <div style="margin-right: 30px;">
+        <a id="toggleSidebarButton" href="#" style="text-decoration: none; color: white;">
+          <i class="fas fa-bars" style="font-size: 25px;" aria-hidden="true"></i>
+        </a>    
+      </div>
+      <div class="navbar-translate">
+        <a class="navbar-brand" href="{{ url_for('user.user_home') }}" rel="tooltip" title="A World of Music" data-placement="bottom" >
+          <img src="{{ url_for('static', filename='user/assets/img/musicverse.png')}}"  alt="Rounded image"  style="width: 150px;">
+        </a>
+      </div>
+      <div class="collapse navbar-collapse" id="example-navbar-success">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <form class="form-inline ml-auto">
+              <div class="form-group no-border">
+                <input type="text" class="form-control" placeholder="Search">
+              </div>
+            </form>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#pablo">
+              <i class="tim-icons icon-settings-gear-63"></i>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown">
+              <i class="tim-icons icon-single-02" aria-hidden="true"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-header">{{data['userdetails']['email']}}</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('user.profile') }}"><i class="tim-icons icon-single-02" aria-hidden="true"></i>My Profile</a>
+              <a class="dropdown-item" href="{{ url_for('uploader.home') }}"><i class="tim-icons icon-headphones" aria-hidden="true"></i>Music Studio</a>
+              <a href="{{ url_for('user.logout') }}" class="dropdown-item"><i class="tim-icons icon-button-power"></i>Log out</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- End Navbar -->

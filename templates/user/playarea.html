@@ -1,0 +1,77 @@
+{% include 'user/user_header.html'%}
+  <div class="wrapper">
+  
+    <div class="page-header header-filter">
+      <div class="squares square1"></div>
+      <div class="squares square2"></div>
+      <div class="squares square3"></div>
+      <div class="squares square4"></div>
+      <div class="squares square5"></div>
+      <div class="squares square6"></div>
+      <div class="squares square7"></div>
+
+  <!-- Side Bar -->
+  <div class="myfixleft sidebar">
+    <div style="margin-top: 100px;">
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="nav nav-pills nav-pills-info flex-column">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Home</a></li>
+               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Trending</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
+            </ul>
+        </div>
+    </div>
+    </div>
+  
+  </div>
+  <!-- End Side Bar -->
+
+
+      <!-- Playlist bar -->
+      <div class="content-center brand"> 
+        <div class="card">
+          <h3 class="text-left" >Playlist</h3>
+
+          <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">#</th>
+                    <th>Pic</th>
+                    <th>Song</th>
+                    <th>Time</th>
+                    <th class="text-center">Fav</th>
+                    <th class="text-center">Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">1</td>
+                    <td><img src="{{ url_for('static', filename='user/assets/img/mike.jpg')}}" alt="Raised circle image" class="img-fluid rounded shadow" style="width: 50px;"></td>
+                    <td><a href="#">Song</a></td>
+                    <td>3:50</td>
+                    <td class="text-center">
+                      <button type="button" rel="tooltip" class="btn btn-info btn-simple btn-icon btn-sm">
+                      <i class="tim-icons icon-heart-2"></i>
+                      </button>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" rel="tooltip" class="btn btn-success btn-simple btn-icon btn-sm">
+                            <i class="tim-icons icon-cloud-download-93"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- End Playlist bar -->
+
+
+    </div>
+
+
+  </div>
+
+  {% include 'user/player.html'%}
+  {% include 'user/user_footer.html'%}

@@ -317,10 +317,12 @@ def uploadmusic():
                     file_extension = os.path.splitext(file.filename)[1]
                     songpath='uploads/songs/' +res[0]['fname']+str(uuid.uuid4()) + file_extension
                     file.save('static/'+songpath)
-                    session['songpath']=songpath
-                    session['songduration']=duration_in_seconds
+                    songpathdb='/static/'+songpath # To store in database with /static as it may sometimes conflict with the save if given in .save
+                    session['songpath']=songpathdb
+                    duration_in_min=secondstominute(int(duration_in_seconds))
+                    session['songduration']=duration_in_min
                     print('static/'+songpath)
-                    flash("Successfully saved the song. Duration :"+ duration_in_seconds)
+                    flash("Successfully saved the song. Duration :"+ duration_in_min)
                     return redirect(url_for('uploader.uploadsong'))
                 else:
                     flash("Invalid file format. Please upload an MP3 file.")
@@ -389,3 +391,12 @@ def uploadsong():
 def logout():
     session.clear()
     return redirect(url_for('public.home'))
+
+def secondstominute(seconds):
+    minutes = seconds // 60
+    remaining_seconds = seconds % 60
+
+    if minutes == 0:
+        return f"0:{remaining_seconds:02d}"
+    else:
+        return f"{minutes}:{remaining_seconds:02d}"

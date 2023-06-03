@@ -1,5 +1,5 @@
 <!-- Song Bar -->
-<div id="app-cover">
+<div id="app-cover" style="z-index: 2;">
   <div id="player">
     <div id="player-track">
       <div id="album-name"></div>
@@ -16,11 +16,16 @@
     </div>
     <div id="player-content">
       <div id="album-art">
-        <img src="https://raw.githubusercontent.com/himalayasingh/music-player-1/master/img/_1.jpg" class="active" id="_1">
-        <img src="https://raw.githubusercontent.com/himalayasingh/music-player-1/master/img/_2.jpg" id="_2">
-        <img src="https://raw.githubusercontent.com/himalayasingh/music-player-1/master/img/_3.jpg" id="_3">
-        <img src="https://raw.githubusercontent.com/himalayasingh/music-player-1/master/img/_4.jpg" id="_4">
-        <img src="https://raw.githubusercontent.com/himalayasingh/music-player-1/master/img/_5.jpg" id="_5">
+        {% if data['currentalbumsongs'] %}
+        {% for row in data['currentalbumsongs'] %}
+        <img src="{{ url_for('static', filename=row['song_image_loc'])}}" class="active" id="_{{ loop.index }}">
+        {% endfor %}
+        {% endif %}
+        {% if data['currentartistsongs'] %}
+        {% for row in data['currentartistsongs'] %}
+        <img src="{{ url_for('static', filename=row['song_image_loc'])}}" class="active" id="_{{ loop.index }}">
+        {% endfor %}
+        {% endif %}
         <div id="buffer-box">Buffering ...</div>
       </div>
       <div id="eqblock">

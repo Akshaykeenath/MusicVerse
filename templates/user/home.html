@@ -33,53 +33,67 @@
 
   <!-- Trendings -->
   <div class="section" style="margin-top: 50px; margin-left: 250px; overflow-y: scroll; max-height: 660px;">
-    <h3>Trending</h3>
+    {% if data['albumdata'] %}
+    <h3>Trending Albums</h3>
     <div>
         <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
             <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
-<li class="nav-item">
-  <form action="{{ url_for('user.play') }}" method="POST" role="tab">
-    <input type="hidden" name="song_id" value="YOUR_SONG_ID">
-    <button class="btn btn-default btn-round" type="submit" class="nav-link">
-      <div class="d-flex flex-column align-items-center" style="width: 150px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-        <div style="padding-top: 10px;">
-          <img src="{{ url_for('static', filename='user/img/neha.jpg')}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="max-width: 100%; max-height: 100%;">
-        </div>
-        <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis; padding-top: 10px;">
-          <span>Song Name</span>
-        </div>
-        <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis;">
-          <span>Song Description</span>
-        </div>
-      </div>
-    </button>
-  </form>
-</li>
-
+            {% for row in data['albumdata'] %}
+          <li class="nav-item" style="margin-right: 30px;">
+            <form action="{{ url_for('user.play') }}" method="POST" role="tab">
+              <input type="hidden" name="contenttype" value="album">
+              <input type="hidden" name="album_id" value="{{ row['album_id'] }}">
+              <input type="hidden" name="album_name" value="{{ row['album_name'] }}">
+              <input type="hidden" name="album_img" value="{{ row['image_loc'] }}">
+              <input type="hidden" name="album_cover" value="{{ row['cover_pic'] }}">
+              <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
+                <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                  <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
+                    <img src="{{ url_for('static', filename=row['image_loc'])}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
+                  </div>
+                  <div class="overlay">
+                    <span class="text-name">{{ row['album_name'] }}</span>
+                  </div>
+                </div>
+              </button>
+            </form>
+          </li>
+          {% endfor %}
           </ul>
     </div>
+    {% endif %}
     <div style="margin-top: 20px;">
-        <h3>Suggestions</h3>
-        <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
-          <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
-          <li class="nav-item">
-            <button class="btn btn-default btn-round" type="button" role="tab" data-toggle="tab">
-              <div class="d-flex flex-column align-items-center" style="width: 150px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                <div style="padding-top: 10px;">
-                  <img src="{{ url_for('static', filename='user/img/neha.jpg')}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="max-width: 100%; max-height: 100%;">
+      {% if data['artistdata'] %}
+        <h3>Top Artists</h3>
+        <div>
+          <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
+            <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
+            {% for row in data['artistdata'] %}
+          <li class="nav-item" style="margin-right: 30px;">
+            <form action="{{ url_for('user.play') }}" method="POST" role="tab">
+              <input type="hidden" name="contenttype" value="artist">
+              <input type="hidden" name="artist_id" value="{{ row['artist_id'] }}">
+              <input type="hidden" name="artist_name" value="{{ row['artist_name'] }}">
+              <input type="hidden" name="artist_img" value="{{ row['artist_image_loc'] }}">
+              <input type="hidden" name="artist_cover" value="{{ row['artist_cover_pic'] }}">
+              <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
+                <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                  <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
+                    <img src="{{ url_for('static', filename=row['artist_image_loc'])}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
+                  </div>
+                  <div class="overlay">
+                    <span class="text-name">{{ row['artist_name'] }}</span>
+                  </div>
                 </div>
-                <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis; padding-top: 10px;">
-                  <span>Song Name</span>
-                </div>
-                <div style="max-height: 80px; overflow: hidden; text-overflow: ellipsis;">
-                  <span>Song Description</span>
-                </div>
-              </div>
-            </button>
+              </button>
+            </form>
           </li>
-          
-          <!-- Add more list items as needed -->
-        </ul>
+          {% endfor %}
+            
+            <!-- Add more list items as needed -->
+            </ul>
+        </div>
+        {% endif %}
     </div>
     
   </div>
@@ -88,5 +102,61 @@
   <div style="margin-top: 150px; margin-left: 250px; overflow-y: scroll; max-height: 400px;">
   </div>
 </div>
+
+<style>
+  button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+button .image-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: filter 0.3s ease;
+  filter: blur(0);
+}
+
+button:hover .image-container {
+  filter: blur(5px);
+}
+
+button .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+button:hover .overlay {
+  opacity: 1;
+}
+
+button .text-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.5rem;
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  padding: 10px;
+   white-space: nowrap;
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+</style>
 
 {% include 'user/user_footer.html'%}

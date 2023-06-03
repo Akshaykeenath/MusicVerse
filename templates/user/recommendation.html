@@ -1,5 +1,5 @@
 {% include 'user/user_header.html'%}
-  <div class="wrapper">
+  <div>
   
     <div class="page-header header-filter">
       <div class="squares square1"></div>
@@ -10,6 +10,110 @@
       <div class="squares square6"></div>
       <div class="squares square7"></div>
 
+      <!-- Playlist bar -->
+      <div class="playarea-container container-fluid">
+        <div class="content"> 
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-12 col-md-12 offset-lg-0 offset-md-3">
+                <div class="card card-coin">
+                  <div class="card-body d-flex" style="background-color: #32325d;">
+                    <div class="align-self-start mr-5">
+                        <img src="{{ url_for('static', filename='public/img/mike.jpg')}}" class="img-fluid rounded shadow-lg">
+                    </div>
+                    <div class="align-self-center d-flex flex-column">
+                        <h4 class="title" style="font-size: calc(1.5rem + 1vw);">Play Name</h4>
+                        <div>
+                            <button class="btn btn-success btn-lg btn-round btn-icon">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="btn btn-default btn-round btn-icon">
+                                <i class="far fa-heart"></i>
+                                <!-- <i class="fas fa-heart"></i> -->
+                            </button>
+                        </div>
+                    </div>
+                    <div class="ml-auto align-self-stretch gradient-overlay">
+                        <img src="{{ url_for('static', filename='public/img/mike.jpg')}}" class="img-fluid rounded shadow">
+                    </div>
+                </div>                                          
+                  <div class="card">
+                    <table class="table">
+                      <thead>
+                          <tr>
+                              <th class="text-center">#</th>
+                              <th>Name</th>
+                              <th>Job Position</th>
+                              <th>Since</th>
+                              <th class="text-right">Salary</th>
+                              <th class="text-right">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td class="text-center">1</td>
+                              <td>Andrew Mike</td>
+                              <td>Develop</td>
+                              <td>2013</td>
+                              <td class="text-right">&euro; 99,225</td>
+                              <td class="td-actions text-right">
+                                  <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
+                                      <i class="tim-icons icon-single-02"></i>
+                                  </button>
+                                  <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon">
+                                      <i class="tim-icons icon-settings-gear-63"></i>
+                                  </button>
+                                  <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
+                                      <i class="tim-icons icon-simple-remove"></i>
+                                  </button>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td class="text-center">2</td>
+                              <td>John Doe</td>
+                              <td>Design</td>
+                              <td>2012</td>
+                              <td class="text-right">&euro; 89,241</td>
+                              <td class="td-actions text-right">
+                                <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-round btn-icon">
+                                    <i class="tim-icons icon-single-02"></i>
+                                </button>
+                                <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-round btn-icon">
+                                    <i class="tim-icons icon-settings-gear-63"></i>
+                                </button>
+                                <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-round btn-icon">
+                                    <i class="tim-icons icon-simple-remove"></i>
+                                </button>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td class="text-center">3</td>
+                              <td>Alex Mike</td>
+                              <td>Design</td>
+                              <td>2010</td>
+                              <td class="text-right">&euro; 92,144</td>
+                              <td class="td-actions text-right">
+                                  <button type="button" rel="tooltip" class="btn btn-info btn-simple btn-icon btn-sm">
+                                      <i class="tim-icons icon-single-02"></i>
+                                  </button>
+                                  <button type="button" rel="tooltip" class="btn btn-success btn-simple btn-icon btn-sm">
+                                      <i class="tim-icons icon-settings-gear-63"></i>
+                                  </button>
+                                  <button type="button" rel="tooltip" class="btn btn-danger btn-simple btn-icon btn-sm">
+                                      <i class="tim-icons icon-simple-remove"></i>
+                                  </button>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Playlist bar -->
   <!-- Side Bar -->
   <div class="myfixleft sidebar">
     <div style="margin-top: 100px;">
@@ -27,51 +131,40 @@
   </div>
   <!-- End Side Bar -->
 
-
-      <!-- Playlist bar -->
-      <div class="content-center brand"> 
-        <div class="card">
-          <h3 class="text-left" >Recomended</h3>
-
-          <table class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Pic</th>
-                    <th>Song</th>
-                    <th>Time</th>
-                    <th class="text-center">Fav</th>
-                    <th class="text-center">Download</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">1</td>
-                    <td><img src="{{ url_for('static', filename='user/assets/img/mike.jpg')}}" alt="Raised circle image" class="img-fluid rounded shadow" style="width: 50px;"></td>
-                    <td><a href="#">Song</a></td>
-                    <td>3:50</td>
-                    <td class="text-center">
-                      <button type="button" rel="tooltip" class="btn btn-info btn-simple btn-icon btn-sm">
-                      <i class="tim-icons icon-heart-2"></i>
-                      </button>
-                    </td>
-                    <td class="text-center">
-                        <button type="button" rel="tooltip" class="btn btn-success btn-simple btn-icon btn-sm">
-                            <i class="tim-icons icon-cloud-download-93"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <!-- End Playlist bar -->
-
-
     </div>
 
 
   </div>
+
+  <style>
+    .playarea-container {
+      position: relative;
+      margin-top: 100px;
+      max-width: 100%; /* Allow the container to grow up to the maximum width of the browser */
+      height: 510px;
+      overflow: auto;
+      scrollbar-width: none; /* Hide the scrollbar for Firefox */
+      -ms-overflow-style: none; /* Hide the scrollbar for IE and Edge */
+    }
+    .playarea-container::-webkit-scrollbar {
+  width: 0;
+}
+.gradient-overlay {
+    position: relative;
+    overflow: hidden;
+}
+
+.gradient-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to right, rgba(50, 50, 93, 1) 0%, rgba(50, 50, 93, 0) 100%);
+}
+
+  </style>
 
   {% include 'user/player.html'%}
   {% include 'user/user_footer.html'%}

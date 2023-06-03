@@ -1,3 +1,30 @@
+// Selecting the song urls and other details
+var trackUrl = []; // Define the trackUrl variable outside the event listener
+var trackNames= [];  
+var albumArtworks=[]; // This is form the player.html while the rest of them are from playerarea.html
+var albums= [];    
+document.addEventListener('DOMContentLoaded', function() {
+  var songurls = document.querySelectorAll('input[name^="songurl"]');
+  var tracknamess= document.querySelectorAll('input[name^="songname"]');
+  var artworks= document.querySelectorAll('input[name^="artworks"]');
+  var album= document.querySelectorAll('input[name^="albums"]');
+
+
+            
+  songurls.forEach(function(element) {
+    trackUrl.push(element.value);
+  });
+  tracknamess.forEach(function(element) {
+    trackNames.push(element.value);
+  });
+  artworks.forEach(function(element) {
+    albumArtworks.push(element.value);
+  });
+  album.forEach(function(element) {
+    albums.push(element.value);
+  });
+});
+
 $(function () {
 var volumeSlider = document.getElementById("volume-slider");
   var playerTrack = $("#player-track"),
@@ -12,7 +39,9 @@ var volumeSlider = document.getElementById("volume-slider");
     insTime = $("#ins-time"),
     sHover = $("#s-hover"),
     playPauseButton = $("#play-pause-button"),
+    playPauseButtonPage = $("#play-pause-button-page"),
     i = playPauseButton.find("i"),
+    iPage = playPauseButtonPage.find("i"),
     tProgress = $("#current-time"),
     tTime = $("#track-length"),
     seekT,
@@ -30,28 +59,6 @@ var volumeSlider = document.getElementById("volume-slider");
     nTime = 0,
     buffInterval = null,
     tFlag = false,
-    albums = [
-      "Dawn",
-      "Me & You",
-      "Electro Boy",
-      "Home",
-      "Proxy (Original Mix)"
-    ],
-    trackNames = [
-      "Skylike - Dawn",
-      "Alex Skrindo - Me & You",
-      "Kaaze - Electro Boy",
-      "Jordan Schor - Home",
-      "Martin Garrix - Proxy"
-    ],
-    albumArtworks = ["_1", "_2", "_3", "_4", "_5"],
-    trackUrl = [
-      "https://raw.githubusercontent.com/himalayasingh/music-player-1/master/music/2.mp3",
-      "https://raw.githubusercontent.com/himalayasingh/music-player-1/master/music/1.mp3",
-      "https://raw.githubusercontent.com/himalayasingh/music-player-1/master/music/3.mp3",
-      "https://raw.githubusercontent.com/himalayasingh/music-player-1/master/music/4.mp3",
-      "https://raw.githubusercontent.com/himalayasingh/music-player-1/master/music/5.mp3"
-    ],
     playPreviousTrackButton = $("#play-previous"),
     playNextTrackButton = $("#play-next"),
     currIndex = -1;
@@ -67,6 +74,7 @@ var volumeSlider = document.getElementById("volume-slider");
           albumArt.addClass("active");
           checkBuffering();
           i.attr("class", "fas fa-pause");
+          iPage.attr("class", "fas fa-pause");
           audio.play();
           
           // Show the equalizer when music is played
@@ -77,6 +85,7 @@ var volumeSlider = document.getElementById("volume-slider");
           clearInterval(buffInterval);
           albumArt.removeClass("buffering");
           i.attr("class", "fas fa-play");
+          iPage.attr("class", "fas fa-play");
           audio.pause();
           
           // Hide the equalizer when music is paused
@@ -85,7 +94,56 @@ var volumeSlider = document.getElementById("volume-slider");
       }, 300);
     }
     
+    var currentSong = document.querySelectorAll(".currentSong");
+
+    currentSong.forEach(function(currentSong) {
+      currentSong.addEventListener("click", function(event) {
+        var currentsongindex = event.target.dataset.value;
+        currentsongindex=currentsongindex-1
+        console.log("Current index value:", currentsongindex);
+        // Setting the current song details
+        if (currentsongindex > -1 && currentsongindex < albumArtworks.length) {
+          currIndex=currentsongindex;
     
+          seekBar.width(0);
+          trackTime.removeClass("active");
+          tProgress.text("00:00");
+          tTime.text("00:00");
+    
+          currAlbum = albums[currentsongindex];
+          currTrackName = trackNames[currentsongindex];
+          currArtwork = albumArtworks[currentsongindex];
+    
+          audio.src = trackUrl[currentsongindex];
+    
+          nTime = 0;
+          bTime = new Date();
+          bTime = bTime.getTime();
+    
+          albumName.text(currAlbum);
+          trackName.text(currTrackName);
+          albumArt.find("img.active").removeClass("active");
+          $("#" + currArtwork).addClass("active");
+    
+          bgArtworkUrl = $("#" + currArtwork).attr("src");
+    
+          bgArtwork.css({ "background-image": "url(" + bgArtworkUrl + ")" });
+        }
+        // Audio play logic
+        setTimeout(function() {
+          if (audio.paused) {
+            playerTrack.addClass("active");
+            albumArt.addClass("active");
+            checkBuffering();
+            i.attr("class", "fas fa-pause");
+            audio.play();
+            
+            // Show the equalizer when music is played
+            $("#equalizer").removeClass("hidden");
+          }
+        }, 300);
+      });
+    });
 
   function showHover(event) {
     seekBarPos = sArea.offset();
@@ -185,6 +243,7 @@ var volumeSlider = document.getElementById("volume-slider");
   }
 
   function selectTrack(flag) {
+    console.log("currIndex value:", currIndex);
     if (flag == 0 || flag == 1) ++currIndex;
     else --currIndex;
 
@@ -284,6 +343,7 @@ volumeSlider.addEventListener("input", function() {
     audio.loop = false;
 
     playPauseButton.on("click", playPause);
+    playPauseButtonPage.on("click", playPause);
 
     sArea.mousemove(function (event) {
       showHover(event);
@@ -359,3 +419,6 @@ audio.addEventListener("pause", function () {
 function pause() {
   $('#equalizer').toggleClass('paused');
 }
+
+
+

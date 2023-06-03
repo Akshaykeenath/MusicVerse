@@ -22,7 +22,7 @@ def home():
     else:
         return redirect(url_for('public.home'))
 
-@uploader.route('/allsongs')
+@uploader.route('/allsongs' , methods=['GET', 'POST'])
 def allsongs():
     if 'uid' in session:
         uid = session['uid']
@@ -30,11 +30,36 @@ def allsongs():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
+        q="SELECT s.song_id,s.song_name,al.album_name,ar.artist_name,s.date,s.status FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.user_id ='%s'"%(uid)
+        allsongdata=select(q)
+        data['allsongdata']=allsongdata
+        q="select * from artist"
+        artistdata=select(q)
+        data['artistdata'] = artistdata
+        q="select * from album"
+        albumdata=select(q)
+        data['albumdata']=albumdata
+        data['currentsongdata']=0
+        if request.method == 'POST':
+            action = request.form.get('action')
+            song_id = action.split('_')[-1]
+            q="SELECT s.song_id,s.song_name,al.album_id,al.album_name,ar.artist_id,ar.artist_name,s.date,s.image_loc,s.song_loc,s.genre,s.language,s.privacy FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.song_id='%s'"%(song_id)
+            currentsongdata=select(q)
+            print('Song id =',song_id)
+            data['currentsongdata']=currentsongdata[0]
+            if action.startswith('update_song'):
+                return render_template('uploader/all_songs.html', data=data, value='updatesong')
+            elif action.startswith('view_song'):
+                 return render_template('uploader/all_songs.html', data=data, value='viewsong')
+            elif action.startswith('delete_song'):
+                # Delete song action
+                # Handle the delete song functionality
+                return 'Delete Song'
         return render_template('uploader/all_songs.html', data=data)
     else:
         return redirect(url_for('public.home'))
 
-@uploader.route('/approvedsongs')
+@uploader.route('/approvedsongs' , methods=['GET', 'POST'])
 def approvedsongs():
     if 'uid' in session:
         uid = session['uid']
@@ -42,6 +67,32 @@ def approvedsongs():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
+        q="SELECT s.song_id,s.song_name,al.album_name,ar.artist_name,s.date FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.status='approved' AND s.privacy='public' AND s.user_id ='%s'"%(uid)
+        approvedsongdata=select(q)
+        data['approvedsongdata']=approvedsongdata
+        q="select * from artist"
+        artistdata=select(q)
+        data['artistdata'] = artistdata
+        q="select * from album"
+        albumdata=select(q)
+        data['albumdata']=albumdata
+        data['currentsongdata']=0
+        if request.method == 'POST':
+                action = request.form.get('action')
+                song_id = action.split('_')[-1]
+                q="SELECT s.song_id,s.song_name,al.album_id,al.album_name,ar.artist_id,ar.artist_name,s.date,s.image_loc,s.song_loc,s.genre,s.language,s.privacy FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.status='approved' AND s.privacy='public' AND s.song_id='%s'"%(song_id)
+                currentsongdata=select(q)
+                print('Song id =',song_id)
+                data['currentsongdata']=currentsongdata[0]
+                if action.startswith('update_song'):
+                    return render_template('uploader/approved_songs.html', data=data, value='updatesong')
+                elif action.startswith('view_song'):
+                    return render_template('uploader/approved_songs.html', data=data, value='viewsong')
+                elif action.startswith('delete_song'):
+                    # Delete song action
+                    # Handle the delete song functionality
+                    return 'Delete Song'
+
         return render_template('uploader/approved_songs.html', data=data)
     else:
         return redirect(url_for('public.home'))
@@ -92,6 +143,9 @@ def rejectedsongs():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
+        q="SELECT s.song_id,s.song_name,al.album_name,ar.artist_name,s.date FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.status='rejected' AND s.user_id ='%s'"%(uid)
+        rejectedsongdata=select(q)
+        data['rejectedsongdata']=rejectedsongdata
         return render_template('uploader/rejected_songs.html', data=data)
     else:
         return redirect(url_for('public.home'))
@@ -115,6 +169,10 @@ def updatesong():
                 return redirect(url_for('uploader.privatesongs'))
             elif pagename == 'pendingsongs':
                 return redirect(url_for('uploader.pendingsongs'))
+            elif pagename == 'approvedsongs':
+                return redirect(url_for('uploader.approvedsongs'))
+            elif pagename == 'allsongs':
+                return redirect(url_for('uploader.allsongs'))
         if 'songupdate' in request.form:
             songname=request.form['songname']
             songid=request.form['songid']
@@ -145,7 +203,7 @@ def privatesongs():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id,s.song_name,al.album_name,ar.artist_name,s.date FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.status='pending' AND s.privacy='private' AND s.user_id ='%s'"%(uid)
+        q="SELECT s.song_id,s.song_name,al.album_name,ar.artist_name,s.date FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.privacy='private' AND s.user_id ='%s'"%(uid)
         privatesongdata=select(q)
         data['privatesongdata']=privatesongdata
         q="select * from artist"
@@ -159,7 +217,7 @@ def privatesongs():
         if request.method == 'POST':
                 action = request.form.get('action')
                 song_id = action.split('_')[-1]
-                q="SELECT s.song_id,s.song_name,al.album_id,al.album_name,ar.artist_id,ar.artist_name,s.date,s.image_loc,s.song_loc,s.genre,s.language,s.privacy FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.status='pending' AND s.privacy='private' AND s.song_id='%s'"%(song_id)
+                q="SELECT s.song_id,s.song_name,al.album_id,al.album_name,ar.artist_id,ar.artist_name,s.date,s.image_loc,s.song_loc,s.genre,s.language,s.privacy FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.privacy='private' AND s.song_id='%s'"%(song_id)
                 currentsongdata=select(q)
                 data['currentsongdata']=currentsongdata[0]
                 if action.startswith('update_song'):

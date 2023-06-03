@@ -280,7 +280,7 @@
                 <h4><b>{{data['currentsongdata']['song_name']}}</b></h4>
                 <h5>{{data['currentsongdata']['album_name']}}</h5>
                 <audio controls>
-                  <source src="{{ url_for('static', filename=data['currentsongdata']['song_loc']) }}" type="audio/mpeg">
+                  <source src="{{ data['currentsongdata']['song_loc'] }}" type="audio/mpeg">
                   Your browser does not support the audio element.
                 </audio>
               </div>

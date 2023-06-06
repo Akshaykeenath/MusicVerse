@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/css/multi-select-tag.css">
+<script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/js/multi-select-tag.js"></script>
 {% include 'uploader/uploader_header.html'%}
 {% include 'uploader/uploader_sidebar.html'%}
 <main id="main" class="main">
@@ -66,7 +68,7 @@
               <th scope="col">Song name</th>
               <th scope="col">Album</th>
               <th scope="col">Artist</th>
-              <th scope="col">Clicks</th>
+              <th scope="col">Privacy</th>
               <th scope="col">Status</th>
               <th scope="col">Action</th>
             </tr>
@@ -77,17 +79,26 @@
               <th scope="row"><a href="#">{{ loop.index }}</a></th>
               <td>{{ row['song_name'] }}</td>
               <td><a href="#" class="text-primary">{{ row['album_name'] }}</a></td>
-              <td>{{ row['artist_name'] }}</td>
-              <td> 0 </td>
+              <td><a href="#" class="text-primary">{{ row['artist_name'] }}</a></td>
+              <td>
+                {% if row['privacy'] == 'public' %}
+                <span class="badge bg-success">Public</span>
+                {% endif %}
+                {% if row['privacy'] == 'private' %}
+                <span class="badge bg-warning">Private</span>
+                {% endif %}
+              </td>
+              <td>
               {% if row['status'] == 'approved' %}
-              <td><span class="badge bg-success">Approved</span></td>
+              <span class="badge bg-success">Approved</span>
               {% endif %}
               {% if row['status'] == 'pending' %}
-              <td><span class="badge bg-warning">Pending</span></td>
+              <span class="badge bg-warning">Pending</span>
               {% endif %}
               {% if row['status'] == 'rejected' %}
-              <td><span class="badge bg-danger">Rejected</span></td>
+              <span class="badge bg-danger">Rejected</span>
               {% endif %}
+            </td>
               {% if row['status'] != 'rejected' %}
               <td>
                 <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
@@ -194,18 +205,21 @@
 
   <div class="col-md-6">
     <div class="form-floating mb-3">
-        <select class="form-select" name="artist" id="artistselect" aria-label="State" required>
-          <option selected value="{{data['currentsongdata']['artist_id']}}">{{data['currentsongdata']['artist_name']}}</option>
-          {% for row in data['artistdata'] %}
-          <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
-          {% endfor %}
-        </select>
-        <label for="artistselect">Artist</label>
-        <div class="invalid-tooltip">
-          Please select an artist.
-        </div>
+      <a> Artist </a>
+      <select name="artist" id="artistdropdata" multiple required>
+        {% for row in data['currentartistdata'] %}
+        <option selected value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
+        {% endfor %}
+        {% for row in data['artistdata'] %}
+        <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
+        {% endfor %}
+      </select>
+      <div class="invalid-tooltip">
+        Please select at least one artist.
       </div>
-  </div>
+    </div>
+  </div>  
+  
 
   <div class="col-md-6">
     <div class="form-floating mb-3">
@@ -390,6 +404,24 @@
     </div>
   </div>
 </div>
+<!-- Artist update modal -->
+<div class="modal fade" id="updateartist" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Artist</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+  
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div><!-- End Vertically centered Modal-->
 
   </main><!-- End #main -->
 
@@ -415,6 +447,17 @@ modal.show();
   function openUploadModal() {
     document.getElementById('imageuploadModal').style.display = 'block';
   }
+  function submitForm(songId) {
+    var form = document.getElementById('form_' + songId);
+    form.submit();
+  }
 </script>
+<script>
+  new MultiSelectTag('artistdropdata', {
+    rounded: true,    // default true
+})
+
+</script>
+
 
               {% include 'uploader/uploader_footer.html'%}

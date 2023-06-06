@@ -1,0 +1,237 @@
+{% include 'admin/admin_header.html'%}
+{% include 'admin/admin_sidebar.html'%}
+
+
+  <main id="main" class="main">
+  <!-- (success:, info:, warning:, danger:) -->
+  {% with messages = get_flashed_messages() %} 
+  {% for message in messages %}
+    {% set alert_class = '' %}
+    {% if message.startswith('success:') %}
+      {% set alert_class = 'alert-success bg-success text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('info:') %}
+      {% set alert_class = 'alert-info bg-info text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('warning:') %}
+      {% set alert_class = 'alert-warning bg-warning text-dark' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('danger:') %}
+      {% set alert_class = 'alert-danger bg-danger text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% endif %}
+    <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endwith %}
+<!-- End flash message alert -->
+
+    <div class="pagetitle">
+      <h1>Approvals</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
+          <li class="breadcrumb-item">Songs</li>
+          <li class="breadcrumb-item active">Approvals</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+        <!-- Song Approvals -->
+        <div class="col-12">
+            <div class="card overflow-auto">
+
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filter</h6>
+                  </li>
+
+                  <li><a class="dropdown-item" href="#">Today</a></li>
+                  <li><a class="dropdown-item" href="#">This Month</a></li>
+                  <li><a class="dropdown-item" href="#">This Year</a></li>
+                </ul>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">Song Approval <span>| Today</span></h5>
+
+                <table class="table table-borderless datatable">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Song Name</th>
+                      <th scope="col">Album</th>
+                      <th scope="col">Artist</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    {% for row in data['pendingsongdata'] %}
+                    <tr>
+                      <th scope="row"><a href="#">{{ loop.index }}</a></th>
+                      <td>{{ row['song_name'] }}</td>
+                      <td><a href="#" class="text-primary">{{ row['album_name'] }}</a></td>
+                      <td>{{ row['artist_name'] }}</td>
+                      <td>
+                        <form action="{{ url_for('admin.approvals') }}" method="POST">
+                          <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
+                          <button type="submit" class="btn btn-success rounded-pill" name="action" value="approve_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Approve Song">
+                            <i class="bi bi-check2"></i>
+                          </button>
+                          <button type="submit" class="btn btn-primary rounded-pill" name="action" value="view_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Song Details">
+                            <i class="bi bi-view-list"></i>
+                          </button>
+                          <button type="submit" class="btn btn-danger rounded-pill" name="action" value="reject_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Reject Song">
+                            <i class="bi bi-x-lg"></i>
+                          </button>
+                        </form>                
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
+          </div><!-- End Song Approvals -->
+      </div>
+    </section>
+
+<!-- View Song Modal -->
+<div class="modal fade" id="viewsong" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">View Song Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Song Details -->
+          <div class="row">
+            <div class="col-xl-4">
+    
+              <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+    
+                  <img src="{{ url_for('static', filename=data['currentsongdata']['image_loc']) }}" alt="SongImage" class="rounded-circle" style="max-width: 200px; max-height: 200px;">
+                  <h4><b>{{data['currentsongdata']['song_name']}}</b></h4>
+                  <h5>{{data['currentsongdata']['album_name']}}</h5>
+                  <audio controls>
+                    <source src="{{ data['currentsongdata']['song_loc'] }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              </div>
+    
+            </div>
+    
+            <div class="col-xl-8">
+    
+              <div class="card">
+                <div class="card-body pt-3">
+                  <!-- Bordered Tabs -->
+                  <ul class="nav nav-tabs nav-tabs-bordered">
+    
+                    <li class="nav-item">
+                      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+                    </li>
+    
+                  </ul>
+                  <div class="tab-content pt-2">
+                    <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                      <h5 class="card-title">Song Details</h5>
+    
+                      <div class="row">
+                        <div class="col-lg-3 col-md-4 label ">Song Name</div>
+                        <div class="col-lg-9 col-md-8">{{data['currentsongdata']['song_name']}}</div>
+                      </div>
+    
+                      <div class="row">
+                        <div class="col-lg-3 col-md-4 label">Album</div>
+                        <div class="col-lg-9 col-md-8">{{data['currentsongdata']['album_name']}}</div>
+                      </div>
+    
+                      <div class="row">
+                        <div class="col-lg-3 col-md-4 label">Artist</div>
+                        <div class="col-lg-9 col-md-8">{{data['currentsongdata']['artist_name']}}</div>
+                      </div>
+  
+                      <div class="row">
+                        <div class="col-lg-3 col-md-4 label">Privacy</div>
+                        <div class="col-lg-9 col-md-8">{{data['currentsongdata']['privacy']}}</div>
+                      </div>
+  
+                      <div class="row">
+                        <div class="col-lg-3 col-md-4 label">Genre</div>
+                        <div class="col-lg-9 col-md-8">{{data['currentsongdata']['genre']}}</div>
+                      </div>
+  
+                      <div class="row">
+                        <div class="col-lg-3 col-md-4 label">Date</div>
+                        <div class="col-lg-9 col-md-8">{{data['currentsongdata']['date']}}</div>
+                      </div>
+  
+                      <div class="row">
+                        <div class="col-lg-3 col-md-4 label">Language</div>
+                        <div class="col-lg-9 col-md-8">{{data['currentsongdata']['language']}}</div>
+                      </div>
+                      <div class="row">
+                        <div class="mt-3 col-lg-2 col-md-3 label"></div>
+                        <div class="mt-3 col-lg-3 col-md-4"> <!-- Increase the left margin -->
+                          <form action="{{ url_for('admin.approvals') }}" method="POST">
+                            <input type="hidden" name="song_id" value="{{data['currentsongdata']['song_id']}}">
+                            <div class="d-flex justify-content-start mb-3"> <!-- Align buttons to the left and add margin-bottom -->
+                              <button type="submit" class="btn btn-success rounded-pill me-4" name="action" value="approve_song_{{data['currentsongdata']['song_id']}}" data-bs-toggle="tooltip" data-bs-placement="top" title="Approve Song">
+                                <i class="bi bi-check2"></i>
+                              </button>
+                              <button type="submit" class="btn btn-danger rounded-pill" name="action" value="reject_song_{{data['currentsongdata']['song_id']}}" data-bs-toggle="tooltip" data-bs-placement="top" title="Reject Song">
+                                <i class="bi bi-x-lg"></i>
+                              </button>
+                            </div>
+                          </form> 
+                        </div>
+                      </div>
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                  </div><!-- End Bordered Tabs -->
+    
+                </div>
+              </div>
+    
+            </div>
+          </div>
+  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End View Song Modal -->
+
+  </main><!-- End #main -->
+
+  {% if value == 'viewsong' %}
+<script>
+// Function to open the modal on page load
+document.addEventListener('DOMContentLoaded', function() {
+var modal = new bootstrap.Modal(document.getElementById('viewsong'));
+modal.show();
+});
+</script>
+{% endif %}
+
+  {% include 'admin/admin_footer.html'%}

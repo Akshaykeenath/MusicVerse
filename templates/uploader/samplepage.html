@@ -1,0 +1,183 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+{% include 'uploader/uploader_header.html'%}
+{% include 'uploader/uploader_sidebar.html'%}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+
+<main id="main" class="main">
+
+    <!-- (success:, info:, warning:, danger:) -->
+    {% with messages = get_flashed_messages() %} 
+  {% for message in messages %}
+    {% set alert_class = '' %}
+    {% if message.startswith('success:') %}
+      {% set alert_class = 'alert-success bg-success text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('info:') %}
+      {% set alert_class = 'alert-info bg-info text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('warning:') %}
+      {% set alert_class = 'alert-warning bg-warning text-dark' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('danger:') %}
+      {% set alert_class = 'alert-danger bg-danger text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% endif %}
+    <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endwith %}
+<!-- End flash message alert -->
+
+    <div class="pagetitle">
+      <h1>Upload Song</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
+          <li class="breadcrumb-item">Songs</li>
+          <li class="breadcrumb-item active">upload song</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+      <div class="row">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Enter Song Details</h5>
+
+              <!-- Song details Form -->
+              <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.samplepage') }}" method="POST" enctype="multipart/form-data">
+                <div class="col-md-12">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="songname" placeholder="Your Name" name="songname" required>
+                    <label for="songname">Song Name</label>
+                    <div class="invalid-tooltip">
+                      Please provide a song name.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="row mb-3 align-items-center">
+                    <label for="formFile" class="col-sm-2 col-form-label">Song Image</label>
+                    <div class="col-sm-10 position-relative">
+                      <div class="form-control">
+                        <input class="form-control" type="file" name="image" id="formFile" accept="image/*" required>
+                        <div class="invalid-tooltip">
+                          Please choose an image file to upload.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-floating mb-3">
+                      <select class="form-select" name="album" id="albumselect" aria-label="Album" required>
+                        <option selected disabled value="">Choose...</option>
+                        {% for row in data['albumdata'] %}
+                        <option value="{{ row['album_id'] }}">{{ row['album_name'] }}</option>
+                        {% endfor %}
+                      </select>
+                      <label for="albumselect">Album</label>
+                      <div class="invalid-tooltip">
+                        Please select an album.
+                      </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-floating mb-3">
+                      <select class="form-select" name="privacy" id="privacyselect" aria-label="State" required>
+                        <option selected disabled value="">Choose...</option>
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                      </select>
+                      <label for="privacyselect">Privacy</label>
+                      <div class="invalid-tooltip">
+                        Please select the privacy of song.
+                      </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        Artist
+                        <select class="form-select" name="artist" id="artistselect" multiple required>
+                            <!-- <option selected disabled value="">Choose...</option> -->
+                            {% for row in data['artistdata'] %}
+                            <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-tooltip">
+                            Please select an artist.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="col-md-12">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="floatingGenre" placeholder="genre" name="genre" required>
+                      <label for="floatingGenre">Genre</label>
+                      <div class="invalid-tooltip">
+                        Please provide a genre.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="row mb-3 align-items-center">
+                    <label for="inputDate" class="col-sm-2 col-form-label">Date</label>
+                    <div class="col-sm-10 position-relative">
+                      <div class="form-control">
+                        <input type="date" class="form-control" id="inputDate" name="date" required>
+                        <div class="invalid-tooltip">
+                          Please provide a valid date.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="floatingLanguage" placeholder="Language" name="language" required>
+                    <label for="floatingLanguage">Language</label>
+                    <div class="invalid-tooltip">
+                      Please provide a valid language.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <a href="{{ url_for('uploader.uploadsong') }}" class="btn btn-secondary">Reset</a>
+                </div>
+              </form>
+               <!-- End Song details Form -->
+            </div>
+          </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  {% include 'uploader/uploader_footer.html'%}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          $('#artistselect').select2();
+      });
+  </script>

@@ -1,5 +1,11 @@
 {% include 'uploader/uploader_header.html'%}
 {% include 'uploader/uploader_sidebar.html'%}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
 <main id="main" class="main">
 
     <!-- (success:, info:, warning:, danger:) -->
@@ -87,21 +93,6 @@
 
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                      <select class="form-select" name="artist" id="artistselect" aria-label="State" required>
-                        <option selected disabled value="">Choose...</option>
-                        {% for row in data['artistdata'] %}
-                        <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
-                        {% endfor %}
-                      </select>
-                      <label for="artistselect">Artist</label>
-                      <div class="invalid-tooltip">
-                        Please select an artist.
-                      </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="form-floating mb-3">
                       <select class="form-select" name="privacy" id="privacyselect" aria-label="State" required>
                         <option selected disabled value="">Choose...</option>
                         <option value="public">Public</option>
@@ -113,6 +104,21 @@
                       </div>
                     </div>
                 </div>
+
+                <div class="col-md-6">
+                  <div class="form-floating mb-3">
+                      Artist
+                      <select class="form-select" name="artist" id="artistselect" multiple required>
+                          <!-- <option selected disabled value="">Choose...</option> -->
+                          {% for row in data['artistdata'] %}
+                          <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
+                          {% endfor %}
+                      </select>
+                      <div class="invalid-tooltip">
+                          Please select an artist.
+                      </div>
+                  </div>
+              </div>
 
                 <div class="col-md-6">
                   <div class="col-md-12">
@@ -165,3 +171,11 @@
   </main><!-- End #main -->
 
   {% include 'uploader/uploader_footer.html'%}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          $('#artistselect').select2();
+      });
+  </script>

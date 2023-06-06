@@ -15,7 +15,7 @@ def user_home():
         q="SELECT DISTINCT album_id,album_name,al.image_loc,al.cover_pic FROM songs s INNER JOIN album al USING (album_id) WHERE privacy='public' AND STATUS='approved'"
         albumdata=select(q)
         data['albumdata']=albumdata # trending albums (currently all albums. Needs to create a view for top 5 trending albums)
-        q="SELECT s.song_id,song_name,s.image_loc AS song_image_loc, song_loc,genre,LANGUAGE,duration,ar.artist_id, ar.artist_name, ar.image_loc AS artist_image_loc, ar.cover_pic AS artist_cover_pic FROM songs s INNER JOIN artist ar USING (artist_id) WHERE s.privacy='public' AND s.STATUS='approved' GROUP BY ar.artist_id"
+        q="SELECT ar.artist_id, ar.artist_name,ar.image_loc AS artist_image_loc, ar.cover_pic AS artist_cover_pic FROM artist ar INNER JOIN songartist USING (artist_id) INNER JOIN songs s USING (song_id) WHERE s.privacy='public' AND s.status='approved' GROUP BY ar.artist_id"
         artistdata=select(q)
         data['artistdata']=artistdata
         return render_template('user/home.html', data=data)
@@ -40,7 +40,8 @@ def play():
             album_name= request.form['album_name']
             album_img= request.form['album_img']
             album_cover= request.form['album_cover']
-            q="SELECT al.album_id,s.song_id,artist_id,song_name,s.image_loc AS song_image_loc, song_loc,genre,LANGUAGE,user_id,privacy,duration,s.status,album_name,al.image_loc AS album_image_loc, al.cover_pic AS album_cover_pic FROM songs s INNER JOIN album al USING (album_id) WHERE s.privacy='public' AND s.STATUS='approved' AND album_id='%s'"%(album_id)
+
+            q="SELECT s.song_id,song_name,s.image_loc AS song_image_loc, song_loc,genre,LANGUAGE,duration, al.album_name FROM songs s INNER JOIN album al USING (album_id) WHERE s.privacy='public' AND s.STATUS='approved' AND al.album_id='%s'"%(album_id)
             currentalbumsongs=select(q)
             data['currentalbumsongs']=currentalbumsongs
             playlistname['name']=album_name
@@ -51,7 +52,7 @@ def play():
             artist_name= request.form['artist_name']
             artist_img= request.form['artist_img']
             artist_cover= request.form['artist_cover']
-            q="SELECT s.song_id,song_name,s.image_loc AS song_image_loc, song_loc,genre,LANGUAGE,duration,ar.artist_id, ar.artist_name, ar.image_loc AS artist_image_loc, ar.cover_pic AS artist_cover_pic, al.album_name FROM songs s INNER JOIN artist ar USING (artist_id) INNER JOIN album al USING (album_id) WHERE s.privacy='public' AND s.STATUS='approved' AND ar.artist_id='%s'"%(artist_id)
+            q="SELECT s.song_id,song_name,s.image_loc AS song_image_loc, song_loc,genre,LANGUAGE,duration, al.album_name FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id=sar.artist_id INNER JOIN album al USING (album_id) WHERE s.privacy='public' AND s.STATUS='approved' AND ar.artist_id='%s'"%(artist_id)
             currentartistsongs=select(q)
             data['currentartistsongs']=currentartistsongs
             playlistname['name']=artist_name

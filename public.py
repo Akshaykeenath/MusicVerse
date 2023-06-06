@@ -21,15 +21,12 @@ def login():
             session['login_id'] = res[0]['login_id']
             lid = session['login_id']
             if res[0]['user_type'] == "admin":
-                value = "AdminRedirect"
-                return render_template('Public/login_redirect.html', value=value)
+                return redirect(url_for('admin.admin_home'))
             elif res[0]['user_type'] == "user":
                 q = "SELECT * FROM user WHERE login_id='%s'" % lid
-                print("inside uploader")
                 res = select(q)
                 if res:
                     session['uid'] = res[0]['user_id']
-                    uid = session['uid']
                     return redirect(url_for('user.user_home'))
         else:
             # Password doesn't match or user doesn't exist

@@ -1,31 +1,32 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/css/multi-select-tag.css">
+<script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/js/multi-select-tag.js"></script>
 {% include 'uploader/uploader_header.html'%}
 {% include 'uploader/uploader_sidebar.html'%}
 <main id="main" class="main">
-
-      <!-- (success:, info:, warning:, danger:) -->
-      {% with messages = get_flashed_messages() %} 
-      {% for message in messages %}
-        {% set alert_class = '' %}
-        {% if message.startswith('success:') %}
-          {% set alert_class = 'alert-success bg-success text-light' %}
-          {% set message = message.split(':')[1] %}
-        {% elif message.startswith('info:') %}
-          {% set alert_class = 'alert-info bg-info text-light' %}
-          {% set message = message.split(':')[1] %}
-        {% elif message.startswith('warning:') %}
-          {% set alert_class = 'alert-warning bg-warning text-dark' %}
-          {% set message = message.split(':')[1] %}
-        {% elif message.startswith('danger:') %}
-          {% set alert_class = 'alert-danger bg-danger text-light' %}
-          {% set message = message.split(':')[1] %}
-        {% endif %}
-        <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    {% endwith %}
-    <!-- End flash message alert -->
+  <!-- (success:, info:, warning:, danger:) -->
+  {% with messages = get_flashed_messages() %} 
+  {% for message in messages %}
+    {% set alert_class = '' %}
+    {% if message.startswith('success:') %}
+      {% set alert_class = 'alert-success bg-success text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('info:') %}
+      {% set alert_class = 'alert-info bg-info text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('warning:') %}
+      {% set alert_class = 'alert-warning bg-warning text-dark' %}
+      {% set message = message.split(':')[1] %}
+    {% elif message.startswith('danger:') %}
+      {% set alert_class = 'alert-danger bg-danger text-light' %}
+      {% set message = message.split(':')[1] %}
+    {% endif %}
+    <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endwith %}
+<!-- End flash message alert -->
 
     <div class="pagetitle">
       <h1>Pending Songs</h1>
@@ -67,8 +68,9 @@
               <th scope="col">Song name</th>
               <th scope="col">Album</th>
               <th scope="col">Artist</th>
-              <th scope="col">Release Date</th>
-              <th scope="col">Actions</th>
+              <th scope="col">Privacy</th>
+              <th scope="col">Status</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -77,8 +79,27 @@
               <th scope="row"><a href="#">{{ loop.index }}</a></th>
               <td>{{ row['song_name'] }}</td>
               <td><a href="#" class="text-primary">{{ row['album_name'] }}</a></td>
-              <td>{{ row['artist_name'] }}</td>
-              <td>{{ row['date'] }}</td>
+              <td><a href="#" class="text-primary">{{ row['artist_name'] }}</a></td>
+              <td>
+                {% if row['privacy'] == 'public' %}
+                <span class="badge bg-success">Public</span>
+                {% endif %}
+                {% if row['privacy'] == 'private' %}
+                <span class="badge bg-warning">Private</span>
+                {% endif %}
+              </td>
+              <td>
+              {% if row['status'] == 'approved' %}
+              <span class="badge bg-success">Approved</span>
+              {% endif %}
+              {% if row['status'] == 'pending' %}
+              <span class="badge bg-warning">Pending</span>
+              {% endif %}
+              {% if row['status'] == 'rejected' %}
+              <span class="badge bg-danger">Rejected</span>
+              {% endif %}
+            </td>
+              {% if row['status'] != 'rejected' %}
               <td>
                 <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
                 <form action="{{ url_for('uploader.pendingsongs') }}" method="POST">
@@ -93,10 +114,10 @@
                   </button>
                 </form>                
               </td>
+              {% endif %}
             </tr>
             {% endfor %}
           </tbody>
-          
         </table>
 
       </div>
@@ -109,7 +130,10 @@
       </div>
     </section>
 
-    <!-- Update Song Modal -->
+  </main><!-- End #main -->
+
+  
+<!-- Update Song Modal -->
 <div class="modal fade" id="updatesong" tabindex="-1">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
@@ -181,18 +205,21 @@
 
   <div class="col-md-6">
     <div class="form-floating mb-3">
-        <select class="form-select" name="artist" id="artistselect" aria-label="State" required>
-          <option selected value="{{data['currentsongdata']['artist_id']}}">{{data['currentsongdata']['artist_name']}}</option>
-          {% for row in data['artistdata'] %}
-          <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
-          {% endfor %}
-        </select>
-        <label for="artistselect">Artist</label>
-        <div class="invalid-tooltip">
-          Please select an artist.
-        </div>
+      <a> Artist </a>
+      <select name="artist" id="artistdropdata" multiple required>
+        {% for row in data['currentartistdata'] %}
+        <option selected value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
+        {% endfor %}
+        {% for row in data['artistdata'] %}
+        <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
+        {% endfor %}
+      </select>
+      <div class="invalid-tooltip">
+        Please select at least one artist.
       </div>
-  </div>
+    </div>
+  </div>  
+  
 
   <div class="col-md-6">
     <div class="form-floating mb-3">
@@ -377,10 +404,27 @@
     </div>
   </div>
 </div>
+<!-- Artist update modal -->
+<div class="modal fade" id="updateartist" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Artist</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+  
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div><!-- End Vertically centered Modal-->
 
   </main><!-- End #main -->
 
-  
 {% if value == 'updatesong' %}
 <script>
 // Function to open the modal on page load
@@ -403,5 +447,17 @@ modal.show();
   function openUploadModal() {
     document.getElementById('imageuploadModal').style.display = 'block';
   }
+  function submitForm(songId) {
+    var form = document.getElementById('form_' + songId);
+    form.submit();
+  }
 </script>
+<script>
+  new MultiSelectTag('artistdropdata', {
+    rounded: true,    // default true
+})
+
+</script>
+
+
               {% include 'uploader/uploader_footer.html'%}

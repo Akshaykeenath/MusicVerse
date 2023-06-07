@@ -31,14 +31,6 @@
   <!-- Template Main CSS File -->
   <link href="{{ url_for('static', filename='uploader/css/style.css') }}" rel="stylesheet">
 
-
-  <!-- =======================================================
-  * Template Name: NiceAdmin
-  * Updated: Mar 09 2023 with Bootstrap v5.2.3
-  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
 </head>
 
 <body>
@@ -177,7 +169,11 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            {% if data['userdetails']['image_loc'] != 'null' %}
             <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" alt="Profile" class="rounded-circle">
+            {% else %}
+            <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" alt="Profile" class="rounded-circle">
+            {% endif %}
             <span class="d-none d-md-block dropdown-toggle ps-2">{{data['userdetails']['fname']}} {{data['userdetails']['lname']}}</span>
           </a><!-- End Profile Iamge Icon -->
 

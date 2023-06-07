@@ -142,7 +142,7 @@ def propicupload():
         q="update user set image_loc='%s' where user_id='%s'"%(imgpath,uid)
         insert(q)
         flash("Successfully updated image")
-        return render_template('user/edit_profile.html',data=data)
+        return redirect(url_for('user.edit_profile'))
     else:
         return redirect(url_for('public.home'))
 

@@ -82,6 +82,8 @@ def approvedsongs():
         data = {}
         count={}
         login_id = session['login_id']
+        q="update notification set status='read' where notification_type='approvals' and user_id='%s'"%(login_id)
+        update(q)
         q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
         approvednotificationdata=select(q)
         data['approvednotificationdata']=approvednotificationdata

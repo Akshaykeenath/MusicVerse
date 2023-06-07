@@ -40,7 +40,11 @@
           <div class="card card-coin card-plain">
             <div class="card-header">
               <div class="image-container">
-                <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image">
+                {% if data['userdetails']['image_loc'] != 'null' %}
+                  <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image">
+                {% else %}
+                <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" class="img-center img-fluid rounded-circle" id="profile-image">
+                {% endif %}
               </div>
               <div style="margin-left: 30px;">
                 <a href="{{ url_for('user.edit_profile') }}" class="btn btn-success btn-round" style="margin-top: 40px;">Edit Profile</a>
@@ -176,6 +180,23 @@
       </div>
     </div>
   </div>
+
+    <!-- Side Bar -->
+    <div class="myfixleft sidebar">
+      <div style="margin-top: 100px;">
+          <div class="row">
+              <div class="col-md-4">
+                  <ul class="nav nav-pills nav-pills-info flex-column">
+                  <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Home</a></li>
+                 <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Trending</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
+              </ul>
+          </div>
+      </div>
+      </div>
+    
+    </div>
+    <!-- End Side Bar -->
 
 <!-- Update Success -->
 {% with messages = get_flashed_messages() %}

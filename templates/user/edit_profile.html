@@ -49,7 +49,11 @@
             <!-- Image Upload -->
             <div style="width: 200px; height: 200px; position: relative; overflow: hidden;">
               <label for="upload-input" onclick="openModal()">
+                {% if data['userdetails']['image_loc'] != 'null' %}
                 <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" class="img-center img-fluid rounded-circle" id="profile-image" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+                {% endif %}
               </label>
             </div>
             

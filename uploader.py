@@ -21,7 +21,7 @@ def home():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id,s.song_name,al.album_name,ar.artist_name,s.date,s.status,s.privacy FROM songs s, artist ar, album al WHERE ar.artist_id=s.artist_id AND al.album_id=s.album_id AND s.user_id ='%s' ORDER BY song_id DESC LIMIT 10"%(uid)
+        q="SELECT s.song_id, s.song_name, al.album_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.date, s.status,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) WHERE s.user_id='%s' GROUP BY s.song_id ORDER BY song_id DESC LIMIT 10"%(uid)
         recentsongdata=select(q) #last 10 songs
         data['recentsongdata']=recentsongdata
         return render_template('uploader/home.html', data=data,count=count)
@@ -43,7 +43,7 @@ def allsongs():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id, s.song_name, al.album_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.date, s.status,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) WHERE s.user_id='%s' GROUP BY s.song_id;"%(uid)
+        q="SELECT s.song_id, s.song_name, al.album_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.date, s.status,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) WHERE s.user_id='%s' GROUP BY s.song_id"%(uid)
         allsongdata=select(q)
         data['allsongdata']=allsongdata
         q="select * from artist"

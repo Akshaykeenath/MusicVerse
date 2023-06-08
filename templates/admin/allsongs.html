@@ -29,12 +29,12 @@
   <!-- End flash message alert -->
 
   <div class="pagetitle">
-    <h1>Approvals</h1>
+    <h1>All Songs</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
         <li class="breadcrumb-item">Songs</li>
-        <li class="breadcrumb-item active">Approvals</li>
+        <li class="breadcrumb-item active">All songs</li>
       </ol>
     </nav>
   </div><!-- End Page Title -->
@@ -58,7 +58,7 @@
             </ul>
           </div>
           <div class="card-body">
-            <h5 class="card-title">Song Approval <span>| Today</span></h5>
+            <h5 class="card-title">All songs <span>| Today</span></h5>
 
             <table class="table table-borderless datatable">
               <thead>
@@ -72,30 +72,34 @@
               </thead>
               <tbody>
 
-                {% for row in data['pendingsongdata'] %}
+                {% for row in data['allsongdata'] %}
                 <tr>
                   <th scope="row"><a href="#">{{ loop.index }}</a></th>
                   <td>{{ row['song_name'] }}</td>
                   <td><a href="#" class="text-primary">{{ row['album_name'] }}</a></td>
                   <td>{{ row['artist_name'] }}</td>
                   <td>
-                    <form action="{{ url_for('admin.approvals') }}" method="POST">
+                    <form action="{{ url_for('admin.allsongs') }}" method="POST">
                       <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
+                      {% if row['status'] == 'pending' %}
                       <button type="submit" class="btn btn-success rounded-pill" name="action"
                         value="approve_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
                         title="Approve Song">
                         <i class="bi bi-check2"></i>
                       </button>
+                      {% endif %}
                       <button type="submit" class="btn btn-primary rounded-pill" name="action"
                         value="view_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
                         title="View Song Details">
                         <i class="bi bi-view-list"></i>
                       </button>
+                      {% if row['status'] == 'pending' %}
                       <button type="submit" class="btn btn-danger rounded-pill" name="action"
                         value="reject_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
                         title="Reject Song">
                         <i class="bi bi-x-lg"></i>
                       </button>
+                      {% endif %}
                     </form>
                   </td>
                 </tr>
@@ -197,6 +201,7 @@
                             <input type="hidden" name="song_id" value="{{data['currentsongdata']['song_id']}}">
                             <div class="d-flex justify-content-start mb-3">
                               <!-- Align buttons to the left and add margin-bottom -->
+                              {% if data['currentsongdata']['status'] == 'pending' %}
                               <button type="submit" class="btn btn-success rounded-pill me-4" name="action"
                                 value="approve_song_{{data['currentsongdata']['song_id']}}" data-bs-toggle="tooltip"
                                 data-bs-placement="top" title="Approve Song">
@@ -207,6 +212,7 @@
                                 data-bs-placement="top" title="Reject Song">
                                 <i class="bi bi-x-lg"></i>
                               </button>
+                              {% endif %}
                             </div>
                           </form>
                         </div>

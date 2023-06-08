@@ -16,6 +16,13 @@
         </a>
         <ul id="songs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
+            <a href="{{ url_for('admin.allsongs') }}">
+              <i class="bi bi-circle"></i><span>All Songs</span>
+            </a>
+          </li>
+        </ul>
+        <ul id="songs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
             <a href="{{ url_for('admin.approvals') }}">
               <i class="bi bi-circle"></i><span>Approvals</span>
             </a>

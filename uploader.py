@@ -296,6 +296,24 @@ def privatesongs():
     else:
         return redirect(url_for('public.home'))
     
+@uploader.route('/analytics')
+def analytics():
+    if 'uid' in session:
+        uid = session['uid']
+        data = {}
+        count={}
+        login_id = session['login_id']
+        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
+        approvednotificationdata=select(q)
+        data['approvednotificationdata']=approvednotificationdata
+        count['notification']=str(len(data['approvednotificationdata']))
+        q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
+        res = select(q)
+        data['userdetails'] = res[0]
+        return render_template('uploader/analytics.html', data=data,count=count)
+    else:
+        return redirect(url_for('public.home'))
+    
 
 @uploader.route('/profile')
 def profile():

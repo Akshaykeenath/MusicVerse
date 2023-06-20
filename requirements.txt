@@ -58,3 +58,6 @@ Werkzeug
 wheel
 wrapt
 zipp
+mutagen
+pydub
+

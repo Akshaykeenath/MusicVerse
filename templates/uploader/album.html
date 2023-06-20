@@ -91,7 +91,7 @@
                             </a>
                           </th>
                           <td><a href="#" class="text-primary fw-bold">{{ row['album_name'] }}</a></td>
-                          <td>64</td>
+                          <td>{{ row['song_count'] }}</td>
                           <td>
                             <form action="{{ url_for('uploader.album') }}" method="POST">
                               <button type="submit" class="btn btn-primary rounded-pill" name="action" value="view_album_{{ row['album_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Album Details">

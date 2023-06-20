@@ -16,6 +16,19 @@ def home():
         uid = session['uid']
         data = {}
         count={}
+        q="SELECT COUNT(song_id) AS song_count FROM songs WHERE user_id=%s"% (uid)
+        song_count=select(q)
+        q="SELECT COUNT(album_id) AS album_count FROM album"
+        album_count=select(q)
+        q="SELECT COUNT(artist_id) AS artist_count FROM artist WHERE user_id=%s"% (uid)
+        artist_count=select(q)
+        data = {
+            'counts': {
+                'song_count': song_count[0]['song_count'],
+                'album_count': album_count[0]['album_count'],
+                'artist_count': artist_count[0]['artist_count']
+            }
+        }
         login_id = session['login_id']
         q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
         approvednotificationdata=select(q)
@@ -27,6 +40,8 @@ def home():
         q="SELECT s.song_id, s.song_name, al.album_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.date, s.status,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) WHERE s.user_id='%s' GROUP BY s.song_id ORDER BY song_id DESC LIMIT 10"%(uid)
         recentsongdata=select(q) #last 10 songs
         data['recentsongdata']=recentsongdata
+        print("The counts are : \n ",data['counts'])
+        
         return render_template('uploader/home.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
@@ -353,7 +368,7 @@ def artist():
         count['notification']=str(len(data['approvednotificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
-        q = "SELECT ar.artist_id,ar.artist_name,ar.image_loc,ar.cover_pic,COUNT(sar.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar USING (artist_id) GROUP BY ar.artist_id"
+        q = "SELECT ar.artist_id,ar.artist_name,ar.image_loc,ar.cover_pic,COUNT(s.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar ON ar.artist_id=sar.artist_id LEFT JOIN songs s ON s.song_id=sar.song_id AND s.privacy='public' AND s.status='approved' GROUP BY sar.artist_id ORDER BY ar.artist_id"
         artistdata=select(q)
         data['userdetails'] = res[0]
         data['artistdetails']=artistdata
@@ -413,7 +428,7 @@ def album():
         count['notification']=str(len(data['approvednotificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
-        q = "select * from album"
+        q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' GROUP BY s.album_id ORDER BY al.album_id"
         albumdata=select(q)
         data['userdetails'] = res[0]
         data['albumdetails']=albumdata
@@ -440,7 +455,7 @@ def album():
                 album_image.save(os.path.join(upload_folder, album_image_filename))
                 cover_image.save(os.path.join(upload_folder, cover_image_filename))
                 # Saving to database
-                q="insert into album (album_name,image_loc,cover_pic) values ('%s','%s','%s')"%(albumname,profilepath,coverpath)
+                q="insert into album (album_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(albumname,profilepath,coverpath,uid)
                 id=insert(q)
                 if q :
                     flash('success: Album added successfully')

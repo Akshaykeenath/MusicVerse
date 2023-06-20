@@ -123,7 +123,7 @@
                 <div class="col-md-6">
                   <div class="col-md-12">
                     <div class="form-floating">
-                      <input type="text" class="form-control" id="floatingGenre" placeholder="genre" name="genre" required>
+                      <input type="text" class="form-control" id="floatingGenre" placeholder="genre" name="genre" {% if data['predictedgenre'] %}value="{{ data['predictedgenre'] }}"{% endif %} required>
                       <label for="floatingGenre">Genre</label>
                       <div class="invalid-tooltip">
                         Please provide a genre.

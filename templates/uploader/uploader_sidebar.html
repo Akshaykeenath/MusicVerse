@@ -1,3 +1,11 @@
+<style>
+  .hidden {
+    display: none;
+  }
+  #audioPlayer {
+      display: none;
+    }
+</style>
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
@@ -104,14 +112,22 @@
         <h5 class="modal-title">Music Upload</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body text-center">
+      <div class="modal-body d-flex justify-content-center align-items-center">
         <div style="border: 2px dashed #ccc; padding: 30px;">
-          <form method="POST" action="{{ url_for('uploader.uploadmusic') }}" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".mp3">
-            <input type="submit" value="Upload">
-        </form>
+          <div class="text-center mb-4">
+            <audio id="audioPlayer" controls></audio>
+          </div>
+          <form method="POST" action="{{ url_for('uploader.uploadmusic') }}" enctype="multipart/form-data" onsubmit="showLoader()">
+            <input type="file" name="file" id="musicFileInput" accept=".mp3">
+            <input type="submit" id="uploadButton" class="btn btn-primary" value="Upload">
+            <button id="loadingButton" class="btn btn-primary hidden" type="button" disabled>
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Analysing...
+            </button>
+          </form>
         </div>
       </div>
+      
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
@@ -119,3 +135,33 @@
   </div>
 </div>
 <!-- End Music Upload Modal -->
+
+<script>
+ function showLoader() {
+    var uploadButton = document.getElementById('uploadButton');
+    var loadingButton = document.getElementById('loadingButton');
+    
+    uploadButton.classList.add('hidden'); // Hide the upload button
+    loadingButton.classList.remove('hidden'); // Show the loading button
+    
+    // Add your logic here to handle the form submission via AJAX or other means
+    // For example, you can use the fetch API to send the form data to the server
+  }
+
+</script>
+<script>
+  const musicFileInput = document.getElementById("musicFileInput");
+    const audioPlayer = document.getElementById("audioPlayer");
+
+    musicFileInput.addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      const fileURL = URL.createObjectURL(file);
+      
+      const source = document.createElement("source");
+      source.src = fileURL;
+      audioPlayer.innerHTML = "";
+      audioPlayer.appendChild(source);
+
+      audioPlayer.style.display = "block";
+    });
+</script>

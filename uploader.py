@@ -4,6 +4,9 @@ from werkzeug.utils import secure_filename
 from database import *
 import uuid
 from mutagen.mp3 import MP3
+import random
+from genre_rec_service import Genre_Recognition_Service
+from pydub import AudioSegment
 
 uploader =Blueprint('uploader',__name__)
 
@@ -416,42 +419,40 @@ def album():
         data['albumdetails']=albumdata
 
         if request.method == 'POST':
-            albumname = request.form['albumname']
-            album_image = request.files['image']
-            cover_image = request.files['coverimage']
-
-            # Get the file extensions
-            album_image_extension = os.path.splitext(album_image.filename)[1]
-            cover_image_extension = os.path.splitext(cover_image.filename)[1]
-
-            # Specify the path where you want to save the uploaded files
-            upload_folder = 'static/uploads/album'  # Update the path according to your setup
-
-            # Create the upload folder if it doesn't exist
-            os.makedirs(upload_folder, exist_ok=True)
-
-            # Customize the filenames
-            album_image_filename = albumname + 'propic' + album_image_extension
-            cover_image_filename = albumname + 'coverpic' + cover_image_extension
-
-            # Saving the path for database
-            profilepath='uploads/album/' + albumname + 'propic' + album_image_extension
-            coverpath='uploads/album/' + albumname + 'coverpic' + cover_image_extension
-
-
-            # Save the uploaded files with the customized filenames
-            album_image.save(os.path.join(upload_folder, album_image_filename))
-            cover_image.save(os.path.join(upload_folder, cover_image_filename))
-
-            # Saving to database
-            q="insert into album (album_name,image_loc,cover_pic) values ('%s','%s','%s')"%(albumname,profilepath,coverpath)
-            id=insert(q)
-            if q :
-                flash('success: Album added successfully')
-                return redirect(url_for('uploader.album'))
+            if 'uploadalbum' in request.form:
+                albumname = request.form['albumname']
+                album_image = request.files['image']
+                cover_image = request.files['coverimage']
+                # Get the file extensions
+                album_image_extension = os.path.splitext(album_image.filename)[1]
+                cover_image_extension = os.path.splitext(cover_image.filename)[1]
+                # Specify the path where you want to save the uploaded files
+                upload_folder = 'static/uploads/album'  # Update the path according to your setup
+                # Create the upload folder if it doesn't exist
+                os.makedirs(upload_folder, exist_ok=True)
+                # Customize the filenames
+                album_image_filename = albumname + 'propic' + album_image_extension
+                cover_image_filename = albumname + 'coverpic' + cover_image_extension
+                # Saving the path for database
+                profilepath='uploads/album/' + albumname + 'propic' + album_image_extension
+                coverpath='uploads/album/' + albumname + 'coverpic' + cover_image_extension
+                # Save the uploaded files with the customized filenames
+                album_image.save(os.path.join(upload_folder, album_image_filename))
+                cover_image.save(os.path.join(upload_folder, cover_image_filename))
+                # Saving to database
+                q="insert into album (album_name,image_loc,cover_pic) values ('%s','%s','%s')"%(albumname,profilepath,coverpath)
+                id=insert(q)
+                if q :
+                    flash('success: Album added successfully')
+                    return redirect(url_for('uploader.album'))
+                else:
+                    flash('danger: Album not added')
+                    return redirect(url_for('uploader.album'))
             else:
-                flash('danger: Album not added')
-                return redirect(url_for('uploader.album'))
+                action = request.form.get('action')
+                album_id = action.split('_')[-1]
+                if action.startswith('view_album'):
+                    print("Selected Album ID",album_id)
         return render_template('uploader/album.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
@@ -477,6 +478,8 @@ def uploadmusic():
             if request.method == 'POST':
                 file = request.files['file']
                 if file and file.filename.endswith('.mp3'):
+                    audio_file = file
+                    prediction = genrePrediction(audio_file)
                     audio = MP3(file)
                     duration_in_seconds = str(int(audio.info.length))
                     file_extension = os.path.splitext(file.filename)[1]
@@ -484,10 +487,11 @@ def uploadmusic():
                     file.save('static/'+songpath)
                     songpathdb='/static/'+songpath # To store in database with /static as it may sometimes conflict with the save if given in .save
                     session['songpath']=songpathdb
+                    session['predictedgenre']=prediction
                     duration_in_min=secondstominute(int(duration_in_seconds))
                     session['songduration']=duration_in_min
-                    print('static/'+songpath)
-                    flash("Successfully saved the song. Duration :"+ duration_in_min)
+                    flash("success: saved the song.")
+                    flash("info: Predicted Genre is "+prediction)
                     return redirect(url_for('uploader.uploadsong'))
                 else:
                     flash("Invalid file format. Please upload an MP3 file.")
@@ -502,6 +506,9 @@ def uploadsong():
         uid = session['uid']
         data = {}
         count={}
+        pgenre=session['predictedgenre']
+        data['predictedgenre']=pgenre
+        print("Predicted Genre is ",data['predictedgenre'])
         login_id = session['login_id']
         q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
         approvednotificationdata=select(q)
@@ -616,3 +623,33 @@ def samplepage():
         return render_template('uploader/samplepage.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
+    
+def genrePrediction(audio_file):
+    # random string of digits for file name
+    file_name = str(random.randint(0, 100000))
+
+    # save the file locally
+    audio_file.save(file_name)
+
+    # check the file extension
+    file_extension = audio_file.filename.split(".")[-1]
+
+    if file_extension == "mp3":
+        # convert MP3 to WAV
+        wav_file_name = file_name + ".wav"
+        audio = AudioSegment.from_mp3(file_name)
+        audio.export(wav_file_name, format="wav")
+        audio_file = wav_file_name
+
+    # invoke the genre recognition service
+    grs = Genre_Recognition_Service()
+
+    # make prediction
+    prediction = grs.predict(file_name)
+
+    # remove the temporary file
+    os.remove(file_name)
+    if file_extension == "mp3":
+        os.remove(wav_file_name)
+
+    return prediction

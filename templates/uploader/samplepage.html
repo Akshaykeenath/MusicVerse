@@ -48,124 +48,67 @@
     <section class="section">
       <div class="row">
 
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Enter Song Details</h5>
-
-              <!-- Song details Form -->
-              <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.samplepage') }}" method="POST" enctype="multipart/form-data">
-                <div class="col-md-12">
-                  <div class="form-floating">
-                    <input type="text" class="form-control" id="songname" placeholder="Your Name" name="songname" required>
-                    <label for="songname">Song Name</label>
-                    <div class="invalid-tooltip">
-                      Please provide a song name.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-md-12">
-                  <div class="row mb-3 align-items-center">
-                    <label for="formFile" class="col-sm-2 col-form-label">Song Image</label>
-                    <div class="col-sm-10 position-relative">
-                      <div class="form-control">
-                        <input class="form-control" type="file" name="image" id="formFile" accept="image/*" required>
-                        <div class="invalid-tooltip">
-                          Please choose an image file to upload.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="form-floating mb-3">
-                      <select class="form-select" name="album" id="albumselect" aria-label="Album" required>
-                        <option selected disabled value="">Choose...</option>
-                        {% for row in data['albumdata'] %}
-                        <option value="{{ row['album_id'] }}">{{ row['album_name'] }}</option>
-                        {% endfor %}
-                      </select>
-                      <label for="albumselect">Album</label>
-                      <div class="invalid-tooltip">
-                        Please select an album.
-                      </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="form-floating mb-3">
-                      <select class="form-select" name="privacy" id="privacyselect" aria-label="State" required>
-                        <option selected disabled value="">Choose...</option>
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                      </select>
-                      <label for="privacyselect">Privacy</label>
-                      <div class="invalid-tooltip">
-                        Please select the privacy of song.
-                      </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-floating mb-3">
-                        Artist
-                        <select class="form-select" name="artist" id="artistselect" multiple required>
-                            <!-- <option selected disabled value="">Choose...</option> -->
-                            {% for row in data['artistdata'] %}
-                            <option value="{{ row['artist_id'] }}">{{ row['artist_name'] }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-tooltip">
-                            Please select an artist.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="col-md-12">
-                    <div class="form-floating">
-                      <input type="text" class="form-control" id="floatingGenre" placeholder="genre" name="genre" required>
-                      <label for="floatingGenre">Genre</label>
-                      <div class="invalid-tooltip">
-                        Please provide a genre.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-md-4">
-                  <div class="row mb-3 align-items-center">
-                    <label for="inputDate" class="col-sm-2 col-form-label">Date</label>
-                    <div class="col-sm-10 position-relative">
-                      <div class="form-control">
-                        <input type="date" class="form-control" id="inputDate" name="date" required>
-                        <div class="invalid-tooltip">
-                          Please provide a valid date.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-md-2">
-                  <div class="form-floating">
-                    <input type="text" class="form-control" id="floatingLanguage" placeholder="Language" name="language" required>
-                    <label for="floatingLanguage">Language</label>
-                    <div class="invalid-tooltip">
-                      Please provide a valid language.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                  <a href="{{ url_for('uploader.uploadsong') }}" class="btn btn-secondary">Reset</a>
-                </div>
-              </form>
-               <!-- End Song details Form -->
+        <div class="row">
+          <div class="col-xl-4">
+  
+            <div class="card">
+              <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                <img src="{{ url_for('static', filename=data['currentalbumdetails']['image_loc']) }}" alt="SongImage" class="rounded-circle" style="max-width: 200px; max-height: 200px;">
+                <h4><b>{{data['currentalbumdetails']['album_name']}}</b></h4>
+              </div>
             </div>
+  
           </div>
+  
+          <div class="col-xl-8">
+  
+            <div class="card">
+              <div class="card-body pt-3">
+                <!-- Bordered Tabs -->
+                <ul class="nav nav-tabs nav-tabs-bordered">
+  
+                  <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+                  </li>
+  
+                </ul>
+                <div class="tab-content pt-2">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Song name</th>
+                        <th scope="col">Artist</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for row in data['albumsongdata'] %}
+                      <tr>
+                        <th scope="row"><a href="#">{{ loop.index }}</a></th>
+                        <td>{{ row['song_name'] }}</td>
+                        <td><a href="#" class="text-primary">{{ row['artist_name'] }}</a></td>
+                        <td>
+                          <audio controls>
+                            <source src="{{ row['song_loc'] }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                          </audio>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                    
+                    <div id="song-list"></div>
+                    
+                    
+                  </table>
+                </div><!-- End Bordered Tabs -->
+  
+              </div>
+            </div>
+  
+          </div>
+        </div>
 
       </div>
     </section>

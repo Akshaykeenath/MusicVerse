@@ -28,12 +28,12 @@
 
 
   <div class="pagetitle">
-    <h1>Album</h1>
+    <h1>My Album</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
         <li class="breadcrumb-item">Album</li>
-        <li class="breadcrumb-item active">Album</li>
+        <li class="breadcrumb-item active">My Album</li>
       </ol>
     </nav>
   </div><!-- End Page Title -->
@@ -45,7 +45,7 @@
       <div class="col-lg-8">
         <div class="row">
 
-          <!-- All Album -->
+          <!-- My Album -->
           <div class="col-12">
             <div class="card top-selling overflow-auto">
 
@@ -63,7 +63,7 @@
               </div>
 
               <div class="card-body pb-0">
-                <h5 class="card-title">All Album <span>| Today</span></h5>
+                <h5 class="card-title">My Album <span>| Today</span></h5>
 
                 <table class="table table-borderless datatable">
                   <thead>
@@ -78,7 +78,7 @@
                   </thead>
                   <tbody>
 
-                    {% for row in data['albumdetails'] %}
+                    {% for row in data['myalbumdetails'] %}
                     <tr>
                       <td>{{ loop.index }}</td>
                       <th scope="row">
@@ -96,10 +96,11 @@
                       <td><a href="#" class="text-primary fw-bold">{{ row['album_name'] }}</a></td>
                       <td>{{ row['song_count'] }}</td>
                       <td>
-                        <form action="{{ url_for('uploader.album') }}" method="POST">
-                          <button type="submit" class="btn btn-primary rounded-pill" name="action"
-                            value="view_album_{{ row['album_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="View Album Details">
+                        <form action="{{ url_for('uploader.myalbum') }}" method="POST">
+                          <button type="submit" class="btn btn-success rounded-pill" name="action" value="update_album_{{ row['album_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Update Album Details">
+                            <i class="bi bi-arrow-up-circle"></i>
+                          </button>
+                          <button type="submit" class="btn btn-primary rounded-pill" name="action" value="view_album_{{ row['album_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Album Details">
                             <i class="bi bi-view-list"></i>
                           </button>
                         </form>
@@ -114,7 +115,7 @@
               </div>
 
             </div>
-          </div><!-- End All Album -->
+          </div><!-- End My Album -->
 
         </div>
       </div><!-- End Left side columns -->
@@ -159,7 +160,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body text-center">
-          <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.album') }}" method="POST"
+          <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.myalbum') }}" method="POST"
             enctype="multipart/form-data">
             <input type="hidden" name="uploadalbum">
             <div class="col-md-12">
@@ -203,7 +204,7 @@
 
             <div class="text-center">
               <button type="submit" class="btn btn-primary">Submit</button>
-              <a href="{{ url_for('uploader.album') }}" class="btn btn-secondary">Reset</a>
+              <a href="{{ url_for('uploader.myalbum') }}" class="btn btn-secondary">Reset</a>
             </div>
           </form>
         </div>
@@ -224,7 +225,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <!-- Song Details -->
+          <!-- Album Details -->
           <div class="row">
             <div class="col-xl-4">
 
@@ -242,12 +243,12 @@
 
               <div class="card">
                 <div class="card-body pt-3">
-                  <!-- Bordered Tabs -->
+                  <!-- Songs List -->
                   <ul class="nav nav-tabs nav-tabs-bordered">
 
                     <li class="nav-item">
                       <button class="nav-link active" data-bs-toggle="tab"
-                        data-bs-target="#profile-overview">Overview</button>
+                        data-bs-target="#profile-overview">Song Details</button>
                     </li>
 
                   </ul>
@@ -258,6 +259,7 @@
                           <th scope="col">#</th>
                           <th scope="col">Song name</th>
                           <th scope="col">Artist</th>
+                          <th scope="col">Song</th>
                           <th scope="col">Action</th>
                         </tr>
                       </thead>
@@ -272,6 +274,12 @@
                               <source src="{{ row['song_loc'] }}" type="audio/mpeg">
                               Your browser does not support the audio element.
                             </audio>
+                          </td>
+                          <td>
+                            <form action="{{ url_for('uploader.myalbum') }}" method="POST">
+                              <button type="submit" class="btn btn-danger rounded-pill" name="songaction" value="remove_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Song">
+                                <i class="bi bi-x-circle"></i>
+                              </button>
                           </td>
                         </tr>
                         {% endfor %}
@@ -294,6 +302,92 @@
   </div>
   <!-- End View Album Modal -->
 
+    <!-- Edit Album Modal -->
+    <div class="modal fade" id="editalbum" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Album Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="{{ url_for('uploader.myalbum') }}" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="albumid" value="{{ data['currentalbumdetails']['album_id'] }}">
+              <input type="hidden" name="albumname" value="{{ data['currentalbumdetails']['album_name'] }}">
+              <div class="row mb-3">
+                <label for="album_name" class="col-md-4 col-lg-3 col-form-label">Album Name</label>
+                <div class="col-md-8 col-lg-9">
+                  <input name="album_name" type="text" class="form-control" id="album_name" value="{{ data['currentalbumdetails']['album_name'] }}">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="albumImage" class="col-md-4 col-lg-3 col-form-label">Album Image</label>
+                <div class="col-md-8 col-lg-9">
+                  <img id="albumImagePreview" src="{{ url_for('static', filename=data['currentalbumdetails']['image_loc']) }}" alt="Album Image" style="max-width: 100px;">
+                  <div class="pt-2">
+                    <label for="albumImageInput" class="btn btn-primary btn-sm" title="Upload new album image">
+                      <i class="bi bi-upload"></i>
+                    </label>
+                    <input type="file" id="albumImageInput" name="albumImage" style="display: none;">
+                    <button type="submit" class="btn btn-success btn-sm" name="submitAlbumImage">Submit</button>
+                    <a href="#" class="btn btn-danger btn-sm" title="Remove current album image"><i class="bi bi-trash"></i></a>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="coverImage" class="col-md-4 col-lg-3 col-form-label">Cover Image</label>
+                <div class="col-md-8 col-lg-9">
+                  <img id="coverImagePreview" src="{{ url_for('static', filename=data['currentalbumdetails']['cover_pic']) }}" alt="Cover Image" style="max-width: 100px;">
+                  <div class="pt-2">
+                    <label for="coverImageInput" class="btn btn-primary btn-sm" title="Upload new cover image">
+                      <i class="bi bi-upload"></i>
+                    </label>
+                    <input type="file" id="coverImageInput" name="coverImage" style="display: none;">
+                    <button type="submit" class="btn btn-success btn-sm" name="submitCoverImage">Submit</button>
+                    <a href="#" class="btn btn-danger btn-sm" title="Remove current cover image"><i class="bi bi-trash"></i></a>
+                  </div>
+                </div>
+              </div>
+            </form>
+            
+            <script>
+              // Function to preview the selected image
+              function previewImage(inputId, previewId) {
+                const input = document.getElementById(inputId);
+                const preview = document.getElementById(previewId);
+                const file = input.files[0];
+                
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = function(event) {
+                    preview.src = event.target.result;
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }
+              
+              // Add event listeners to the file input elements
+              const albumImageInput = document.getElementById('albumImageInput');
+              const coverImageInput = document.getElementById('coverImageInput');
+              
+              albumImageInput.addEventListener('change', function() {
+                previewImage('albumImageInput', 'albumImagePreview');
+              });
+              
+              coverImageInput.addEventListener('change', function() {
+                previewImage('coverImageInput', 'coverImagePreview');
+              });
+            </script>
+            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Edit Album Modal -->
+
 </main><!-- End #main -->
 
 
@@ -304,6 +398,16 @@
   // Function to open the modal on page load
   document.addEventListener('DOMContentLoaded', function () {
     var modal = new bootstrap.Modal(document.getElementById('viewalbum'));
+    modal.show();
+  });
+</script>
+{% endif %}
+
+{% if value == 'editalbum' %}
+<script>
+  // Function to open the modal on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('editalbum'));
     modal.show();
   });
 </script>

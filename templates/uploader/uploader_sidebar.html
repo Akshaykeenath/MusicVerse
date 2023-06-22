@@ -59,10 +59,21 @@
       </li><!-- End Artist Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ url_for('uploader.album') }}">
-          <i class="bi bi-file-earmark-music-fill"></i>
-          <span>Album</span>
+        <a class="nav-link collapsed" data-bs-target="#album-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-file-earmark-music-fill"></i><span>Albums</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
+        <ul id="album-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('uploader.album') }}">
+              <i class="bi bi-circle"></i><span>All Albums</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.myalbum') }}">
+              <i class="bi bi-circle"></i><span>My Albums</span>
+            </a>
+          </li>
+        </ul>
       </li><!-- End Album Nav -->
 
       <li class="nav-item">

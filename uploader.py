@@ -18,7 +18,7 @@ def home():
         count={}
         q="SELECT COUNT(song_id) AS song_count FROM songs WHERE user_id=%s"% (uid)
         song_count=select(q)
-        q="SELECT COUNT(album_id) AS album_count FROM album"
+        q="SELECT COUNT(album_id) AS album_count FROM album WHERE user_id=%s"% (uid)
         album_count=select(q)
         q="SELECT COUNT(artist_id) AS artist_count FROM artist WHERE user_id=%s"% (uid)
         artist_count=select(q)
@@ -432,7 +432,8 @@ def album():
         albumdata=select(q)
         data['userdetails'] = res[0]
         data['albumdetails']=albumdata
-
+        data['currentalbumdetails']=''
+        data['albumsongdata']=''
         if request.method == 'POST':
             if 'uploadalbum' in request.form:
                 albumname = request.form['albumname']
@@ -463,16 +464,138 @@ def album():
                 else:
                     flash('danger: Album not added')
                     return redirect(url_for('uploader.album'))
-            else:
+            elif 'action' in request.form:
                 action = request.form.get('action')
                 album_id = action.split('_')[-1]
                 if action.startswith('view_album'):
-                    print("Selected Album ID",album_id)
+                    q="select * from album where album_id='%s'"%(album_id)
+                    currentalbumdetails=select(q)
+                    data['currentalbumdetails']=currentalbumdetails[0]
+                    q="SELECT DISTINCT s.song_id, s.song_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id WHERE s.privacy='public' AND s.STATUS='approved' AND s.album_id='%s' GROUP BY sar.song_id ORDER BY song_id"%(album_id)
+                    albumsongdata=select(q)
+                    print(albumsongdata)
+                    data['albumsongdata']=albumsongdata
+                    return render_template('uploader/album.html', data=data,count=count, value='viewalbum')
         return render_template('uploader/album.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
 
-
+@uploader.route('/myalbum', methods=['GET', 'POST'])
+def myalbum():
+    if 'uid' in session:
+        login_id = session['login_id']
+        uid = session['uid']
+        data = {}
+        count={}
+        login_id = session['login_id']
+        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
+        approvednotificationdata=select(q)
+        data['approvednotificationdata']=approvednotificationdata
+        count['notification']=str(len(data['approvednotificationdata']))
+        q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
+        res = select(q)
+        q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' WHERE al.user_id = '%s' GROUP BY s.album_id ORDER BY al.album_id"%(uid)
+        myalbumdata=select(q)
+        data['userdetails'] = res[0]
+        data['myalbumdetails']=myalbumdata
+        data['currentalbumdetails']=''
+        data['albumsongdata']=''
+        if request.method == 'POST':
+            if 'uploadalbum' in request.form:
+                albumname = request.form['albumname']
+                album_image = request.files['image']
+                cover_image = request.files['coverimage']
+                # Get the file extensions
+                album_image_extension = os.path.splitext(album_image.filename)[1]
+                cover_image_extension = os.path.splitext(cover_image.filename)[1]
+                # Specify the path where you want to save the uploaded files
+                upload_folder = 'static/uploads/album'  # Update the path according to your setup
+                # Create the upload folder if it doesn't exist
+                os.makedirs(upload_folder, exist_ok=True)
+                # Customize the filenames
+                album_image_filename = albumname + 'propic' + album_image_extension
+                cover_image_filename = albumname + 'coverpic' + cover_image_extension
+                # Saving the path for database
+                profilepath='uploads/album/' + albumname + 'propic' + album_image_extension
+                coverpath='uploads/album/' + albumname + 'coverpic' + cover_image_extension
+                # Save the uploaded files with the customized filenames
+                album_image.save(os.path.join(upload_folder, album_image_filename))
+                cover_image.save(os.path.join(upload_folder, cover_image_filename))
+                # Saving to database
+                q="insert into album (album_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(albumname,profilepath,coverpath,uid)
+                id=insert(q)
+                if q :
+                    flash('success: Album added successfully')
+                    return redirect(url_for('uploader.myalbum'))
+                else:
+                    flash('danger: Album not added')
+                    return redirect(url_for('uploader.myalbum'))
+            elif 'action' in request.form:
+                action = request.form.get('action')
+                album_id = action.split('_')[-1]
+                if action.startswith('view_album'):
+                    q="select * from album where album_id='%s'"%(album_id)
+                    currentalbumdetails=select(q)
+                    data['currentalbumdetails']=currentalbumdetails[0]
+                    q="SELECT DISTINCT s.song_id, s.song_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id WHERE s.privacy='public' AND s.STATUS='approved' AND s.album_id='%s' GROUP BY sar.song_id ORDER BY song_id"%(album_id)
+                    albumsongdata=select(q)
+                    print(albumsongdata)
+                    data['albumsongdata']=albumsongdata
+                    return render_template('uploader/myalbum.html', data=data,count=count, value='viewalbum')
+                elif action.startswith('update_album'):
+                    q="select * from album where album_id='%s'"%(album_id)
+                    currentalbumdetails=select(q)
+                    data['currentalbumdetails']=currentalbumdetails[0]
+                    return render_template('uploader/myalbum.html', data=data,count=count, value='editalbum')
+            elif 'submitAlbumImage' in request.form:
+                album_image = request.files['albumImage']
+                if album_image.filename !='':
+                    albumid = request.form['albumid']
+                    albumname = request.form['albumname']
+                    # Get the file extensions
+                    album_image_extension = os.path.splitext(album_image.filename)[1]
+                    # Specify the path where you want to save the uploaded files
+                    upload_folder = 'static/uploads/album'  # Update the path according to your setup
+                    # Create the upload folder if it doesn't exist
+                    os.makedirs(upload_folder, exist_ok=True)
+                    # Customize the filenames
+                    album_image_filename = albumname + 'propic' + album_image_extension
+                    # Saving the path for database
+                    profilepath='uploads/album/' + albumname + 'propic' + album_image_extension
+                    # Save the uploaded files with the customized filenames
+                    album_image.save(os.path.join(upload_folder, album_image_filename))
+                    # Saving to database
+                    q="update album set image_loc='%s' where album_id='%s'"%(profilepath,albumid)
+                    update(q)
+                    flash("success: Updated Album Image successfully")
+                else:
+                    flash("danger: Add Album image first")
+            elif 'submitCoverImage' in request.form:
+                cover_image = request.files['coverImage']
+                if cover_image.filename !='':
+                    albumid = request.form['albumid']
+                    albumname = request.form['albumname']
+                    # Get the file extensions
+                    cover_image_extension = os.path.splitext(cover_image.filename)[1]
+                    # Specify the path where you want to save the uploaded files
+                    upload_folder = 'static/uploads/album'  # Update the path according to your setup
+                    # Create the upload folder if it doesn't exist
+                    os.makedirs(upload_folder, exist_ok=True)
+                    # Customize the filenames
+                    cover_image_filename = albumname + 'coverpic' + cover_image_extension
+                    # Saving the path for database
+                    coverpath='uploads/album/' + albumname + 'coverpic' + cover_image_extension
+                    # Save the uploaded files with the customized filenames
+                    cover_image.save(os.path.join(upload_folder, cover_image_filename))
+                    # Saving to database
+                    q="update album set cover_pic='%s' where album_id='%s'"%(coverpath,albumid)
+                    update(q)
+                    flash("success: Updated Album Cover successfully")
+                else:
+                    flash("danger: Add Cover image first")
+        return render_template('uploader/myalbum.html', data=data,count=count)
+    else:
+        return redirect(url_for('public.home'))
 
     
 @uploader.route('/uploadmusic', methods=['GET', 'POST'])
@@ -615,26 +738,14 @@ def samplepage():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]        #A flash message is there for upload successfull in return render_template('uploader/home.html', data=data,count=count)
-        q="select * from artist"
-        artistdata=select(q)
-        data['artistdata'] = artistdata
-        q="select * from album"
-        albumdata=select(q)
-        data['albumdata']=albumdata
-        if request.method == 'POST':
-            songname=request.form['songname']
-            image = request.files['image']
-            album=request.form['album']
-            artist_ids = request.form.getlist('artist') 
-            genre=request.form['genre']
-            date=request.form['date']
-            language=request.form['language']
-            privacy=request.form['privacy']
-            print('Artist ID:',artist)
-            for artist_id in artist_ids:
-                # Process each selected artist_id individually
-                # (e.g., store in a database, append to a list, etc.)
-                print("Artist ID:",artist_id)
+        album_id=2
+        q="select * from album where album_id='%s'"%(album_id)
+        currentalbumdetails=select(q)
+        data['currentalbumdetails']=currentalbumdetails[0]
+        q="SELECT DISTINCT s.song_id, s.song_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id WHERE s.privacy='public' AND s.STATUS='approved' AND s.album_id='%s' GROUP BY sar.song_id ORDER BY song_id"%(album_id)
+        albumsongdata=select(q)
+        print(albumsongdata)
+        data['albumsongdata']=albumsongdata
         return render_template('uploader/samplepage.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))

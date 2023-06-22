@@ -61,7 +61,7 @@ def allsongs():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id, s.song_name, al.album_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.date, s.status,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) WHERE s.user_id='%s' GROUP BY s.song_id"%(uid)
+        q="SELECT s.song_id, s.song_name, IFNULL(al.album_name, 'No album') AS album_name, IFNULL(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.user_id = '%s' GROUP BY s.song_id;"%(uid)
         allsongdata=select(q)
         data['allsongdata']=allsongdata
         q="select * from artist"
@@ -74,7 +74,7 @@ def allsongs():
         if request.method == 'POST':
             action = request.form.get('action')
             song_id = action.split('_')[-1]
-            q="SELECT s.song_id,s.song_name,al.album_id,al.album_name,GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name,s.date,s.image_loc,s.song_loc,s.genre,s.language,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id=sar.artist_id INNER JOIN album al USING (album_id) where s.song_id='%s' GROUP BY s.song_id"%(song_id)
+            q="SELECT s.song_id, s.song_name, al.album_id, IFNULL(al.album_name, 'Null') AS album_name, IFNULL(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'Null') AS artist_name, s.date, s.image_loc, s.song_loc, s.genre, s.language, s.privacy FROM songs s LEFT JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.song_id = '%s' GROUP BY s.song_id"%(song_id)
             currentsongdata=select(q)
             data['currentsongdata']=currentsongdata[0]
             q="SELECT artist_id, artist_name FROM artist INNER JOIN songartist USING (artist_id) WHERE song_id='%s'"%(song_id)
@@ -109,7 +109,7 @@ def approvedsongs():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id, s.song_name, al.album_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.date, s.status,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) WHERE s.privacy='public' and s.status='approved' and s.user_id='%s' GROUP BY s.song_id;"%(uid)
+        q="SELECT s.song_id, s.song_name, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(uid)
         approvedsongdata=select(q)
         data['approvedsongdata']=approvedsongdata
         q="select * from artist"
@@ -122,7 +122,7 @@ def approvedsongs():
         if request.method == 'POST':
                 action = request.form.get('action')
                 song_id = action.split('_')[-1]
-                q="SELECT s.song_id,s.song_name,al.album_id,al.album_name,GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name,s.date,s.image_loc,s.song_loc,s.genre,s.language,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id=sar.artist_id INNER JOIN album al USING (album_id) where s.song_id='%s' GROUP BY s.song_id"%(song_id)
+                q="SELECT s.song_id, s.song_name, al.album_id, COALESCE(al.album_name, 'Null') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'Null') AS artist_name, s.date, s.image_loc, s.song_loc, s.genre, s.language, s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.song_id = '%s' GROUP BY s.song_id;"%(song_id)
                 currentsongdata=select(q)
                 data['currentsongdata']=currentsongdata[0]
                 q="SELECT artist_id, artist_name FROM artist INNER JOIN songartist USING (artist_id) WHERE song_id='%s'"%(song_id)
@@ -568,6 +568,7 @@ def myalbum():
                     q="update album set image_loc='%s' where album_id='%s'"%(profilepath,albumid)
                     update(q)
                     flash("success: Updated Album Image successfully")
+                    return redirect(url_for('uploader.myalbum'))
                 else:
                     flash("danger: Add Album image first")
             elif 'submitCoverImage' in request.form:
@@ -591,8 +592,23 @@ def myalbum():
                     q="update album set cover_pic='%s' where album_id='%s'"%(coverpath,albumid)
                     update(q)
                     flash("success: Updated Album Cover successfully")
+                    return redirect(url_for('uploader.myalbum'))
                 else:
                     flash("danger: Add Cover image first")
+            elif 'nameupdate' in request.form:
+                albumid = request.form['albumid']
+                albumname = request.form['album_name']
+                q="update album set album_name='%s' where album_id='%s'"%(albumname,albumid)
+                update(q)
+                flash("success: Updated Album Name")
+                return redirect(url_for('uploader.myalbum'))
+            elif 'songaction' in request.form:
+                songaction = request.form.get('songaction')
+                song_id = songaction.split('_')[-1]
+                q="update songs set album_id='0' where song_id='%s'"%(song_id)
+                update(q)
+                flash("warning: Song removed")
+                return redirect(url_for('uploader.myalbum'))
         return render_template('uploader/myalbum.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))

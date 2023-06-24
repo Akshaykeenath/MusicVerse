@@ -62,17 +62,24 @@
                             class="img-fluid rounded shadow" style="width: 50px;"></td>
                         <td><a href="#" class="currentSong" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                         </td>
-                        <td>{{ row['duration'] }}</td>
+                        <td>{{ row['duration'] }}</td>                       
                         <td class="text-center">
-                          <button type="button" rel="tooltip" class="btn btn-info btn-simple btn-icon btn-sm">
-                            <i class="tim-icons icon-heart-2"></i>
-                          </button>
-                        </td>
+                          {% if row['liked']=='yes' %}
+                            <button type="button" rel="tooltip" class="btn btn-primary btn-icon btn-round liked like-button" data-song-id="{{ row['song_id'] }}">
+                              <i class="fas fa-heart"></i>
+                            </button>
+                          {% else %}
+                            <button type="button" rel="tooltip" class="btn btn-neutral btn-icon btn-round btn-simple like-button" data-song-id="{{ row['song_id'] }}">
+                              <i class="far fa-heart"></i>
+                            </button>
+                          {% endif %}
+                        </td>                                                                 
                         <td class="text-center">
                           <button type="button" rel="tooltip" class="btn btn-success btn-simple btn-icon btn-sm">
                             <i class="tim-icons icon-cloud-download-93"></i>
                           </button>
                         </td>
+                  
                         <input type="hidden" name="songurl{{ loop.index }}" value="{{ row['song_loc'] }}">
                         <input type="hidden" name="songname{{ loop.index }}" value="{{ row['song_name'] }}">
                         <input type="hidden" name="artworks{{ loop.index }}" value="_{{ loop.index }}">
@@ -131,10 +138,16 @@
                         </td>
                         <td>{{ row['duration'] }}</td>
                         <td class="text-center">
-                          <button type="button" rel="tooltip" class="btn btn-info btn-simple btn-icon btn-sm">
-                            <i class="tim-icons icon-heart-2"></i>
-                          </button>
-                        </td>
+                          {% if row['liked']=='yes' %}
+                            <button type="button" rel="tooltip" class="btn btn-primary btn-icon btn-round liked like-button" data-song-id="{{ row['song_id'] }}">
+                              <i class="fas fa-heart"></i>
+                            </button>
+                          {% else %}
+                            <button type="button" rel="tooltip" class="btn btn-neutral btn-icon btn-round btn-simple like-button" data-song-id="{{ row['song_id'] }}">
+                              <i class="far fa-heart"></i>
+                            </button>
+                          {% endif %}
+                        </td>                         
                         <td class="text-center">
                           <button type="button" rel="tooltip" class="btn btn-success btn-simple btn-icon btn-sm">
                             <i class="tim-icons icon-cloud-download-93"></i>
@@ -222,3 +235,103 @@
 
 {% include 'user/player.html'%}
 {% include 'user/user_footer.html'%}
+
+<!-- JS for song like -->
+
+<script>
+// $(document).ready(function() {
+//   // Attach a click event listener to the like button
+//   $('.like-button').click(function() {
+//     // Get the song ID from the data attribute of the clicked button
+//     var songId = $(this).data('song-id');
+
+//     // Reference to the clicked button
+//     var $button = $(this);
+
+//     // Determine the current like status of the song
+//     var isLiked = $button.hasClass('liked');
+
+//     // Make an AJAX request to your Flask server to handle the like action
+//     $.ajax({
+//       type: 'POST', // or 'GET' if you prefer
+//       url: '{{ url_for("user.like_song") }}', // generate the URL dynamically using Flask's url_for function
+//       data: {
+//         songId: songId, // Pass the extracted song ID to the server
+//         isLiked: !isLiked // Pass the updated like status to the server
+//       },
+//       success: function(response) {
+//         // The like action was successful
+//         console.log('Song liked/unliked!');
+
+//         // Toggle the button icon and class based on the updated like status
+//         if (isLiked) {
+//           $button.removeClass('liked');
+//           $button.removeClass('btn-primary');
+//           $button.addClass('btn-neutral');
+//           $button.addClass('btn-simple');
+//           $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
+//         } else {
+//           $button.addClass('liked');
+//           $button.removeClass('btn-neutral');
+//           $button.removeClass('btn-simple');
+//           $button.addClass('btn-primary');
+//           $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
+//         }
+//       },
+//       error: function(error) {
+//         // An error occurred while processing the like action
+//         console.error('Error liking/unliking the song:', error);
+//       }
+//     });
+//   });
+// });
+
+$(document).ready(function() {
+  // Attach a click event listener to the like buttons
+  $('.like-button').click(function() {
+    // Get the song ID from the data attribute of the clicked button
+    var songId = $(this).data('song-id');
+
+    // Reference to the clicked button
+    var $button = $(this);
+
+    // Determine the current like status of the song
+    var isLiked = $button.hasClass('liked');
+
+    // Make an AJAX request to your Flask server to handle the like action
+    $.ajax({
+      type: 'POST', // or 'GET' if you prefer
+      url: '{{ url_for("user.like_song") }}', // generate the URL dynamically using Flask's url_for function
+      data: {
+        songId: songId, // Pass the extracted song ID to the server
+        isLiked: !isLiked // Pass the updated like status to the server
+      },
+      success: function(response) {
+        // The like action was successful
+        console.log('Song liked/unliked!', songId);
+
+        // Toggle the button icon and class based on the updated like status
+        if (isLiked) {
+          $button.removeClass('liked');
+          $button.removeClass('btn-primary');
+          $button.addClass('btn-neutral');
+          $button.addClass('btn-simple');
+          $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
+        } else {
+          $button.addClass('liked');
+          $button.removeClass('btn-neutral');
+          $button.removeClass('btn-simple');
+          $button.addClass('btn-primary');
+          $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
+        }
+      },
+      error: function(error) {
+        // An error occurred while processing the like action
+        console.error('Error liking/unliking the song:', error);
+      }
+    });
+  });
+});
+
+
+</script>

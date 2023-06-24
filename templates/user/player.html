@@ -53,16 +53,32 @@
         </div>
       </div>
       <div id="player-controls">
+        <div class="control" style="padding-left: 60px;">
+          <div class="btn btn-info btn-sm" id="play-previous">
+            <i class="fas fa-backward"></i>
+          </div>
+        </div>
+        <div class="control" style="padding: 20px;">
+          <div class="btn btn-info btn-sm" id="play-pause-button">
+            <i class="fas fa-play"></i>
+          </div>
+        </div>
+        <div class="control"  style="padding-right: 250px;">
+          <div class="btn btn-info btn-sm" id="play-next">
+            <i class="fas fa-forward"></i>
+          </div>
+        </div>
         
-        <div class="btn btn-primary btn-simple btn-round" id="shuffle-icon" style="margin-right: 50px;">
+        <div class="btn btn-neutral btn-icon btn-round btn-simple" id="shuffle-icon" style="margin-right: 50px;">
           <!-- Shuffle icon -->
           <i class="fas fa-random"></i>
         </div>
-        <div class="btn btn-primary btn-simple btn-round" id="repeat-icon" style="margin-right: 50px;">
+        
+        <div class="btn btn-neutral btn-icon btn-round btn-simple" id="repeat-icon" style="margin-right: 50px;">
           <!-- Repeat icon -->
           <i class="fas fa-redo-alt"></i>
         </div>
-        <div class="volumecontainer">
+        <div class="volumecontainer btn-link btn-info btn-simple btn-sm btn-round">
           <div id="volume-control" style="font-size: 25px; color: #e14eca;">
             <i class="fas fa-volume-up"></i>
           </div>
@@ -70,23 +86,33 @@
             <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" class="volume-slider">
           </div>
         </div>
-        <div class="control" style="padding-left: 60px;">
-          <div class="button" id="play-previous">
-            <i class="fas fa-backward"></i>
-          </div>
-        </div>
-        <div class="control" style="padding: 20px;">
-          <div class="button" id="play-pause-button">
-            <i class="fas fa-play"></i>
-          </div>
-        </div>
-        <div class="control"  style="padding-right: 60px;">
-          <div class="button" id="play-next">
-            <i class="fas fa-forward"></i>
-          </div>
-        </div>
       </div>
       
     </div>
   </div>
 </div>
+<script>
+var shuffleButton = document.getElementById("shuffle-icon");
+
+shuffleButton.addEventListener("click", function() {
+  if (shuffleButton.classList.contains("btn-primary")) {
+    shuffleButton.classList.remove("btn-primary");
+    shuffleButton.classList.add("btn-neutral", "btn-simple");
+  } else {
+    shuffleButton.classList.remove("btn-neutral", "btn-simple");
+    shuffleButton.classList.add("btn-primary");
+  }
+});
+
+var repeatButton = document.getElementById("repeat-icon");
+
+repeatButton.addEventListener("click", function() {
+  if (repeatButton.classList.contains("btn-primary")) {
+    repeatButton.classList.remove("btn-primary");
+    repeatButton.classList.add("btn-neutral", "btn-simple");
+  } else {
+    repeatButton.classList.remove("btn-neutral", "btn-simple");
+    repeatButton.classList.add("btn-primary");
+  }
+});
+</script>

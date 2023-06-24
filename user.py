@@ -31,6 +31,9 @@ def play():
         data = {}
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
+        q="SELECT song_id FROM likes WHERE user_id='%s'"%(uid)
+        likedsongids=select(q)
+        likedsonglist = [song['song_id'] for song in likedsongids]
         data['userdetails'] = res[0]
         data['currentalbumsongs']=''
         data['currentartistsongs']=''
@@ -41,7 +44,7 @@ def play():
             album_img= request.form['album_img']
             album_cover= request.form['album_cover']
 
-            q="SELECT s.song_id,song_name,s.image_loc AS song_image_loc, song_loc,genre,LANGUAGE,duration, al.album_name FROM songs s INNER JOIN album al USING (album_id) WHERE s.privacy='public' AND s.STATUS='approved' AND al.album_id='%s'"%(album_id)
+            q="SELECT s.song_id, s.song_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.LANGUAGE, s.duration, al.album_name, CASE WHEN l.song_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN album al USING (album_id) LEFT JOIN likes l ON s.song_id = l.song_id AND l.user_id = '%s' WHERE s.privacy = 'public' AND s.STATUS = 'approved' AND al.album_id = '%s';"%(uid,album_id)
             currentalbumsongs=select(q)
             data['currentalbumsongs']=currentalbumsongs
             playlistname['name']=album_name
@@ -52,7 +55,7 @@ def play():
             artist_name= request.form['artist_name']
             artist_img= request.form['artist_img']
             artist_cover= request.form['artist_cover']
-            q="SELECT s.song_id,song_name,s.image_loc AS song_image_loc, song_loc,genre,LANGUAGE,duration, al.album_name FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id=sar.artist_id INNER JOIN album al USING (album_id) WHERE s.privacy='public' AND s.STATUS='approved' AND ar.artist_id='%s'"%(artist_id)
+            q="SELECT s.song_id, s.song_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.LANGUAGE, s.duration, al.album_name, CASE WHEN l.song_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) LEFT JOIN likes l ON s.song_id = l.song_id AND l.user_id = '%s' WHERE s.privacy = 'public' AND s.STATUS = 'approved' AND ar.artist_id = '%s'"%(uid,artist_id)
             currentartistsongs=select(q)
             data['currentartistsongs']=currentartistsongs
             playlistname['name']=artist_name
@@ -61,9 +64,6 @@ def play():
         return render_template('user/playarea.html', data=data, playlist=playlistname)
     else:
         return redirect(url_for('public.home'))
-
-
-
 
 @user.route('/recommendation')
 def recommendation():
@@ -145,6 +145,25 @@ def propicupload():
         return redirect(url_for('user.edit_profile'))
     else:
         return redirect(url_for('public.home'))
+    
+@user.route('/like_song', methods=['POST'])
+def like_song():
+    if 'uid' in session:
+        uid = session['uid']
+        song_id = request.form.get('songId')
+        is_liked = request.form.get('isLiked')
+        # Perform the necessary actions based on the song ID and like status
+        if is_liked == 'true':
+            q="insert into likes(song_id,user_id) values('%s','%s')"%(song_id,uid)
+            likeid=insert(q)
+        else:
+            q="delete from likes where song_id='%s' and user_id='%s'"%(song_id,uid)
+            delete(q)
+
+        # Return a JSON response indicating success
+        return jsonify({'message': 'Like/Unlike action successful'})
+
+
 
 @user.route('/logout')
 def logout():

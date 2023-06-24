@@ -28,12 +28,12 @@
 
 
   <div class="pagetitle">
-    <h1>All Artist</h1>
+    <h1>My Artist</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
         <li class="breadcrumb-item">Artist</li>
-        <li class="breadcrumb-item active">All Artist</li>
+        <li class="breadcrumb-item active">My Artist</li>
       </ol>
     </nav>
   </div><!-- End Page Title -->
@@ -45,7 +45,7 @@
       <div class="col-lg-8">
         <div class="row">
 
-          <!-- All Artist -->
+          <!-- My Artist -->
           <div class="col-12">
             <div class="card top-selling overflow-auto">
 
@@ -63,7 +63,7 @@
               </div>
 
               <div class="card-body pb-0">
-                <h5 class="card-title">All Artist <span>| Today</span></h5>
+                <h5 class="card-title">My Artist <span>| Today</span></h5>
 
                 <table class="table table-borderless datatable">
                   <thead>
@@ -96,8 +96,13 @@
                       <td><a href="#" class="text-primary fw-bold">{{ row['artist_name'] }}</a></td>
                       <td>{{ row['song_count'] }}</td>
                       <td>
-                        <form action="{{ url_for('uploader.artist') }}" method="POST">
-                          <button type="submit" class="btn btn-primary rounded-pill" name="viewartistaction"
+                        <form action="{{ url_for('uploader.myartist') }}" method="POST">
+                          <button type="submit" class="btn btn-success rounded-pill" name="artistaction"
+                            value="update_artist_{{ row['artist_id'] }}" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Update Artist Details">
+                            <i class="bi bi-arrow-up-circle"></i>
+                          </button>
+                          <button type="submit" class="btn btn-primary rounded-pill" name="artistaction"
                             value="view_artist_{{ row['artist_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
                             title="View Artist Details">
                             <i class="bi bi-view-list"></i>
@@ -159,7 +164,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body text-center">
-          <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.artist') }}" method="POST"
+          <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.myartist') }}" method="POST"
             enctype="multipart/form-data">
             <div class="col-md-12">
               <div class="form-floating">
@@ -202,7 +207,7 @@
 
             <div class="text-center">
               <button type="submit" class="btn btn-primary" name="addartistbtn">Submit</button>
-              <a href="{{ url_for('uploader.artist') }}" class="btn btn-secondary">Reset</a>
+              <a href="{{ url_for('uploader.myartist') }}" class="btn btn-secondary">Reset</a>
             </div>
           </form>
         </div>
@@ -232,7 +237,7 @@
                     alt="ArtistImage" class="rounded-circle mb-3" style="max-width: 200px; max-height: 200px;">
                   <h4 class="mb-0"><b>{{data['currentartistdetails']['artist_name']}}</b></h4>
                 </div>
-              </div>              
+              </div>
             </div>
             <!-- End Artist Details -->
             <div class="col-xl-8">
@@ -253,6 +258,7 @@
                           <th scope="col">Song name</th>
                           <th scope="col">Artist</th>
                           <th scope="col">Song</th>
+                          <th scope="col">Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -266,6 +272,12 @@
                               <source src="{{ row['song_loc'] }}" type="audio/mpeg">
                               Your browser does not support the audio element.
                             </audio>
+                          </td>
+                          <td>
+                            <form action="{{ url_for('uploader.myartist') }}" method="POST">
+                              <button type="submit" class="btn btn-danger rounded-pill" name="songaction" value="remove_song_{{ row['song_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Song">
+                                <i class="bi bi-x-circle"></i>
+                              </button>
                           </td>
                         </tr>
                         {% endfor %}
@@ -288,6 +300,100 @@
   </div>
   <!-- End View Artist Modal -->
 
+  <!-- Edit Artist Modal -->
+  <div class="modal fade" id="editartist" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Artist Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ url_for('uploader.myartist') }}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="artistid" value="{{ data['currentartistdetails']['artist_id'] }}">
+            <input type="hidden" name="artistname" value="{{ data['currentartistdetails']['artist_name'] }}">
+            <div class="row mb-3">
+              <label for="artist_name" class="col-md-4 col-lg-3 col-form-label">Artist Name</label>
+              <div class="col-md-8 col-lg-9">
+                <input name="artist_name" type="text" class="form-control" id="artist_name"
+                  value="{{ data['currentartistdetails']['artist_name'] }}">
+                <button type="submit" name="nameupdate" class="btn btn-success btn-sm mt-2">Update</button>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="artistImage" class="col-md-4 col-lg-3 col-form-label">Artist Image</label>
+              <div class="col-md-8 col-lg-9">
+                <img id="artistImagePreview"
+                  src="{{ url_for('static', filename=data['currentartistdetails']['image_loc']) }}" alt="Artist Image"
+                  style="max-width: 100px;">
+                <div class="pt-2">
+                  <label for="artistImageInput" class="btn btn-primary btn-sm" title="Upload new artist image">
+                    <i class="bi bi-upload"></i>
+                  </label>
+                  <input type="file" id="artistImageInput" name="artistImage" style="display: none;">
+                  <button type="submit" class="btn btn-success btn-sm" name="submitArtistImage">Submit</button>
+                  <a href="#" class="btn btn-danger btn-sm" title="Remove current artist image"><i
+                      class="bi bi-trash"></i></a>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="coverImage" class="col-md-4 col-lg-3 col-form-label">Cover Image</label>
+              <div class="col-md-8 col-lg-9">
+                <img id="coverImagePreview"
+                  src="{{ url_for('static', filename=data['currentartistdetails']['cover_pic']) }}" alt="Cover Image"
+                  style="max-width: 100px;">
+                <div class="pt-2">
+                  <label for="coverImageInput" class="btn btn-primary btn-sm" title="Upload new cover image">
+                    <i class="bi bi-upload"></i>
+                  </label>
+                  <input type="file" id="coverImageInput" name="coverImage" style="display: none;">
+                  <button type="submit" class="btn btn-success btn-sm" name="submitCoverImage">Submit</button>
+                  <a href="#" class="btn btn-danger btn-sm" title="Remove current cover image"><i
+                      class="bi bi-trash"></i></a>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <script>
+            // Function to preview the selected image
+            function previewImage(inputId, previewId) {
+              const input = document.getElementById(inputId);
+              const preview = document.getElementById(previewId);
+              const file = input.files[0];
+
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                  preview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+              }
+            }
+
+            // Add event listeners to the file input elements
+            const artistImageInput = document.getElementById('artistImageInput');
+            const coverImageInput = document.getElementById('coverImageInput');
+
+            artistImageInput.addEventListener('change', function () {
+              previewImage('artistImageInput', 'artistImagePreview');
+            });
+
+            coverImageInput.addEventListener('change', function () {
+              previewImage('coverImageInput', 'coverImagePreview');
+            });
+          </script>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Edit Artist Modal -->
+
 </main><!-- End #main -->
 
 {% include 'uploader/uploader_footer.html'%}
@@ -297,6 +403,16 @@
   // Function to open the modal on page load
   document.addEventListener('DOMContentLoaded', function () {
     var modal = new bootstrap.Modal(document.getElementById('viewartist'));
+    modal.show();
+  });
+</script>
+{% endif %}
+
+{% if value == 'editartist' %}
+<script>
+  // Function to open the modal on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('editartist'));
     modal.show();
   });
 </script>

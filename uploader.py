@@ -30,14 +30,14 @@ def home():
             }
         }
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id, s.song_name, al.album_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.date, s.status,s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id INNER JOIN album al USING (album_id) WHERE s.user_id='%s' GROUP BY s.song_id ORDER BY song_id DESC LIMIT 10"%(uid)
+        q="SELECT s.song_id, s.song_name, IFNULL(al.album_name, 'No album') AS album_name, IFNULL(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.user_id = '%s' GROUP BY s.song_id ORDER BY song_id DESC LIMIT 10"%(uid)
         recentsongdata=select(q) #last 10 songs
         data['recentsongdata']=recentsongdata
         print("The counts are : \n ",data['counts'])
@@ -51,13 +51,15 @@ def allsongs():
     if 'uid' in session:
         uid = session['uid']
         login_id = session['login_id']
+        q="update notification set status='read' where (notification_type = 'approvals' OR notification_type = 'songremoval') and user_id='%s'"%(login_id)
+        update(q)
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
@@ -99,17 +101,16 @@ def approvedsongs():
         login_id = session['login_id']
         data = {}
         count={}
-        login_id = session['login_id']
-        q="update notification set status='read' where notification_type='approvals' and user_id='%s'"%(login_id)
+        q="update notification set status='read' where (notification_type = 'approvals' OR notification_type = 'songremoval') and user_id='%s'"%(login_id)
         update(q)
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id, s.song_name, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s INNER JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(uid)
+        q="SELECT s.song_id, s.song_name, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(uid)
         approvedsongdata=select(q)
         data['approvedsongdata']=approvedsongdata
         q="select * from artist"
@@ -149,10 +150,10 @@ def pendingsongs():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
@@ -197,10 +198,10 @@ def rejectedsongs():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
@@ -276,10 +277,10 @@ def privatesongs():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
@@ -321,10 +322,10 @@ def analytics():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
@@ -341,10 +342,10 @@ def profile():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
@@ -362,54 +363,211 @@ def artist():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
-        q = "SELECT ar.artist_id,ar.artist_name,ar.image_loc,ar.cover_pic,COUNT(s.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar ON ar.artist_id=sar.artist_id LEFT JOIN songs s ON s.song_id=sar.song_id AND s.privacy='public' AND s.status='approved' GROUP BY sar.artist_id ORDER BY ar.artist_id"
+        q = "SELECT ar.artist_id, ar.artist_name, ar.image_loc, ar.cover_pic, COUNT(s.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar ON ar.artist_id = sar.artist_id LEFT JOIN songs s ON s.song_id = sar.song_id AND s.privacy = 'public' AND s.status = 'approved' GROUP BY ar.artist_id ORDER BY ar.artist_id"
         artistdata=select(q)
         data['userdetails'] = res[0]
         data['artistdetails']=artistdata
+        data['currentartistsongs']=''
+        data['currentartistdetails']=''
         if request.method == 'POST':
-            artistname = request.form['artistname']
-            artist_image = request.files['image']
-            cover_image = request.files['coverimage']
+            if 'addartistbtn' in request.form:
+                artistname = request.form['artistname']
+                artist_image = request.files['image']
+                cover_image = request.files['coverimage']
 
-            # Get the file extensions
-            artist_image_extension = os.path.splitext(artist_image.filename)[1]
-            cover_image_extension = os.path.splitext(cover_image.filename)[1]
+                # Get the file extensions
+                artist_image_extension = os.path.splitext(artist_image.filename)[1]
+                cover_image_extension = os.path.splitext(cover_image.filename)[1]
 
-            # Specify the path where you want to save the uploaded files
-            upload_folder = 'static/uploads/artist'  # Update the path according to your setup
+                # Specify the path where you want to save the uploaded files
+                upload_folder = 'static/uploads/artist'  # Update the path according to your setup
 
-            # Create the upload folder if it doesn't exist
-            os.makedirs(upload_folder, exist_ok=True)
+                # Create the upload folder if it doesn't exist
+                os.makedirs(upload_folder, exist_ok=True)
 
-            # Customize the filenames
-            artist_image_filename = artistname + 'propic' + artist_image_extension
-            cover_image_filename = artistname + 'coverpic' + cover_image_extension
+                # Customize the filenames
+                artist_image_filename = artistname + 'propic' + artist_image_extension
+                cover_image_filename = artistname + 'coverpic' + cover_image_extension
 
-            # Saving the path for database
-            profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
-            coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
+                # Saving the path for database
+                profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
+                coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
 
 
-            # Save the uploaded files with the customized filenames
-            artist_image.save(os.path.join(upload_folder, artist_image_filename))
-            cover_image.save(os.path.join(upload_folder, cover_image_filename))
+                # Save the uploaded files with the customized filenames
+                artist_image.save(os.path.join(upload_folder, artist_image_filename))
+                cover_image.save(os.path.join(upload_folder, cover_image_filename))
 
-            # Saving to database
-            q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(artistname,profilepath,coverpath,uid)
-            id=insert(q)
-            if q :
-                flash('success: Artist added successfully')
-                return redirect(url_for('uploader.artist'))
-            else:
-                flash('danger: Artist not added')
-                return redirect(url_for('uploader.artist'))
+                # Saving to database
+                q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(artistname,profilepath,coverpath,uid)
+                id=insert(q)
+                if q :
+                    flash('success: Artist added successfully')
+                    return redirect(url_for('uploader.artist'))
+                else:
+                    flash('danger: Artist not added')
+                    return redirect(url_for('uploader.artist'))
+            elif 'viewartistaction' in request.form:
+                viewartistaction = request.form.get('viewartistaction')
+                artist_id = viewartistaction.split('_')[-1]
+                q="SELECT * FROM artist WHERE artist_id='%s'"%(artist_id)
+                currentartistdetails=select(q)
+                data['currentartistdetails']=currentartistdetails[0]
+                q="SELECT s.song_id, s.song_name, IFNULL(al.album_name, 'No album') AS album_name, s.image_loc, s.song_loc, s.genre, s.date, s.language, s.duration FROM songs s LEFT JOIN album al ON s.album_id = al.album_id AND s.status = 'approved' AND s.privacy = 'public' INNER JOIN songartist sa ON sa.song_id = s.song_id AND sa.artist_id = '%s'"%(artist_id)
+                currentartistsongs=select(q)
+                data['currentartistsongs']=currentartistsongs
+                return render_template('uploader/artist.html', data=data,count=count,value='viewartist')
         return render_template('uploader/artist.html', data=data,count=count)
+    else:
+        return redirect(url_for('public.home'))
+    
+@uploader.route('/myartist', methods=['GET', 'POST'])
+def myartist():
+    if 'uid' in session:
+        login_id = session['login_id']
+        uid = session['uid']
+        data = {}
+        count={}
+        login_id = session['login_id']
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
+        q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
+        res = select(q)
+        q = "SELECT ar.artist_id, ar.artist_name, ar.image_loc, ar.cover_pic, COUNT(s.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar ON ar.artist_id = sar.artist_id LEFT JOIN songs s ON s.song_id = sar.song_id AND s.privacy = 'public' AND s.status = 'approved' WHERE ar.user_id='%s' GROUP BY ar.artist_id ORDER BY ar.artist_id"%(uid)
+        artistdata=select(q)
+        data['userdetails'] = res[0]
+        data['artistdetails']=artistdata
+        data['currentartistsongs']=''
+        data['currentartistdetails']=''
+        if request.method == 'POST':
+            if 'addartistbtn' in request.form:
+                artistname = request.form['artistname']
+                artist_image = request.files['image']
+                cover_image = request.files['coverimage']
+
+                # Get the file extensions
+                artist_image_extension = os.path.splitext(artist_image.filename)[1]
+                cover_image_extension = os.path.splitext(cover_image.filename)[1]
+
+                # Specify the path where you want to save the uploaded files
+                upload_folder = 'static/uploads/artist'  # Update the path according to your setup
+
+                # Create the upload folder if it doesn't exist
+                os.makedirs(upload_folder, exist_ok=True)
+
+                # Customize the filenames
+                artist_image_filename = artistname + 'propic' + artist_image_extension
+                cover_image_filename = artistname + 'coverpic' + cover_image_extension
+
+                # Saving the path for database
+                profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
+                coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
+
+
+                # Save the uploaded files with the customized filenames
+                artist_image.save(os.path.join(upload_folder, artist_image_filename))
+                cover_image.save(os.path.join(upload_folder, cover_image_filename))
+
+                # Saving to database
+                q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(artistname,profilepath,coverpath,uid)
+                id=insert(q)
+                if q :
+                    flash('success: Artist added successfully')
+                    return redirect(url_for('uploader.myartist'))
+                else:
+                    flash('danger: Artist not added')
+                    return redirect(url_for('uploader.myartist'))
+            elif 'artistaction' in request.form:
+                artistaction = request.form.get('artistaction')
+                artist_id = artistaction.split('_')[-1]
+                q="SELECT * FROM artist WHERE artist_id='%s'"%(artist_id)
+                currentartistdetails=select(q)
+                data['currentartistdetails']=currentartistdetails[0]
+                if artistaction.startswith('view_artist'):
+                    q="SELECT s.song_id, s.song_name, IFNULL(al.album_name, 'No album') AS album_name, s.image_loc, s.song_loc, s.genre, s.date, s.language, s.duration FROM songs s LEFT JOIN album al ON s.album_id = al.album_id AND s.status = 'approved' AND s.privacy = 'public' INNER JOIN songartist sa ON sa.song_id = s.song_id AND sa.artist_id = '%s'"%(artist_id)
+                    currentartistsongs=select(q)
+                    data['currentartistsongs']=currentartistsongs
+                    return render_template('uploader/myartist.html', data=data,count=count,value='viewartist')
+                elif artistaction.startswith('update_artist'):
+                    return render_template('uploader/myartist.html', data=data,count=count,value='editartist')
+            elif 'submitArtistImage' in request.form:
+                artist_image = request.files['artistImage']
+                if artist_image.filename !='':
+                    artistid = request.form['artistid']
+                    artistname = request.form['artistname']
+                    # Get the file extensions
+                    artist_image_extension = os.path.splitext(artist_image.filename)[1]
+                    # Specify the path where you want to save the uploaded files
+                    upload_folder = 'static/uploads/artist'  # Update the path according to your setup
+                    # Create the upload folder if it doesn't exist
+                    os.makedirs(upload_folder, exist_ok=True)
+                    # Customize the filenames
+                    artist_image_filename = artistname + 'propic' + artist_image_extension
+                    # Saving the path for database
+                    profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
+                    # Save the uploaded files with the customized filenames
+                    artist_image.save(os.path.join(upload_folder, artist_image_filename))
+                    # Saving to database
+                    q="update artist set image_loc='%s' where artist_id='%s'"%(profilepath,artistid)
+                    update(q)
+                    flash("success: Updated Artist Image successfully")
+                    return redirect(url_for('uploader.myartist'))
+                else:
+                    flash("danger: Add Artist image first")
+            elif 'submitCoverImage' in request.form:
+                cover_image = request.files['coverImage']
+                if cover_image.filename !='':
+                    artistid = request.form['artistid']
+                    artistname = request.form['artistname']
+                    # Get the file extensions
+                    cover_image_extension = os.path.splitext(cover_image.filename)[1]
+                    # Specify the path where you want to save the uploaded files
+                    upload_folder = 'static/uploads/artist'  # Update the path according to your setup
+                    # Create the upload folder if it doesn't exist
+                    os.makedirs(upload_folder, exist_ok=True)
+                    # Customize the filenames
+                    cover_image_filename = artistname + 'coverpic' + cover_image_extension
+                    # Saving the path for database
+                    coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
+                    # Save the uploaded files with the customized filenames
+                    cover_image.save(os.path.join(upload_folder, cover_image_filename))
+                    # Saving to database
+                    q="update artist set cover_pic='%s' where artist_id='%s'"%(coverpath,artistid)
+                    update(q)
+                    flash("success: Updated Artist Cover successfully")
+                    return redirect(url_for('uploader.myartist'))
+                else:
+                    flash("danger: Add Cover image first")
+            elif 'nameupdate' in request.form:
+                artistid = request.form['artistid']
+                artistname = request.form['artist_name']
+                q="update artist set artist_name='%s' where artist_id='%s'"%(artistname,artistid)
+                update(q)
+                flash("success: Updated Artist Name")
+                return redirect(url_for('uploader.myartist'))
+            elif 'songaction' in request.form:
+                songaction = request.form.get('songaction')
+                song_id = songaction.split('_')[-1]
+                q="SELECT u.login_id FROM USER u INNER JOIN songs s ON s.user_id=u.user_id WHERE song_id='%s'"%(song_id)
+                login_id=select(q)
+                login_id=login_id[0]['login_id']
+                q="insert into notification(user_id,content_id,content,content_status,status,notification_type) values('%s','%s','Song removed from artist','artistremoved','toread','songremoval')"%(login_id,song_id)
+                insert(q)
+                q="DELETE from songartist where song_id='%s'"%(song_id)
+                delete(q)
+
+                flash("warning: Song removed"+song_id)
+                return redirect(url_for('uploader.myartist'))
+                
+        return render_template('uploader/myartist.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
     
@@ -422,10 +580,10 @@ def album():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' GROUP BY s.album_id ORDER BY al.album_id"
@@ -488,10 +646,10 @@ def myalbum():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' WHERE al.user_id = '%s' GROUP BY s.album_id ORDER BY al.album_id"%(uid)
@@ -605,6 +763,11 @@ def myalbum():
             elif 'songaction' in request.form:
                 songaction = request.form.get('songaction')
                 song_id = songaction.split('_')[-1]
+                q="SELECT u.login_id FROM USER u INNER JOIN songs s ON s.user_id=u.user_id WHERE song_id='%s'"%(song_id)
+                login_id=select(q)
+                login_id=login_id[0]['login_id']
+                q="insert into notification(user_id,content_id,content,content_status,status,notification_type) values('%s','%s','Song removed from album','albumremoved','toread','songremoval')"%(login_id,song_id)
+                insert(q)
                 q="update songs set album_id='0' where song_id='%s'"%(song_id)
                 update(q)
                 flash("warning: Song removed")
@@ -664,10 +827,10 @@ def uploadsong():
         data['predictedgenre']=pgenre
         print("Predicted Genre is ",data['predictedgenre'])
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]        #A flash message is there for upload successfull in return render_template('uploader/home.html', data=data,count=count)
@@ -747,10 +910,10 @@ def samplepage():
         data = {}
         count={}
         login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='approved' AND notification_type='approvals' AND n.user_id='%s'"%(login_id)
-        approvednotificationdata=select(q)
-        data['approvednotificationdata']=approvednotificationdata
-        count['notification']=str(len(data['approvednotificationdata']))
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]        #A flash message is there for upload successfull in return render_template('uploader/home.html', data=data,count=count)

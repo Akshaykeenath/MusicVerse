@@ -28,12 +28,19 @@
                     <div>
                       <button class="btn btn-success btn-lg btn-round btn-icon" id="play-pause-button-page">
                         <i class="fas fa-play"></i>
-                        <!-- <i class="fas fa-pause"></i> -->
                       </button>
-                      <button class="btn btn-default btn-round btn-icon">
+                      {% if playlist['like']=='yes' %}
+                      <button class="btn btn-default btn-round btn-icon album-like-button" data-album-id="{{ playlist['id'] }}">
+                        <i class="fas fa-heart"></i>
+                        <!-- <i class="fas fa-heart"></i> -->
+                      </button> 
+                      {% else %}
+                      <button class="btn btn-default btn-round btn-icon album-like-button" data-album-id="{{ playlist['id'] }}">
                         <i class="far fa-heart"></i>
                         <!-- <i class="fas fa-heart"></i> -->
-                      </button>
+                      </button> 
+                      {% endif %}
+                      <span style="margin-left: 10px;">songs count : {{ data['currentalbumsongs']|length }}</span>
                     </div>
                   </div>
                   <div class="ml-auto align-self-stretch gradient-overlay">
@@ -104,10 +111,18 @@
                       <button class="btn btn-success btn-lg btn-round btn-icon" id="play-pause-button-page">
                         <i class="fas fa-play"></i>
                       </button>
-                      <button class="btn btn-default btn-round btn-icon">
+                      {% if playlist['like']=='yes' %}
+                      <button class="btn btn-default btn-round btn-icon artist-like-button" data-artist-id="{{ playlist['id'] }}">
+                        <i class="fas fa-heart"></i>
+                        <!-- <i class="fas fa-heart"></i> -->
+                      </button> 
+                      {% else %}
+                      <button class="btn btn-default btn-round btn-icon artist-like-button" data-artist-id="{{ playlist['id'] }}">
                         <i class="far fa-heart"></i>
                         <!-- <i class="fas fa-heart"></i> -->
-                      </button>
+                      </button> 
+                      {% endif %}  
+                      <span style="margin-left: 10px;">songs count : {{ data['currentartistsongs']|length }}</span>
                     </div>
                   </div>
                   <div class="ml-auto align-self-stretch gradient-overlay">
@@ -164,6 +179,74 @@
                 </div>
               </div>
               {% endif %}
+
+              {% if data['favoritesongdata'] %}
+              <div class="card card-coin">
+                <div class="card-body d-flex" style="background-color: #32325d;">
+                  <div class="align-self-start mr-5">
+                    <img src="{{ url_for('static', filename='user/assets/img/favoritesongs.png')}}"
+                      class="img-fluid rounded-circle shadow-lg " style="min-height: 150px; max-height: 200px;">
+                  </div>
+                  <div class="align-self-center d-flex flex-column">
+                    <h4 class="title" style="font-size: calc(1.5rem + 1vw);">Liked Songs</h4>
+                    <div>
+                      <button class="btn btn-success btn-lg btn-round btn-icon" id="play-pause-button-page">
+                        <i class="fas fa-play"></i>
+                      </button>
+                      <span style="margin-left: 10px;">songs count : {{ data['favoritesongdata']|length }}</span>
+                    </div>
+                  </div>
+                  
+                </div>
+
+                <div class="card">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th class="text-center">#</th>
+                        <th>Pic</th>
+                        <th>Song</th>
+                        <th>Time</th>
+                        <th class="text-center">Fav</th>
+                        <th class="text-center">Download</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for row in data['favoritesongdata'] %}
+                      <tr class="hover-row">
+                        <td class="text-center">{{ loop.index }}</td>
+                        <td><img src="{{ url_for('static', filename=row['song_image_loc']) }}" alt="Raised circle image"
+                            class="img-fluid rounded shadow" style="width: 50px;"></td>
+                        <td><a href="#" class="currentSong" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
+                        </td>
+                        <td>{{ row['duration'] }}</td>
+                        <td class="text-center">
+                          {% if row['liked']=='yes' %}
+                            <button type="button" rel="tooltip" class="btn btn-primary btn-icon btn-round liked like-button" data-song-id="{{ row['song_id'] }}">
+                              <i class="fas fa-heart"></i>
+                            </button>
+                          {% else %}
+                            <button type="button" rel="tooltip" class="btn btn-neutral btn-icon btn-round btn-simple like-button" data-song-id="{{ row['song_id'] }}">
+                              <i class="far fa-heart"></i>
+                            </button>
+                          {% endif %}
+                        </td>                         
+                        <td class="text-center">
+                          <button type="button" rel="tooltip" class="btn btn-success btn-simple btn-icon btn-sm">
+                            <i class="tim-icons icon-cloud-download-93"></i>
+                          </button>
+                        </td>
+                        <input type="hidden" name="songurl{{ loop.index }}" value="{{ row['song_loc'] }}">
+                        <input type="hidden" name="songname{{ loop.index }}" value="{{ row['song_name'] }}">
+                        <input type="hidden" name="artworks{{ loop.index }}" value="_{{ loop.index }}">
+                        <input type="hidden" name="albums{{ loop.index }}" value="{{ row['album_name'] }}">
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -178,7 +261,7 @@
           <div class="col-md-4">
             <ul class="nav nav-pills nav-pills-info flex-column">
               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Home</a></li>
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Trending</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('user.favorite') }}">Favorites</a></li>
               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
             </ul>
           </div>
@@ -239,53 +322,6 @@
 <!-- JS for song like -->
 
 <script>
-// $(document).ready(function() {
-//   // Attach a click event listener to the like button
-//   $('.like-button').click(function() {
-//     // Get the song ID from the data attribute of the clicked button
-//     var songId = $(this).data('song-id');
-
-//     // Reference to the clicked button
-//     var $button = $(this);
-
-//     // Determine the current like status of the song
-//     var isLiked = $button.hasClass('liked');
-
-//     // Make an AJAX request to your Flask server to handle the like action
-//     $.ajax({
-//       type: 'POST', // or 'GET' if you prefer
-//       url: '{{ url_for("user.like_song") }}', // generate the URL dynamically using Flask's url_for function
-//       data: {
-//         songId: songId, // Pass the extracted song ID to the server
-//         isLiked: !isLiked // Pass the updated like status to the server
-//       },
-//       success: function(response) {
-//         // The like action was successful
-//         console.log('Song liked/unliked!');
-
-//         // Toggle the button icon and class based on the updated like status
-//         if (isLiked) {
-//           $button.removeClass('liked');
-//           $button.removeClass('btn-primary');
-//           $button.addClass('btn-neutral');
-//           $button.addClass('btn-simple');
-//           $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
-//         } else {
-//           $button.addClass('liked');
-//           $button.removeClass('btn-neutral');
-//           $button.removeClass('btn-simple');
-//           $button.addClass('btn-primary');
-//           $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
-//         }
-//       },
-//       error: function(error) {
-//         // An error occurred while processing the like action
-//         console.error('Error liking/unliking the song:', error);
-//       }
-//     });
-//   });
-// });
-
 $(document).ready(function() {
   // Attach a click event listener to the like buttons
   $('.like-button').click(function() {
@@ -328,6 +364,84 @@ $(document).ready(function() {
       error: function(error) {
         // An error occurred while processing the like action
         console.error('Error liking/unliking the song:', error);
+      }
+    });
+  });
+
+  // Album Like code
+  $('.album-like-button').click(function() {
+    // Get the album ID from the data attribute of the clicked button
+    var albumId = $(this).data('album-id');
+
+    // Reference to the clicked button
+    var $button = $(this);
+
+    // Determine the current like status of the album
+    var isLiked = $button.find('i').hasClass('fas fa-heart');
+
+    // Make an AJAX request to your server to handle the like action
+    $.ajax({
+      type: 'POST', // or 'GET' if you prefer
+      url: '{{ url_for("user.like_album") }}', // generate the URL dynamically using Flask's url_for function
+      data: {
+        albumId: albumId, // Pass the extracted album ID to the server
+        isLiked: !isLiked // Pass the updated like status to the server
+      },
+      success: function(response) {
+        // The like action was successful
+        console.log('Album liked/unliked!', albumId);
+
+        // Toggle the button icon based on the updated like status
+        if (isLiked) {
+          $button.removeClass('liked');
+          $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
+        } else {
+          $button.addClass('liked');
+          $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
+        }
+      },
+      error: function(error) {
+        // An error occurred while processing the like action
+        console.error('Error liking/unliking the album:', error);
+      }
+    });
+  });
+
+  // Artist Like code
+  $('.artist-like-button').click(function() {
+    // Get the artist ID from the data attribute of the clicked button
+    var artistId = $(this).data('artist-id');
+
+    // Reference to the clicked button
+    var $button = $(this);
+
+    // Determine the current like status of the artist
+    var isLiked = $button.find('i').hasClass('fas fa-heart');
+
+    // Make an AJAX request to your server to handle the like action
+    $.ajax({
+      type: 'POST', // or 'GET' if you prefer
+      url: '{{ url_for("user.like_artist") }}', // generate the URL dynamically using Flask's url_for function
+      data: {
+        artistId: artistId, // Pass the extracted artist ID to the server
+        isLiked: !isLiked // Pass the updated like status to the server
+      },
+      success: function(response) {
+        // The like action was successful
+        console.log('Artist liked/unliked!', artistId);
+
+        // Toggle the button icon based on the updated like status
+        if (isLiked) {
+          $button.removeClass('liked');
+          $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
+        } else {
+          $button.addClass('liked');
+          $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
+        }
+      },
+      error: function(error) {
+        // An error occurred while processing the like action
+        console.error('Error liking/unliking the artist:', error);
       }
     });
   });

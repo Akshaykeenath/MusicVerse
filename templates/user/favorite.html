@@ -20,8 +20,8 @@
         <div class="row">
             <div class="col-md-4">
               <ul class="nav nav-pills nav-pills-info flex-column">
-                <li class="nav-item"><a class="nav-link active" href="{{ url_for('user.user_home') }}">Home</a></li>
-               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.favorite') }}">Favorites</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Home</a></li>
+               <li class="nav-item"><a class="nav-link active" href="{{ url_for('user.favorite') }}">Favorites</a></li>
               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
             </ul>
         </div>
@@ -33,7 +33,6 @@
 
   <!-- Trendings -->
   <div class="section" style="margin-top: 50px; margin-left: 250px; overflow-y: scroll; max-height: 660px;">
-
     <!-- Favorite Songs box -->
     {% if data['favoritesongdata'] != [] %}
     <div>
@@ -60,20 +59,17 @@
         <!-- Space for the content below (album data or artist or what ever. Only needed for this one)-->
     </div>
     {% endif %}
-    <!-- Top Albums -->
-    {% if data['albumdata'] != [] %}
-    <h3>Trending Albums</h3>
+    <!-- Favorite Albums -->
+    {% if data['favoritealbumdata'] != [] %}
+    <h3>Favorite Albums</h3>
     <div>
         <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
             <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
-            {% for row in data['albumdata'] %}
+            {% for row in data['favoritealbumdata'] %}
           <li class="nav-item" style="margin-right: 30px;">
             <form action="{{ url_for('user.play') }}" method="POST" role="tab">
               <input type="hidden" name="contenttype" value="album">
               <input type="hidden" name="album_id" value="{{ row['album_id'] }}">
-              <input type="hidden" name="album_name" value="{{ row['album_name'] }}">
-              <input type="hidden" name="album_img" value="{{ row['image_loc'] }}">
-              <input type="hidden" name="album_cover" value="{{ row['cover_pic'] }}">
               <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
                 <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                   <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
@@ -91,19 +87,16 @@
     </div>
     {% endif %}
     <div style="margin-top: 20px;">
-      {% if data['artistdata'] != [] %}
-        <h3>Top Artists</h3>
+      {% if data['favoriteartistdata'] != [] %}
+        <h3>Favorite Artists</h3>
         <div>
           <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
             <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
-            {% for row in data['artistdata'] %}
+            {% for row in data['favoriteartistdata'] %}
           <li class="nav-item" style="margin-right: 30px;">
             <form action="{{ url_for('user.play') }}" method="POST" role="tab">
               <input type="hidden" name="contenttype" value="artist">
               <input type="hidden" name="artist_id" value="{{ row['artist_id'] }}">
-              <input type="hidden" name="artist_name" value="{{ row['artist_name'] }}">
-              <input type="hidden" name="artist_img" value="{{ row['artist_image_loc'] }}">
-              <input type="hidden" name="artist_cover" value="{{ row['artist_cover_pic'] }}">
               <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
                 <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                   <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
@@ -121,6 +114,19 @@
             <!-- Add more list items as needed -->
             </ul>
         </div>
+        {% endif %}
+        {% if data['favoriteartistdata'] == [] and data['favoritealbumdata'] == [] and data['favoritesongdata'] == [] %}
+        <div class="container">
+            <div class="row">
+              <div class="col-12" style="display: flex; align-items: center; justify-content: center; height: 80vh;">
+                <h1 style="text-align: center;">
+                  <i class="fas fa-sad-tear" style="font-size: 100px; color: #6d6d6d;"></i>
+                  <br>
+                  Oops.... Nothing here....
+                </h1>
+              </div>
+            </div>
+          </div>
         {% endif %}
     </div>
     

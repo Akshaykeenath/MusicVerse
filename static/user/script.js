@@ -98,9 +98,27 @@ var volumeSlider = document.getElementById("volume-slider");
 
     currentSong.forEach(function(currentSong) {
       currentSong.addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent default link behavior
         var currentsongindex = event.target.dataset.value;
+        var songId = event.target.dataset.songid;
         currentsongindex=currentsongindex-1
         console.log("Current index value:", currentsongindex);
+
+        // Send the song ID and song index to the Flask server using AJAX
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/user/song_click", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+          // Handle the server response if needed
+          console.log(xhr.responseText);
+        }
+      };
+
+      var data = JSON.stringify({ song_id: songId, song_index: currentsongindex });
+      xhr.send(data);
+
         // Setting the current song details
         if (currentsongindex > -1 && currentsongindex < albumArtworks.length) {
           currIndex=currentsongindex;
@@ -136,6 +154,7 @@ var volumeSlider = document.getElementById("volume-slider");
             albumArt.addClass("active");
             checkBuffering();
             i.attr("class", "fas fa-pause");
+            iPage.attr("class", "fas fa-pause");
             audio.play();
             
             // Show the equalizer when music is played
@@ -223,6 +242,7 @@ var volumeSlider = document.getElementById("volume-slider");
 
     if (playProgress == 100) {
       i.attr("class", "fa fa-play");
+      iPage.attr("class", "fas fa-play");
       seekBar.width(0);
       tProgress.text("00:00");
       albumArt.removeClass("buffering").removeClass("active");
@@ -248,10 +268,15 @@ var volumeSlider = document.getElementById("volume-slider");
     else --currIndex;
 
     if (currIndex > -1 && currIndex < albumArtworks.length) {
-      if (flag == 0) i.attr("class", "fa fa-play");
+      if (flag == 0) 
+      {
+        i.attr("class", "fa fa-play");
+        iPage.attr("class", "fas fa-play");
+      }
       else {
         albumArt.removeClass("buffering");
         i.attr("class", "fa fa-pause");
+        iPage.attr("class", "fas fa-pause");
       }
 
       seekBar.width(0);
@@ -291,6 +316,7 @@ var volumeSlider = document.getElementById("volume-slider");
       else ++currIndex;
     }
   }
+  
   var muteButton = document.getElementById("volume-control");
   var volumeSlider = document.getElementById("volume-slider");
   var previousVolume = 1; // Store the previous volume value
@@ -361,6 +387,11 @@ volumeSlider.addEventListener("input", function() {
     playNextTrackButton.on("click", function () {
       selectTrack(1);
     });
+
+    $(audio).on("ended", function() {
+      selectTrack(1);
+    });
+
   }
 
   initPlayer();

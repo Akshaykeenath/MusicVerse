@@ -115,9 +115,11 @@ repeatButton.addEventListener("click", function() {
   if (repeatButton.classList.contains("btn-primary")) {
     repeatButton.classList.remove("btn-primary");
     repeatButton.classList.add("btn-neutral", "btn-simple");
+    audio.loop = false;
   } else {
     repeatButton.classList.remove("btn-neutral", "btn-simple");
     repeatButton.classList.add("btn-primary");
+    audio.loop = true;
   }
 });
 </script>

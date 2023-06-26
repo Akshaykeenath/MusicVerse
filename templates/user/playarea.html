@@ -67,7 +67,7 @@
                         <td class="text-center">{{ loop.index }}</td>
                         <td><img src="{{ url_for('static', filename=row['song_image_loc'])}}" alt="Raised circle image"
                             class="img-fluid rounded shadow" style="width: 50px;"></td>
-                        <td><a href="#" class="currentSong" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
+                        <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                         </td>
                         <td>{{ row['duration'] }}</td>                       
                         <td class="text-center">
@@ -149,7 +149,7 @@
                         <td class="text-center">{{ loop.index }}</td>
                         <td><img src="{{ url_for('static', filename=row['song_image_loc']) }}" alt="Raised circle image"
                             class="img-fluid rounded shadow" style="width: 50px;"></td>
-                        <td><a href="#" class="currentSong" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
+                        <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                         </td>
                         <td>{{ row['duration'] }}</td>
                         <td class="text-center">
@@ -217,7 +217,7 @@
                         <td class="text-center">{{ loop.index }}</td>
                         <td><img src="{{ url_for('static', filename=row['song_image_loc']) }}" alt="Raised circle image"
                             class="img-fluid rounded shadow" style="width: 50px;"></td>
-                        <td><a href="#" class="currentSong" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
+                        <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}" data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                         </td>
                         <td>{{ row['duration'] }}</td>
                         <td class="text-center">

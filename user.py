@@ -63,6 +63,9 @@ def play():
         playlistname={}
         if contenttype == 'album':
             album_id= request.form['album_id']
+            # Adding to clicks table
+            q="INSERT INTO clicks(content_id,user_id,content_type) values ('%s','%s','album')"%(album_id,uid)
+            cid=insert(q)
             q="SELECT al.album_id, al.album_name, al.image_loc, al.cover_pic, (CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END) AS liked FROM album al LEFT JOIN likes l ON al.album_id = l.content_id AND l.content_type = 'album' AND l.user_id='%s' WHERE al.album_id = '%s'"%(uid,album_id)
             albumdetails=select(q)
             print(albumdetails)
@@ -80,6 +83,8 @@ def play():
             playlistname['like']=album_like
         elif contenttype=='artist':
             artist_id=request.form['artist_id']
+            q="INSERT INTO clicks(content_id,user_id,content_type) values ('%s','%s','artist')"%(artist_id,uid)
+            cid=insert(q)
             q="SELECT ar.artist_id, ar.artist_name, ar.image_loc,ar.cover_pic, (CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END) AS liked FROM artist ar LEFT JOIN likes l ON ar.artist_id = l.content_id AND l.content_type = 'artist' AND l.user_id='%s' WHERE ar.artist_id = '%s'"%(uid,artist_id)
             artistdetails=select(q)
             artist_name = artistdetails[0]['artist_name']
@@ -103,6 +108,24 @@ def play():
         return render_template('user/playarea.html', data=data, playlist=playlistname)
     else:
         return redirect(url_for('public.home'))
+    
+@user.route('/song_click', methods=['POST'])
+def song_click():
+    if 'uid' in session:
+        uid = session['uid']
+        song_id = request.json['song_id']
+        song_index = request.json['song_index']
+        q="INSERT INTO clicks(content_id,user_id,content_type) values ('%s','%s','song')"%(song_id,uid)
+        cid=insert(q)
+        response = {
+            'status': 'success',
+            'message': 'Song ID and song index received',
+            'song_id': song_id,
+            'song_index': song_index
+        }
+        
+        # Return the response as JSON
+        return jsonify(response)
 
 @user.route('/recommendation')
 def recommendation():

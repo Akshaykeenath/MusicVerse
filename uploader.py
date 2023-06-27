@@ -315,7 +315,7 @@ def privatesongs():
     else:
         return redirect(url_for('public.home'))
     
-@uploader.route('/analytics')
+@uploader.route('/analytics' , methods=['GET', 'POST'])
 def analytics():
     if 'uid' in session:
         uid = session['uid']
@@ -329,6 +329,27 @@ def analytics():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
+        q="SELECT s.song_id, s.song_name, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(uid)
+        publicsongdata=select(q)
+        data['publicsongdata']=publicsongdata
+        q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id AND s.user_id = '%s')) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id AND a.user_id = '%s')) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id AND ar.user_id = '%s')) GROUP BY DATE(TIMESTAMP)"%(uid,uid,uid)
+
+        totalclicks=select(q)
+        dates = [str(item['dates']) for item in totalclicks]
+        clicks = [item['clicks'] for item in totalclicks]
+        data['chartdata']={'clicks':clicks,'dates':dates}
+        if 'contenttype' in request.form:
+            contenttype = request.form.get('contenttype')
+            if contenttype == 'SongClicked':
+                song_id = request.form.get('songId')
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='song' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(song_id)
+                songclickdata=select(q)
+                print(songclickdata)
+                dates = [str(item['dates']) for item in songclickdata]
+                clicks = [item['clicks'] for item in songclickdata]
+
+                # Return the data as a JSON response
+                return jsonify({'clicks': clicks, 'dates': dates})
         return render_template('uploader/analytics.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))

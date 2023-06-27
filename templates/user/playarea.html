@@ -91,6 +91,7 @@
                         <input type="hidden" name="songname{{ loop.index }}" value="{{ row['song_name'] }}">
                         <input type="hidden" name="artworks{{ loop.index }}" value="_{{ loop.index }}">
                         <input type="hidden" name="albums{{ loop.index }}" value="{{ row['album_name'] }}">
+                        <input type="hidden" name="duration{{ loop.index }}" value="{{ row['duration'] }}">
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -172,6 +173,7 @@
                         <input type="hidden" name="songname{{ loop.index }}" value="{{ row['song_name'] }}">
                         <input type="hidden" name="artworks{{ loop.index }}" value="_{{ loop.index }}">
                         <input type="hidden" name="albums{{ loop.index }}" value="{{ row['album_name'] }}">
+                        <input type="hidden" name="duration{{ loop.index }}" value="{{ row['duration'] }}">
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -240,6 +242,7 @@
                         <input type="hidden" name="songname{{ loop.index }}" value="{{ row['song_name'] }}">
                         <input type="hidden" name="artworks{{ loop.index }}" value="_{{ loop.index }}">
                         <input type="hidden" name="albums{{ loop.index }}" value="{{ row['album_name'] }}">
+                        <input type="hidden" name="duration{{ loop.index }}" value="{{ row['duration'] }}">
                       </tr>
                       {% endfor %}
                     </tbody>

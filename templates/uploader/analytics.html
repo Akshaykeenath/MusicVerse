@@ -1,3 +1,4 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% include 'uploader/uploader_header.html'%}
 {% include 'uploader/uploader_sidebar.html'%}
 
@@ -35,63 +36,74 @@
                     </div>
 
                     <div class="card-body">
-                        <h5 class="card-title">Reports <span>/Today</span></h5>
+                        <h5 id="ReportData" class="card-title">Report <span >| Total clicks</span></h5>
 
                         <!-- Line Chart -->
                         <div id="reportsChart"></div>
 
                         <script>
-                            document.addEventListener("DOMContentLoaded", () => {
-                                new ApexCharts(document.querySelector("#reportsChart"), {
-                                    series: [{
-                                        name: 'Sales',
-                                        data: [31, 40, 28, 51, 42, 82, 56],
-                                    }, {
-                                        name: 'Revenue',
-                                        data: [11, 32, 45, 32, 34, 52, 41]
-                                    }, {
-                                        name: 'Customers',
-                                        data: [15, 11, 32, 18, 9, 24, 11]
-                                    }],
-                                    chart: {
-                                        height: 350,
-                                        type: 'area',
-                                        toolbar: {
-                                            show: false
+                            function initializeChart(clicks, dates) {
+                                if (!window.chart) {
+                                    window.chart = new ApexCharts(document.querySelector("#reportsChart"), {
+                                        series: [{
+                                            name: 'Clicks',
+                                            data: clicks,
+                                        }],
+                                        chart: {
+                                            height: 350,
+                                            type: 'area',
+                                            toolbar: {
+                                                show: false
+                                            },
                                         },
-                                    },
-                                    markers: {
-                                        size: 4
-                                    },
-                                    colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                                    fill: {
-                                        type: "gradient",
-                                        gradient: {
-                                            shadeIntensity: 1,
-                                            opacityFrom: 0.3,
-                                            opacityTo: 0.4,
-                                            stops: [0, 90, 100]
+                                        markers: {
+                                            size: 4
+                                        },
+                                        colors: ['#4154f1'],
+                                        fill: {
+                                            type: "gradient",
+                                            gradient: {
+                                                shadeIntensity: 1,
+                                                opacityFrom: 0.3,
+                                                opacityTo: 0.4,
+                                                stops: [0, 90, 100]
+                                            }
+                                        },
+                                        dataLabels: {
+                                            enabled: false
+                                        },
+                                        stroke: {
+                                            curve: 'smooth',
+                                            width: 2
+                                        },
+                                        xaxis: {
+                                            type: 'datetime',
+                                            categories: dates
+                                        },
+                                        tooltip: {
+                                            x: {
+                                                format: 'dd/MM/yy'
+                                            },
                                         }
-                                    },
-                                    dataLabels: {
-                                        enabled: false
-                                    },
-                                    stroke: {
-                                        curve: 'smooth',
-                                        width: 2
-                                    },
-                                    xaxis: {
-                                        type: 'datetime',
-                                        categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-                                    },
-                                    tooltip: {
-                                        x: {
-                                            format: 'dd/MM/yy HH:mm'
-                                        },
-                                    }
-                                }).render();
+                                    });
+                                    window.chart.render();
+                                } else {
+                                    window.chart.updateSeries([{
+                                        data: clicks
+                                    }]);
+                                    window.chart.updateOptions({
+                                        xaxis: {
+                                            categories: dates
+                                        }
+                                    });
+                                }
+                            }
+
+                            document.addEventListener("DOMContentLoaded", () => {
+                                initializeChart({{ data['chartdata']['clicks']|tojson }}, {{ data['chartdata']['dates']|tojson }});
                             });
                         </script>
+
                         <!-- End Line Chart -->
 
                     </div>
@@ -99,7 +111,7 @@
                 </div>
             </div><!-- End Reports -->
 
-            <!-- Recent Sales -->
+            <!-- Public Songs -->
             <div class="col-12">
                 <div class="card recent-sales overflow-auto">
 
@@ -117,64 +129,97 @@
                     </div>
 
                     <div class="card-body">
-                        <h5 class="card-title">Recent Sales <span>| Today</span></h5>
+                        <h5 class="card-title">Public Songs <span>| Today</span></h5>
 
                         <table class="table table-borderless datatable">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Customer</th>
-                                    <th scope="col">Product</th>
-                                    <th scope="col">Price</th>
+                                    <th scope="col">Song name</th>
+                                    <th scope="col">Album</th>
+                                    <th scope="col">Artist</th>
+                                    <th scope="col">Privacy</th>
                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for row in data['publicsongdata'] %}
                                 <tr>
-                                    <th scope="row"><a href="#">#2457</a></th>
-                                    <td>Brandon Jacob</td>
-                                    <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                                    <td>$64</td>
-                                    <td><span class="badge bg-success">Approved</span></td>
+                                    <th scope="row"><a href="#">{{ loop.index }}</a></th>
+                                    <td><a href="#" class="text-primary song-link" data-song-id="{{ row['song_id'] }}" data-song-name="{{ row['song_name'] }}">{{ row['song_name'] }}</a></td>
+                                    <td>{{ row['album_name'] }}</td>
+                                    <td><a href="#" class="text-primary">{{ row['artist_name'] }}</a></td>
+                                    <td>
+                                        {% if row['privacy'] == 'public' %}
+                                        <span class="badge bg-success">Public</span>
+                                        {% endif %}
+                                        {% if row['privacy'] == 'private' %}
+                                        <span class="badge bg-warning">Private</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if row['status'] == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                        {% endif %}
+                                        {% if row['status'] == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                        {% if row['status'] == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
-                                <tr>
-                                    <th scope="row"><a href="#">#2147</a></th>
-                                    <td>Bridie Kessler</td>
-                                    <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                                    <td>$47</td>
-                                    <td><span class="badge bg-warning">Pending</span></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><a href="#">#2049</a></th>
-                                    <td>Ashleigh Langosh</td>
-                                    <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                                    <td>$147</td>
-                                    <td><span class="badge bg-success">Approved</span></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><a href="#">#2644</a></th>
-                                    <td>Angus Grady</td>
-                                    <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                                    <td>$67</td>
-                                    <td><span class="badge bg-danger">Rejected</span></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><a href="#">#2644</a></th>
-                                    <td>Raheem Lehner</td>
-                                    <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                                    <td>$165</td>
-                                    <td><span class="badge bg-success">Approved</span></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
 
                     </div>
 
                 </div>
-            </div><!-- End Recent Sales -->
+            </div><!-- End Public Songss -->
 
         </div>
     </section>
 
 </main><!-- End #main -->
 {% include 'uploader/uploader_footer.html'%}
+
+<script>
+    $(document).ready(function() {
+        $('.song-link').on('click', function(event) {
+            event.preventDefault();
+            console.log("Song got clicked");
+            var songId = $(this).data('song-id');
+            var contenttype;
+
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('uploader.analytics') }}",
+                data: { 
+                    songId: songId,
+                    contenttype : 'SongClicked'
+                },
+                success: function(response) {
+                    // Handle the response from the server
+                    console.log(response);
+
+                    // Extract clicks and dates from the response
+                    var clicks = response.clicks;
+                    var dates = response.dates;
+
+                    // Update the chart with the new data
+                    initializeChart(clicks, dates);
+                    // Get the song name from the clicked element
+                    var songName = $(event.currentTarget).data('song-name');
+
+                    // Update the h5 element
+                    $('#ReportData').html('Song Report <span >| '+ songName +'</span>');
+
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>

@@ -2,15 +2,18 @@
 var trackUrl = []; // Define the trackUrl variable outside the event listener
 var trackNames= [];  
 var albumArtworks=[]; // This is form the player.html while the rest of them are from playerarea.html
-var albums= [];    
+var albums= [];
+var duration=[];    
 document.addEventListener('DOMContentLoaded', function() {
   var songurls = document.querySelectorAll('input[name^="songurl"]');
   var tracknamess= document.querySelectorAll('input[name^="songname"]');
   var artworks= document.querySelectorAll('input[name^="artworks"]');
   var album= document.querySelectorAll('input[name^="albums"]');
+  var durations= document.querySelectorAll('input[name^="duration"]');
 
-
-            
+  durations.forEach(function(element) {
+    duration.push(element.value);
+  });          
   songurls.forEach(function(element) {
     trackUrl.push(element.value);
   });
@@ -131,7 +134,9 @@ var volumeSlider = document.getElementById("volume-slider");
           currAlbum = albums[currentsongindex];
           currTrackName = trackNames[currentsongindex];
           currArtwork = albumArtworks[currentsongindex];
-    
+          currDuration=duration[currentsongindex];
+          console.log("track Name : ",currTrackName,"Track duration",currDuration)
+          tTime.text(currDuration);
           audio.src = trackUrl[currentsongindex];
     
           nTime = 0;
@@ -140,6 +145,7 @@ var volumeSlider = document.getElementById("volume-slider");
     
           albumName.text(currAlbum);
           trackName.text(currTrackName);
+          tTime.text(currDuration);
           albumArt.find("img.active").removeClass("active");
           $("#" + currArtwork).addClass("active");
     
@@ -227,7 +233,7 @@ var volumeSlider = document.getElementById("volume-slider");
     else tProgress.text(curMinutes + ":" + curSeconds);
 
     if (isNaN(durMinutes) || isNaN(durSeconds)) tTime.text("00:00");
-    else tTime.text(durMinutes + ":" + durSeconds);
+    else tTime.text(currDuration);
 
     if (
       isNaN(curMinutes) ||
@@ -287,7 +293,7 @@ var volumeSlider = document.getElementById("volume-slider");
       currAlbum = albums[currIndex];
       currTrackName = trackNames[currIndex];
       currArtwork = albumArtworks[currIndex];
-
+      currDuration=duration[currIndex];
       audio.src = trackUrl[currIndex];
 
       nTime = 0;
@@ -305,6 +311,7 @@ var volumeSlider = document.getElementById("volume-slider");
 
       albumName.text(currAlbum);
       trackName.text(currTrackName);
+      tTime.text(currDuration);
       albumArt.find("img.active").removeClass("active");
       $("#" + currArtwork).addClass("active");
 

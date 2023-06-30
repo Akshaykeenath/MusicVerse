@@ -335,7 +335,6 @@ def analytics():
         data['chartdata']={'clicks':clicks,'dates':dates}
         q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' AND s.user_id='%s' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' AND a.user_id='%s' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' AND a.user_id='%s' GROUP BY name"%(uid,uid,uid)
         clickdata=select(q)
-        print(clickdata)
         q = "SELECT al.album_id,al.album_name,al.image_loc,COUNT(c.click_id) AS clicks FROM album al LEFT JOIN clicks c ON al.album_id=c.content_id AND c.content_type='album' WHERE al.user_id='%s' GROUP BY al.album_id"%(uid)
         myalbumdetails=select(q)
         data['myalbumdetails']=myalbumdetails

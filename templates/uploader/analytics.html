@@ -119,12 +119,13 @@
             <div class="card top-selling overflow-auto">
 
               <div class="card-body pb-0">
+              <h5 class="card-title">My Songs
                 {% for item in clickdata %}
                 {% if item['name'] == 'Songs' %}
-                <h5 class="card-title">My Songs <span class="badge rounded-pill bg-secondary text-light"> {{
-                    item['clicks'] }}</span></h5>
+                 <span class="badge rounded-pill bg-secondary text-light"> {{ item['clicks'] }}</span>
                 {% endif %}
                 {% endfor %}
+              </h5>
                 <table class="table table-borderless datatable">
                   <thead>
                     <tr>
@@ -166,13 +167,13 @@
           <div class="col-12">
             <div class="card top-selling overflow-auto">
               <div class="card-body pb-0">
+              <h5 class="card-title">My Albums 
                 {% for item in clickdata %}
                 {% if item['name'] == 'Albums' %}
-                <h5 class="card-title">My Albums <span class="badge rounded-pill bg-secondary text-light"> {{
-                    item['clicks'] }}</span></h5>
+                <span class="badge rounded-pill bg-secondary text-light"> {{ item['clicks'] }}</span>
                 {% endif %}
                 {% endfor %}
-
+              </h5>
                 <table class="table table-borderless table-hover datatable">
                   <thead>
                     <tr>
@@ -217,8 +218,8 @@
           <div class="card">
 
             <div class="card-body pb-0">
-              <h5 class="card-title">Total Clicks <span class="badge rounded-pill bg-secondary text-light"> {{
-                  data['chartdata']['clicks'][-1] }}</span></h5>
+              <h5 class="card-title">Total Clicks <span class="badge rounded-pill bg-secondary text-light"> {% if data['chartdata']['clicks'][-1] %} {{
+                  data['chartdata']['clicks'][-1] }} {% endif %}</span></h5>
 
               <div id="trafficChart" style="min-height: 380px;" class="echart"></div>
 
@@ -274,13 +275,13 @@
           <div class="card top-selling overflow-auto">
 
             <div class="card-body pb-0">
+            <h5 class="card-title">My Artist 
               {% for item in clickdata %}
               {% if item['name'] == 'Artists' %}
-              <h5 class="card-title">My Artist <span class="badge rounded-pill bg-secondary text-light"> {{
-                  item['clicks'] }}</span></h5>
+              <span class="badge rounded-pill bg-secondary text-light"> {{ item['clicks'] }}</span>
               {% endif %}
               {% endfor %}
-
+            </h5>
               <table class="table table-borderless">
                 <thead>
                   <tr>

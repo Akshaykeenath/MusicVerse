@@ -1,126 +1,215 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% include 'uploader/uploader_header.html'%}
 {% include 'uploader/uploader_sidebar.html'%}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
-    <style>
-        .select2-container {
-            width: 100% !important;
-        }
-    </style>
+
 
 <main id="main" class="main">
 
-    <!-- (success:, info:, warning:, danger:) -->
-    {% with messages = get_flashed_messages() %} 
-  {% for message in messages %}
-    {% set alert_class = '' %}
-    {% if message.startswith('success:') %}
-      {% set alert_class = 'alert-success bg-success text-light' %}
-      {% set message = message.split(':')[1] %}
-    {% elif message.startswith('info:') %}
-      {% set alert_class = 'alert-info bg-info text-light' %}
-      {% set message = message.split(':')[1] %}
-    {% elif message.startswith('warning:') %}
-      {% set alert_class = 'alert-warning bg-warning text-dark' %}
-      {% set message = message.split(':')[1] %}
-    {% elif message.startswith('danger:') %}
-      {% set alert_class = 'alert-danger bg-danger text-light' %}
-      {% set message = message.split(':')[1] %}
-    {% endif %}
-    <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-  {% endfor %}
-{% endwith %}
-<!-- End flash message alert -->
+  <div id="reportsChartArea" class="pagetitle">
+    <h1>Analytics</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
+        <li class="breadcrumb-item active">Analytics</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
 
-    <div class="pagetitle">
-      <h1>Upload Song</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
-          <li class="breadcrumb-item">Songs</li>
-          <li class="breadcrumb-item active">upload song</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-    <section class="section">
-      <div class="row">
-
+  <section class="section dashboard">
+    <div class="row">
+      <!-- Left side columns -->
+      <div class="col-lg-8">
         <div class="row">
-          <div class="col-xl-4">
-  
+
+          <!-- Reports -->
+          <div class="col-12">
             <div class="card">
-              <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                <img src="{{ url_for('static', filename=data['currentalbumdetails']['image_loc']) }}" alt="SongImage" class="rounded-circle" style="max-width: 200px; max-height: 200px;">
-                <h4><b>{{data['currentalbumdetails']['album_name']}}</b></h4>
-              </div>
-            </div>
-  
-          </div>
-  
-          <div class="col-xl-8">
-  
-            <div class="card">
-              <div class="card-body pt-3">
-                <!-- Bordered Tabs -->
-                <ul class="nav nav-tabs nav-tabs-bordered">
-  
-                  <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filter</h6>
                   </li>
-  
+
+                  <li><a class="dropdown-item" href="#">Today</a></li>
+                  <li><a class="dropdown-item" href="#">This Month</a></li>
+                  <li><a class="dropdown-item" href="#">This Year</a></li>
                 </ul>
-                <div class="tab-content pt-2">
-                  <table class="table table-hover">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Song name</th>
-                        <th scope="col">Artist</th>
-                        <th scope="col">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for row in data['albumsongdata'] %}
-                      <tr>
-                        <th scope="row"><a href="#">{{ loop.index }}</a></th>
-                        <td>{{ row['song_name'] }}</td>
-                        <td><a href="#" class="text-primary">{{ row['artist_name'] }}</a></td>
-                        <td>
-                          <audio controls>
-                            <source src="{{ row['song_loc'] }}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                          </audio>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                    
-                    <div id="song-list"></div>
-                    
-                    
-                  </table>
-                </div><!-- End Bordered Tabs -->
-  
               </div>
+
+              <div class="card-body">
+                <h5 id="ReportData" class="card-title">Report <span>| Total clicks</span></h5>
+
+                <!-- Line Chart -->
+                <div id="reportsChart"></div>
+
+                <script>
+                  function initializeChart(clicks, dates) {
+                    if (!window.chart) {
+                      window.chart = new ApexCharts(document.querySelector("#reportsChart"), {
+                        series: [{
+                          name: 'Clicks',
+                          data: clicks,
+                        }],
+                        chart: {
+                          height: 350,
+                          type: 'area',
+                          toolbar: {
+                            show: false
+                          },
+                        },
+                        markers: {
+                          size: 4
+                        },
+                        colors: ['#4154f1'],
+                        fill: {
+                          type: "gradient",
+                          gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.3,
+                            opacityTo: 0.4,
+                            stops: [0, 90, 100]
+                          }
+                        },
+                        dataLabels: {
+                          enabled: false
+                        },
+                        stroke: {
+                          curve: 'smooth',
+                          width: 2
+                        },
+                        xaxis: {
+                          type: 'datetime',
+                          categories: dates
+                        },
+                        tooltip: {
+                          x: {
+                            format: 'dd/MM/yy'
+                          },
+                        }
+                      });
+                      window.chart.render();
+                    } else {
+                      window.chart.updateSeries([{
+                        data: clicks
+                      }]);
+                      window.chart.updateOptions({
+                        xaxis: {
+                          categories: dates
+                        }
+                      });
+                    }
+                  }
+
+                  document.addEventListener("DOMContentLoaded", () => {
+                    initializeChart({{ data['chartdata']['clicks'] | tojson }}, {{ data['chartdata']['dates'] | tojson }});
+                            });
+                </script>
+
+                <!-- End Line Chart -->
+
+              </div>
+
             </div>
-  
-          </div>
+          </div><!-- End Reports -->
+
+          <!-- Public Songs -->
+          <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filter</h6>
+                  </li>
+
+                  <li><a class="dropdown-item" href="#">Today</a></li>
+                  <li><a class="dropdown-item" href="#">This Month</a></li>
+                  <li><a class="dropdown-item" href="#">This Year</a></li>
+                </ul>
+              </div>
+
+              <div class="card-body">
+                <h5 class="card-title">Public Songs <span>| Today</span></h5>
+
+                <table class="table table-borderless datatable table-hover">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Song name</th>
+                      <th scope="col">Album</th>
+                      <th scope="col">Artist</th>
+                      <th scope="col">Privacy</th>
+                      <th scope="col">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in data['publicsongdata'] %}
+                    <tr>
+                      <th scope="row">{{ loop.index }}</th>
+                      <td><a href="#" class="text-primary" data-song-id="{{ row['song_id'] }}">{{ row['song_name'] }}</a></td>
+                      <td>{{ row['album_name'] }}</td>
+                      <td>{{ row['artist_name'] }}</td>
+                      <td>
+                        {% if row['privacy'] == 'public' %}
+                        <span class="badge bg-success">Public</span>
+                        {% endif %}
+                        {% if row['privacy'] == 'private' %}
+                        <span class="badge bg-warning">Private</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if row['status'] == 'approved' %}
+                        <span class="badge bg-success">Approved</span>
+                        {% endif %}
+                        {% if row['status'] == 'pending' %}
+                        <span class="badge bg-warning">Pending</span>
+                        {% endif %}
+                        {% if row['status'] == 'rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
+          </div><!-- End Public Songss -->
+
+
         </div>
-
       </div>
-    </section>
+    </div>
+  </section>
+</main><!-- End #main -->
+{% include 'uploader/uploader_footer.html'%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var links = document.querySelectorAll('.text-primary');
+  
+  links.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var songId = this.dataset.songId;
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/uploader/analytics_overview';
+      
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'songId';
+      input.value = songId;
+      
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    });
+  });
+});
+</script>
 
-  </main><!-- End #main -->
-
-  {% include 'uploader/uploader_footer.html'%}
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-  <script>
-      $(document).ready(function() {
-          $('#artistselect').select2();
-      });
-  </script>

@@ -1,0 +1,166 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% include 'uploader/uploader_header.html'%}
+{% include 'uploader/uploader_sidebar.html'%}
+
+
+<main id="main" class="main">
+
+  <div id="reportsChartArea" class="pagetitle">
+    {% if data['contentdata']['song_name'] %}
+    <h1>{{ data['contentdata']['song_name'] }}</h1>
+    {% elif data['contentdata']['album_name'] %}
+    <h1>{{ data['contentdata']['album_name'] }}</h1>
+    {% elif data['contentdata']['artist_name'] %}
+    <h1>{{ data['contentdata']['artist_name'] }}</h1>
+    {% endif %}
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('uploader.analytics') }}">Analytics</a></li>
+        {% if data['contentdata']['song_name'] %}
+        <li class="breadcrumb-item active">{{ data['contentdata']['song_name'] }}</li>
+        {% elif data['contentdata']['album_name'] %}
+        <li class="breadcrumb-item active">{{ data['contentdata']['album_name'] }}</li>
+        {% elif data['contentdata']['artist_name'] %}
+        <li class="breadcrumb-item active">{{ data['contentdata']['artist_name'] }}</li>
+        {% endif %}
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+      <!-- Left side columns -->
+      <div class="col-lg-9">
+        <div class="row">
+
+          <!-- Reports -->
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 id="ReportData" class="card-title">Report <span> | {{ data['contentdata']['song_name'] }} </span>
+                </h5>
+
+                <!-- Line Chart -->
+                <div id="reportsChart"></div>
+
+                <script>
+                  function initializeChart(clicks, dates, likes) {
+                    if (!window.chart) {
+                      window.chart = new ApexCharts(document.querySelector("#reportsChart"), {
+                        series: [{
+                          name: 'Clicks',
+                          data: clicks,
+                        },
+                        {
+                          name: 'Likes',
+                          data: likes
+                        }
+                        ],
+                        chart: {
+                          height: 350,
+                          type: 'area',
+                          toolbar: {
+                            show: false
+                          },
+                        },
+                        markers: {
+                          size: 4
+                        },
+                        colors: ['#4154f1', '#ff771d'],
+                        fill: {
+                          type: "gradient",
+                          gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.3,
+                            opacityTo: 0.4,
+                            stops: [0, 90, 100]
+                          }
+                        },
+                        dataLabels: {
+                          enabled: false
+                        },
+                        stroke: {
+                          curve: 'smooth',
+                          width: 2
+                        },
+                        xaxis: {
+                          type: 'datetime',
+                          categories: dates
+                        },
+                        tooltip: {
+                          x: {
+                            format: 'dd/MM/yy'
+                          },
+                        }
+                      });
+                      window.chart.render();
+                    } else {
+                      window.chart.updateSeries([{
+                        data: clicks
+                      }]);
+                      window.chart.updateOptions({
+                        xaxis: {
+                          categories: dates
+                        }
+                      });
+                    }
+                  }
+
+                  document.addEventListener("DOMContentLoaded", () => {
+                    initializeChart({{ data['chartdata']['clicks'] | tojson }}, {{ data['chartdata']['dates'] | tojson }}, {{ data['chartdata']['likes'] | tojson }});
+                            });
+                </script>
+
+                <!-- End Line Chart -->
+
+              </div>
+
+            </div>
+          </div><!-- End Reports -->
+
+        </div>
+      </div>
+
+      <!-- Right side columns -->
+      <div class="col-lg-3">
+        <!-- Content Details -->
+        <div class="col--4">
+          <div class="card">
+            <div class="card-body pb-0">
+              <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                <img src="{{ url_for('static', filename=data['contentdata']['image_loc'])}}" alt="Profile"
+                  class="rounded-circle" style="max-width: 200px; height: auto;">
+                {% if data['contentdata']['song_name'] %}
+                <h6 class="mt-3">Song</h6>
+                <h4>{{ data['contentdata']['song_name'] }}</h4>
+                {% elif data['contentdata']['album_name'] %}
+                <h6 class="mt-3">Album</h6>
+                <h4>{{ data['contentdata']['album_name'] }}</h4>
+                {% elif data['contentdata']['artist_name'] %}
+                <h6 class="mt-3">Artist</h6>
+                <h4>{{ data['contentdata']['artist_name'] }}</h4>
+                {% endif %}
+                <table>
+                  <tr>
+                    <td><span class="badge text-primary"> Total Clicks </span></td>
+                    <td> <span class=" text-primary "><i class="bi bi-eye-fill"></i> {% if
+                        data['chartdata']['clicks'][-1] %} {{ data['chartdata']['clicks'][-1] }} {% else %} 0 {% endif
+                        %} </span></td>
+                  </tr>
+                  <tr>
+                    <td> <span class="badge text-danger"> Total Likes </span> </td>
+                    <td> <span class=" text-danger "><i class="ri-heart-fill"></i> {% if data['chartdata']['likes'][-1]
+                        %} {{ data['chartdata']['likes'][-1] }} {% else %} 0 {% endif %}</span></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Content Details -->
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+{% include 'uploader/uploader_footer.html'%}

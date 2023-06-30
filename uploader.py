@@ -7,7 +7,7 @@ from mutagen.mp3 import MP3
 import random
 from genre_rec_service import Genre_Recognition_Service
 from pydub import AudioSegment
-
+from analytics import *
 uploader =Blueprint('uploader',__name__)
 
 @uploader.route('/')
@@ -40,7 +40,6 @@ def home():
         q="SELECT s.song_id, s.song_name, IFNULL(al.album_name, 'No album') AS album_name, IFNULL(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.user_id = '%s' GROUP BY s.song_id ORDER BY song_id DESC LIMIT 10"%(uid)
         recentsongdata=select(q) #last 10 songs
         data['recentsongdata']=recentsongdata
-        print("The counts are : \n ",data['counts'])
         
         return render_template('uploader/home.html', data=data,count=count)
     else:
@@ -178,7 +177,6 @@ def pendingsongs():
                 data['currentsongdata']=currentsongdata[0]
                 data['currentartistdata']=currentartistdata
                 if action.startswith('update_song'):
-                    print("All artist datas",data['artistdata'])
                     return render_template('uploader/pending_songs.html', data=data,count=count, value='updatesong')
                 elif action.startswith('view_song'):
                     return render_template('uploader/pending_songs.html', data=data,count=count, value='viewsong')
@@ -250,7 +248,6 @@ def updatesong():
             q="delete from songartist where song_id='%s'"%(songid)
             delete(q)
             for artist_id in artist_ids:
-                print("Artist id fron for loop:",artist_id)
                 q="insert into songartist (song_id,artist_id) values('%s','%s')"%(songid,artist_id)
                 insert(q)
             flash('success: Song Details updated successfully')
@@ -329,28 +326,87 @@ def analytics():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        q="SELECT s.song_id, s.song_name, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(uid)
-        publicsongdata=select(q)
-        data['publicsongdata']=publicsongdata
+        q="SELECT s.song_id,s.song_name,s.image_loc,COUNT(c.click_id) AS clicks FROM songs s LEFT JOIN clicks c ON s.song_id=c.content_id AND c.content_type='song' WHERE s.user_id='%s' GROUP BY s.song_id"%(uid)
+        songdata=select(q)
+        data['songdata']=songdata
         q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id AND s.user_id = '%s')) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id AND a.user_id = '%s')) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id AND ar.user_id = '%s')) GROUP BY DATE(TIMESTAMP)"%(uid,uid,uid)
-
         totalclicks=select(q)
-        dates = [str(item['dates']) for item in totalclicks]
-        clicks = [item['clicks'] for item in totalclicks]
+        clicks, dates = getClicksDatesInc(totalclicks)
         data['chartdata']={'clicks':clicks,'dates':dates}
+        q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' AND s.user_id='%s' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' AND a.user_id='%s' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' AND a.user_id='%s' GROUP BY name"%(uid,uid,uid)
+        clickdata=select(q)
+        print(clickdata)
+        q = "SELECT al.album_id,al.album_name,al.image_loc,COUNT(c.click_id) AS clicks FROM album al LEFT JOIN clicks c ON al.album_id=c.content_id AND c.content_type='album' WHERE al.user_id='%s' GROUP BY al.album_id"%(uid)
+        myalbumdetails=select(q)
+        data['myalbumdetails']=myalbumdetails
+        q = "SELECT ar.artist_id,ar.artist_name,ar.image_loc,COUNT(c.click_id) AS clicks FROM artist ar LEFT JOIN clicks c ON ar.artist_id=c.content_id AND c.content_type='artist' WHERE ar.user_id='%s' GROUP BY ar.artist_id"%(uid)
+        myartistdata=select(q)
+        data['myartistdata']=myartistdata
         if 'contenttype' in request.form:
             contenttype = request.form.get('contenttype')
             if contenttype == 'SongClicked':
                 song_id = request.form.get('songId')
                 q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='song' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(song_id)
                 songclickdata=select(q)
-                print(songclickdata)
-                dates = [str(item['dates']) for item in songclickdata]
-                clicks = [item['clicks'] for item in songclickdata]
+                clicks, dates = getClicksDatesInc(songclickdata)
+                q="select * from songs where song_id='%s'"%(song_id)
+                songdata=select(q)
+                return jsonify({'clicks': clicks, 'dates': dates,'songdata':songdata[0]})
+        return render_template('uploader/analytics.html', data=data,count=count,clickdata=clickdata)
+    else:
+        return redirect(url_for('public.home'))
 
-                # Return the data as a JSON response
-                return jsonify({'clicks': clicks, 'dates': dates})
-        return render_template('uploader/analytics.html', data=data,count=count)
+@uploader.route('/analytics_overview' , methods=['GET', 'POST'])
+def analytics_overview():
+    if 'uid' in session:
+        uid = session['uid']
+        data = {}
+        count={}
+        login_id = session['login_id']
+        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
+        notificationdata=select(q)
+        data['notificationdata']=notificationdata
+        count['notification']=str(len(data['notificationdata']))
+        q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
+        res = select(q)
+        data['userdetails'] = res[0]
+        if request.method == 'POST':
+            song_id = request.form.get('songId')
+            album_id = request.form.get('albumId')
+            artist_id = request.form.get('artistId')
+            if song_id:
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='song' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(song_id)
+                songclickdata=select(q)
+                q="select * from songs where song_id='%s'"%(song_id)
+                songdata=select(q)
+                data['contentdata']=songdata[0] #Song data
+                q="SELECT DATE(l.timestamp) AS dates,COUNT(*) AS likes FROM likes l WHERE l.content_type='song' AND l.content_id='%s' GROUP BY DATE(l.timestamp)"%(song_id)
+                songlikes=select(q)
+                clicks, likes, dates = getClicksLikesDates(songclickdata, songlikes)
+                data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
+                return render_template('uploader/analytics_overview.html', data=data, count=count)
+            elif album_id:
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='album' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(album_id)
+                albumclickdata=select(q)
+                q="select * from album where album_id='%s'"%(album_id)
+                albumdata=select(q)
+                data['contentdata']=albumdata[0] #Album data
+                q="SELECT DATE(l.timestamp) AS dates,COUNT(*) AS likes FROM likes l WHERE l.content_type='album' AND l.content_id='%s' GROUP BY DATE(l.timestamp)"%(album_id)
+                albumlikes=select(q)
+                clicks, likes, dates = getClicksLikesDates(albumclickdata, albumlikes)
+                data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
+                return render_template('uploader/analytics_overview.html', data=data, count=count)
+            elif artist_id:
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='artist' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(artist_id)
+                artistclickdata=select(q)
+                q="select * from artist where artist_id='%s'"%(artist_id)
+                artistdata=select(q)
+                data['contentdata']=artistdata[0] #Artist data
+                q="SELECT DATE(l.timestamp) AS dates,COUNT(*) AS likes FROM likes l WHERE l.content_type='artist' AND l.content_id='%s' GROUP BY DATE(l.timestamp)"%(artist_id)
+                artistlikes=select(q)
+                clicks, likes, dates = getClicksLikesDates(artistclickdata, artistlikes)
+                data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
+                return render_template('uploader/analytics_overview.html', data=data, count=count)
     else:
         return redirect(url_for('public.home'))
     
@@ -370,7 +426,6 @@ def profile():
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
-        print(data['userdetails'])
         return render_template('uploader/uploader_profile.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
@@ -652,7 +707,6 @@ def album():
                     data['currentalbumdetails']=currentalbumdetails[0]
                     q="SELECT DISTINCT s.song_id, s.song_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id WHERE s.privacy='public' AND s.STATUS='approved' AND s.album_id='%s' GROUP BY sar.song_id ORDER BY song_id"%(album_id)
                     albumsongdata=select(q)
-                    print(albumsongdata)
                     data['albumsongdata']=albumsongdata
                     return render_template('uploader/album.html', data=data,count=count, value='viewalbum')
         return render_template('uploader/album.html', data=data,count=count)
@@ -718,7 +772,6 @@ def myalbum():
                     data['currentalbumdetails']=currentalbumdetails[0]
                     q="SELECT DISTINCT s.song_id, s.song_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id WHERE s.privacy='public' AND s.STATUS='approved' AND s.album_id='%s' GROUP BY sar.song_id ORDER BY song_id"%(album_id)
                     albumsongdata=select(q)
-                    print(albumsongdata)
                     data['albumsongdata']=albumsongdata
                     return render_template('uploader/myalbum.html', data=data,count=count, value='viewalbum')
                 elif action.startswith('update_album'):
@@ -846,7 +899,6 @@ def uploadsong():
         count={}
         pgenre=session['predictedgenre']
         data['predictedgenre']=pgenre
-        print("Predicted Genre is ",data['predictedgenre'])
         login_id = session['login_id']
         q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
         notificationdata=select(q)
@@ -926,7 +978,6 @@ def secondstominute(seconds):
 @uploader.route('/samplepage', methods=['GET', 'POST'])
 def samplepage():
     if 'uid' in session:
-        login_id = session['login_id']
         uid = session['uid']
         data = {}
         count={}
@@ -937,16 +988,20 @@ def samplepage():
         count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
-        data['userdetails'] = res[0]        #A flash message is there for upload successfull in return render_template('uploader/home.html', data=data,count=count)
-        album_id=2
-        q="select * from album where album_id='%s'"%(album_id)
-        currentalbumdetails=select(q)
-        data['currentalbumdetails']=currentalbumdetails[0]
-        q="SELECT DISTINCT s.song_id, s.song_name, GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc FROM songs s INNER JOIN songartist sar USING (song_id) INNER JOIN artist ar ON ar.artist_id = sar.artist_id WHERE s.privacy='public' AND s.STATUS='approved' AND s.album_id='%s' GROUP BY sar.song_id ORDER BY song_id"%(album_id)
-        albumsongdata=select(q)
-        print(albumsongdata)
-        data['albumsongdata']=albumsongdata
-        return render_template('uploader/samplepage.html', data=data,count=count)
+        data['userdetails'] = res[0]
+        q="SELECT s.song_id, s.song_name, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(uid)
+        publicsongdata=select(q)
+        data['publicsongdata']=publicsongdata
+        q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id AND s.user_id = '%s')) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id AND a.user_id = '%s')) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id AND ar.user_id = '%s')) GROUP BY DATE(TIMESTAMP)"%(uid,uid,uid)
+        totalclicks=select(q)
+        clicks, dates = getClicksDates(totalclicks)
+        data['chartdata']={'clicks':clicks,'dates':dates}
+        q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' AND s.user_id='%s' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' AND a.user_id='%s' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' AND a.user_id='%s' GROUP BY name"%(uid,uid,uid)
+        clickdata=select(q)
+        q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' WHERE al.user_id = '%s' GROUP BY s.album_id ORDER BY al.album_id"%(uid)
+        myalbumdetails=select(q)
+        data['myalbumdetails']=myalbumdetails
+        return render_template('uploader/samplepage.html', data=data,count=count,clickdata=clickdata)
     else:
         return redirect(url_for('public.home'))
     

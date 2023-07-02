@@ -1,170 +1,276 @@
 {% include 'user/user_header.html'%}
-  <div>
-  
-    <div class="page-header header-filter">
-      <div class="squares square1"></div>
-      <div class="squares square2"></div>
-      <div class="squares square3"></div>
-      <div class="squares square4"></div>
-      <div class="squares square5"></div>
-      <div class="squares square6"></div>
-      <div class="squares square7"></div>
 
-      <!-- Playlist bar -->
-      <div class="playarea-container container-fluid">
-        <div class="content"> 
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-12 col-md-12 offset-lg-0 offset-md-3">
-                <div class="card card-coin">
-                  <div class="card-body d-flex" style="background-color: #32325d;">
-                    <div class="align-self-start mr-5">
-                        <img src="{{ url_for('static', filename='public/img/mike.jpg')}}" class="img-fluid rounded shadow-lg">
-                    </div>
-                    <div class="align-self-center d-flex flex-column">
-                        <h4 class="title" style="font-size: calc(1.5rem + 1vw);">Play Name</h4>
-                        <div>
-                            <button class="btn btn-success btn-lg btn-round btn-icon">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <button class="btn btn-default btn-round btn-icon">
-                                <i class="far fa-heart"></i>
-                                <!-- <i class="fas fa-heart"></i> -->
-                            </button>
-                        </div>
-                    </div>
-                    <div class="ml-auto align-self-stretch gradient-overlay">
-                        <img src="{{ url_for('static', filename='public/img/mike.jpg')}}" class="img-fluid rounded shadow">
-                    </div>
-                </div>                                          
-                  <div class="card">
-                    <table class="table">
-                      <thead>
-                          <tr>
-                              <th class="text-center">#</th>
-                              <th>Name</th>
-                              <th>Job Position</th>
-                              <th>Since</th>
-                              <th class="text-right">Salary</th>
-                              <th class="text-right">Actions</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <tr>
-                              <td class="text-center">1</td>
-                              <td>Andrew Mike</td>
-                              <td>Develop</td>
-                              <td>2013</td>
-                              <td class="text-right">&euro; 99,225</td>
-                              <td class="td-actions text-right">
-                                  <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
-                                      <i class="tim-icons icon-single-02"></i>
-                                  </button>
-                                  <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon">
-                                      <i class="tim-icons icon-settings-gear-63"></i>
-                                  </button>
-                                  <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
-                                      <i class="tim-icons icon-simple-remove"></i>
-                                  </button>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td class="text-center">2</td>
-                              <td>John Doe</td>
-                              <td>Design</td>
-                              <td>2012</td>
-                              <td class="text-right">&euro; 89,241</td>
-                              <td class="td-actions text-right">
-                                <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-round btn-icon">
-                                    <i class="tim-icons icon-single-02"></i>
-                                </button>
-                                <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-round btn-icon">
-                                    <i class="tim-icons icon-settings-gear-63"></i>
-                                </button>
-                                <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-round btn-icon">
-                                    <i class="tim-icons icon-simple-remove"></i>
-                                </button>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td class="text-center">3</td>
-                              <td>Alex Mike</td>
-                              <td>Design</td>
-                              <td>2010</td>
-                              <td class="text-right">&euro; 92,144</td>
-                              <td class="td-actions text-right">
-                                  <button type="button" rel="tooltip" class="btn btn-info btn-simple btn-icon btn-sm">
-                                      <i class="tim-icons icon-single-02"></i>
-                                  </button>
-                                  <button type="button" rel="tooltip" class="btn btn-success btn-simple btn-icon btn-sm">
-                                      <i class="tim-icons icon-settings-gear-63"></i>
-                                  </button>
-                                  <button type="button" rel="tooltip" class="btn btn-danger btn-simple btn-icon btn-sm">
-                                      <i class="tim-icons icon-simple-remove"></i>
-                                  </button>
-                              </td>
-                          </tr>
-                      </tbody>
-                  </table>
+<style>
+  /* Hide scroll bars */
+  .section::-webkit-scrollbar {
+    display: none;
+  }
+
+  .section {
+    overflow: -moz-scrollbars-none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<div class="page-header header-filter">
+
+  <!-- Side Bar -->
+  <div class="myfixleft sidebar">
+    <div style="margin-top: 100px;">
+      <div class="row">
+        <div class="col-md-4">
+          <ul class="nav nav-pills nav-pills-info flex-column">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user.favorite') }}">Favorites</a></li>
+            <li class="nav-item"><a class="nav-link active" href="{{ url_for('user.recommendation') }}">Recommended</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- End Side Bar -->
+
+  <!-- Search -->
+  <div class="section" style="margin-top: 50px; margin-left: 250px; overflow-y: scroll; max-height: 660px;">
+    <!-- Search Bar -->
+    <div class="container">
+      <div class="row">
+        <div class="col col-8">
+          <div class="input-group">
+            <input id="search-input" type="text" class="form-control" placeholder="Search">
+            <div class="input-group-append">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 30px;">
+        <!-- Space for the content below-->
+      </div>
+    </div>
+    <!-- End Search Bar -->
+
+    <!-- Search Result -->
+    <div id="SearchResultArea" class="session hidden">
+      <div class="row">
+        <!-- Top Result -->
+        <div class="col col-5">
+          <h2 class="text-success ml-3 mt-3"> Top Result </h2>
+          <div class="card">
+            <div class="container mt-3">
+              <div class="row">
+                <div class="col">
+                  <div class="col-sm-3 col-6">
+                    <img id="TopSearchImage" src="{{ url_for('static', filename='public/img/defaultavathar.png') }}"
+                      alt="Circle image" class="img-fluid rounded-circle shadow" style="width: 150px;">
                   </div>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col col-10">
+                  <h3 class="mb-2" id="TopSearchSongName">Song Name</h3>
+                  <h6 class="my-1" id="TopSearchArtistName">Artist Name <span
+                      class="badge badge-default ml-3">Song</span></h6>
+                  <h6 class="my-1" id="TopSearchDuration">Duration</h6>
+                </div>
+                <div class="col text-right col-2">
+                  <button class="btn btn-success btn-lg btn-round btn-icon" id="play-pause-button-page">
+                    <i class="fas fa-play"></i>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- End Playlist bar -->
-  <!-- Side Bar -->
-  <div class="myfixleft sidebar">
-    <div style="margin-top: 100px;">
-        <div class="row">
-            <div class="col-md-4">
-                <ul class="nav nav-pills nav-pills-info flex-column">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Home</a></li>
-               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Trending</a></li>
-              <li class="nav-item"><a class="nav-link active" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
-            </ul>
+        <!-- Songs Result -->
+        <div class="col col-7">
+          <h2 class=" ml-3 mt-3"> Songs </h2>
+          <div class="card text-center">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th class="text-center">#</th>
+                  <th>Song Name</th>
+                  <th>Genre</th>
+                  <th>Language</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody id="search-results">
+                <!-- Results will be dynamically added here -->
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
+
+    <!-- End Search Result -->
+    <!-- No Element Found Area -->
+    <div id="SearchResultNotFound" class="session text-center hidden">
+      <h1 class="text-warning"> No matching Contents Found !!!!!</h1>
+
     </div>
-  
+
   </div>
-  <!-- End Side Bar -->
+</div>
 
-    </div>
+<style>
+  button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
 
-
-  </div>
-
-  <style>
-    .playarea-container {
-      position: relative;
-      margin-top: 100px;
-      max-width: 100%; /* Allow the container to grow up to the maximum width of the browser */
-      height: 510px;
-      overflow: auto;
-      scrollbar-width: none; /* Hide the scrollbar for Firefox */
-      -ms-overflow-style: none; /* Hide the scrollbar for IE and Edge */
-    }
-    .playarea-container::-webkit-scrollbar {
-  width: 0;
-}
-.gradient-overlay {
-    position: relative;
-    overflow: hidden;
-}
-
-.gradient-overlay::after {
-    content: "";
+  button .image-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(to right, rgba(50, 50, 93, 1) 0%, rgba(50, 50, 93, 0) 100%);
-}
+    transition: filter 0.3s ease;
+    filter: blur(0);
+  }
 
-  </style>
+  button:hover .image-container {
+    filter: blur(5px);
+  }
 
-  {% include 'user/player.html'%}
-  {% include 'user/user_footer.html'%}
+  button .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  button:hover .overlay {
+    opacity: 1;
+  }
+
+  button .text-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+
+{% include 'user/user_footer.html'%}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    var searchInput = $('#search-input');
+    var SearchResultArea = document.getElementById('SearchResultArea');
+    var SearchResultNotFound = document.getElementById('SearchResultNotFound');
+    // Capture user input and send it to Flask
+    searchInput.on('input', function () {
+      var searchText = searchInput.val();
+
+      // Check if search text is empty or less than 3 characters
+      if (searchText === '' || searchText.length < 3) {
+        // Clear the previous results
+        $('#search-results tbody').empty();
+        $('#TopSearchSongName').text('Song Name');
+        $('#TopSearchArtistName').text('');
+        $('#TopSearchDuration').text('');
+        $('#TopSearchImage').attr('src', '');
+        SearchResultArea.classList.add('hidden');
+        SearchResultNotFound.classList.add('hidden');
+        return; // Exit the function
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/user/search',
+        data: { text: searchText },
+        success: function (response) {
+          console.log(response)
+          // Clear the previous results
+          $('#search-results').empty();
+          $('#TopSearchSongName').text('Song Name');
+          $('#TopSearchArtistName').text('');
+          $('#TopSearchDuration').text('');
+          $('#TopSearchImage').attr('src', '');
+
+          if (response['matching_songs'].length > 0) {
+            SearchResultNotFound.classList.add('hidden');
+            SearchResultArea.classList.remove('hidden');
+
+            // Update the top result
+            var topResult = response['matching_songs'][0];
+
+            // Update the song name
+            var songNameElement = document.getElementById('TopSearchSongName');
+            songNameElement.textContent = topResult['song_name'];
+
+            // Update the artist name
+            var artistNameElement = document.getElementById('TopSearchArtistName');
+            artistNameElement.textContent = topResult['artist_name'];
+
+            // Update the duration
+            var durationElement = document.getElementById('TopSearchDuration');
+            durationElement.textContent = topResult['duration'];
+
+            // Update the image source
+            var imageElement = document.getElementById('TopSearchImage');
+            imageElement.src = '{{ url_for('static', filename='') }}' + topResult['image_loc'];
+
+            // Loop through the results and append them to the table
+            for (var i = 0; i < response['matching_songs'].length; i++) {
+              var result = response['matching_songs'][i];
+              var row = '<tr>';
+              row += '<td class="text-center">' + (i + 1) + '</td>';
+              row += '<td>' + result['song_name'] + '</td>';
+              row += '<td>' + result['genre'] + '</td>';
+              row += '<td>' + result['language'] + '</td>';
+              row += '<td>' + result['duration'] + '</td>';
+              row += '</tr>';
+
+              // Append the row to the table body
+              $('#search-results').append(row);
+            }
+          } else {
+            SearchResultArea.classList.add('hidden');
+            SearchResultNotFound.classList.remove('hidden');
+          }
+        },
+        error: function (xhr, status, error) {
+          console.log('An error occurred: ' + error);
+        }
+      });
+    });
+
+    // Clear the search results when the search bar is cleared
+    searchInput.on('keyup', function () {
+      if (searchInput.val() === '') {
+        $('#search-results tbody').empty();
+        $('#TopSearchSongName').text('Song Name');
+        $('#TopSearchArtistName').text('');
+        $('#TopSearchDuration').text('');
+        $('#TopSearchImage').attr('src', '');
+        SearchResultArea.classList.add('hidden');
+        SearchResultNotFound.classList.add('hidden');
+      }
+    });
+  });
+</script>

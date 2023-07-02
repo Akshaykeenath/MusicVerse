@@ -2,6 +2,8 @@ from flask import *
 from database import *
 import os
 from trending import *
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 user = Blueprint('user',__name__)
 
@@ -46,7 +48,40 @@ def favorite():
         return render_template('user/favorite.html', data=data)
     else:
         return redirect(url_for('public.home'))
-        
+    
+@user.route('/search', methods=['POST'])
+def search():
+    search_text = request.form.get('text')
+    q = "SELECT s.song_id, s.song_name,GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc, s.image_loc, s.genre, s.language, s.duration FROM songs s INNER JOIN songartist sar ON s.song_id = sar.song_id INNER JOIN artist ar ON sar.artist_id = ar.artist_id WHERE s.privacy = 'public' AND s.status = 'approved' GROUP BY s.song_id"
+    songs = select(q)
+
+    q = "SELECT * FROM album"
+    albums = select(q)
+
+    q = "SELECT * FROM artist"
+    artists = select(q)
+
+    # Find the matches above a certain similarity threshold for song names
+    threshold = 80  # Adjust the threshold as needed
+    song_matches = process.extract(search_text, [song['song_name'] for song in songs], limit=5)
+    matching_songs = [song for song in songs if any(match[1] >= threshold and match[0] == song['song_name'] for match in song_matches)]
+
+    # Find the matches above a certain similarity threshold for album names
+    album_matches = process.extract(search_text, [album['album_name'] for album in albums], limit=5)
+    matching_albums = [album for album in albums if any(match[1] >= threshold and match[0] == album['album_name'] for match in album_matches)]
+
+    # Find the matches above a certain similarity threshold for artist names
+    artist_matches = process.extract(search_text, [artist['artist_name'] for artist in artists], limit=5)
+    matching_artists = [artist for artist in artists if any(match[1] >= threshold and match[0] == artist['artist_name'] for match in artist_matches)]
+
+    response = {
+        'matching_songs': matching_songs,
+        'matching_albums': matching_albums,
+        'matching_artists': matching_artists
+    }
+
+    return jsonify(response)
+
 
 @user.route('/play', methods=['POST'])
 def play():

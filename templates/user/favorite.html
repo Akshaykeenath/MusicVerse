@@ -14,22 +14,33 @@
 
 <div class="page-header header-filter">
 
-  <!-- Side Bar -->
-  <div class="myfixleft sidebar">
-    <div style="margin-top: 100px;">
-        <div class="row">
-            <div class="col-md-4">
-              <ul class="nav nav-pills nav-pills-info flex-column">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('user.user_home') }}">Home</a></li>
-               <li class="nav-item"><a class="nav-link active" href="{{ url_for('user.favorite') }}">Favorites</a></li>
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
-            </ul>
-        </div>
+<!-- Side Bar -->
+<div class="myfixleft sidebar">
+  <div style="margin-top: 100px;">
+    <div class="row">
+      <div class="col-md-11">
+        <ul class="nav nav-pills nav-pills-info flex-column">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.user_home') }}">
+              <i class="fas fa-home mr-2"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-2 active" href="{{ url_for('user.favorite') }}">
+              <i class="fas fa-heart mr-2"></i> Favorites
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.explore') }}">
+              <i class="fas fa-compass mr-2"></i> Explore
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-    </div>
-  
   </div>
-  <!-- End Side Bar -->
+</div>
+<!-- End Side Bar -->
 
   <!-- Trendings -->
   <div class="section" style="margin-top: 50px; margin-left: 250px; overflow-y: scroll; max-height: 660px;">

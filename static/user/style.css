@@ -14,7 +14,7 @@ body {
   right: 0;
   left: 0;
   width: 100vw;
-  height: 100px;
+  height: 70px;
   margin: -4px auto;
 }
 
@@ -75,7 +75,7 @@ body {
 #track-name {
   color: #acaebd;
   font-size: 13px;
-  margin: 2px 0 13px 0;
+  margin: 2px 0 8px 0;
 }
 
 #track-time {
@@ -168,12 +168,12 @@ body {
 #album-art {
   position: absolute;
   top: -40px;
-  width: 115px;
-  height: 115px;
+  width: 100px;
+  height: 100px;
   margin-left: 40px;
   transform: rotateZ(0);
   transition: 0.3s ease all;
-  box-shadow: 0 0 0 10px #fff;
+  box-shadow: 0 0 0 4px #fff;
   border-radius: 50%;
   overflow: hidden;
 }
@@ -342,7 +342,7 @@ body {
 
 #equalizer {
   position: relative;
-  top: 50px;
+  top: 30px;
   left: 200px;
   /* generates a random number in the range 430 - 500*/
   /* adds random animation durations to for up 20 bars; for more, change 20 to a higer value (below) */

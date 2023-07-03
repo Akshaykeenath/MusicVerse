@@ -14,22 +14,33 @@
 
 <div class="page-header header-filter">
 
-  <!-- Side Bar -->
-  <div class="myfixleft sidebar">
-    <div style="margin-top: 100px;">
-        <div class="row">
-            <div class="col-md-4">
-              <ul class="nav nav-pills nav-pills-info flex-column">
-                <li class="nav-item"><a class="nav-link active" href="{{ url_for('user.user_home') }}">Home</a></li>
-               <li class="nav-item"><a class="nav-link" href="{{ url_for('user.favorite') }}">Favorites</a></li>
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('user.recommendation') }}">Recommended</a></li>
-            </ul>
-        </div>
+<!-- Side Bar -->
+<div class="myfixleft sidebar">
+  <div style="margin-top: 100px;">
+    <div class="row">
+      <div class="col-md-11">
+        <ul class="nav nav-pills nav-pills-info flex-column">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-2 active" href="{{ url_for('user.user_home') }}">
+              <i class="fas fa-home mr-2"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.favorite') }}">
+              <i class="fas fa-heart mr-2"></i> Favorites
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.explore') }}">
+              <i class="fas fa-compass mr-2"></i> Explore
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-    </div>
-  
   </div>
-  <!-- End Side Bar -->
+</div>
+<!-- End Side Bar -->
 
   <!-- Trendings -->
   <div class="section" style="margin-top: 50px; margin-left: 250px; overflow-y: scroll; max-height: 660px;">
@@ -92,9 +103,6 @@
             <form action="{{ url_for('user.play') }}" method="POST" role="tab">
               <input type="hidden" name="contenttype" value="album">
               <input type="hidden" name="album_id" value="{{ row['album_id'] }}">
-              <input type="hidden" name="album_name" value="{{ row['album_name'] }}">
-              <input type="hidden" name="album_img" value="{{ row['image_loc'] }}">
-              <input type="hidden" name="album_cover" value="{{ row['cover_pic'] }}">
               <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
                 <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                   <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
@@ -113,7 +121,7 @@
     {% endif %}
     <div style="margin-top: 20px;">
       {% if data['artistdata'] != [] %}
-        <h3>Top Artists</h3>
+        <h3>Trending Artists</h3>
         <div>
           <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
             <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
@@ -122,9 +130,6 @@
             <form action="{{ url_for('user.play') }}" method="POST" role="tab">
               <input type="hidden" name="contenttype" value="artist">
               <input type="hidden" name="artist_id" value="{{ row['artist_id'] }}">
-              <input type="hidden" name="artist_name" value="{{ row['artist_name'] }}">
-              <input type="hidden" name="artist_img" value="{{ row['artist_image_loc'] }}">
-              <input type="hidden" name="artist_cover" value="{{ row['artist_cover_pic'] }}">
               <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
                 <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                   <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">

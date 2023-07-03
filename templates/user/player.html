@@ -36,6 +36,11 @@
         <img src="{{ url_for('static', filename=row['song_image_loc'])}}" class="active" id="_{{ loop.index }}">
         {% endfor %}
         {% endif %}
+        {% if data['searchsongdata'] %}
+        {% for row in data['searchsongdata'] %}
+        <img src="{{ url_for('static', filename=row['song_image_loc'])}}" class="active" id="_{{ loop.index }}">
+        {% endfor %}
+        {% endif %}
         <div id="buffer-box">Buffering ...</div>
       </div>
       <div id="eqblock">

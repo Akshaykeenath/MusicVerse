@@ -55,24 +55,51 @@ def search():
     q = "SELECT s.song_id, s.song_name,GROUP_CONCAT(ar.artist_name SEPARATOR ', ') AS artist_name, s.song_loc, s.image_loc, s.genre, s.language, s.duration FROM songs s INNER JOIN songartist sar ON s.song_id = sar.song_id INNER JOIN artist ar ON sar.artist_id = ar.artist_id WHERE s.privacy = 'public' AND s.status = 'approved' GROUP BY s.song_id"
     songs = select(q)
 
-    q = "SELECT * FROM album"
+    q = "SELECT al.album_id,al.album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS songs  FROM album al INNER JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' GROUP BY al.album_id"
     albums = select(q)
 
-    q = "SELECT * FROM artist"
+    q = "SELECT ar.artist_id,ar.artist_name,ar.image_loc,ar.cover_pic, COUNT(s.song_id) AS songs FROM artist ar INNER JOIN songartist sar ON ar.artist_id=sar.artist_id INNER JOIN songs s ON sar.song_id=s.song_id AND  s.privacy='public' AND s.status='approved' GROUP BY ar.artist_id"
     artists = select(q)
 
     # Find the matches above a certain similarity threshold for song names
     threshold = 80  # Adjust the threshold as needed
     song_matches = process.extract(search_text, [song['song_name'] for song in songs], limit=5)
-    matching_songs = [song for song in songs if any(match[1] >= threshold and match[0] == song['song_name'] for match in song_matches)]
+    matching_songs = []
+    for song in songs:
+        for match in song_matches:
+            if match[0] == song['song_name'] and match[1] >= threshold:
+                song['score'] = match[1]
+                matching_songs.append(song)
+                break
+
+    # Sort matching songs by score in descending order
+    matching_songs = sorted(matching_songs, key=lambda x: x['score'], reverse=True)
 
     # Find the matches above a certain similarity threshold for album names
     album_matches = process.extract(search_text, [album['album_name'] for album in albums], limit=5)
-    matching_albums = [album for album in albums if any(match[1] >= threshold and match[0] == album['album_name'] for match in album_matches)]
+    matching_albums = []
+    for album in albums:
+        for match in album_matches:
+            if match[0] == album['album_name'] and match[1] >= threshold:
+                album['score'] = match[1]
+                matching_albums.append(album)
+                break
+
+    # Sort matching albums by score in descending order
+    matching_albums = sorted(matching_albums, key=lambda x: x['score'], reverse=True)
 
     # Find the matches above a certain similarity threshold for artist names
     artist_matches = process.extract(search_text, [artist['artist_name'] for artist in artists], limit=5)
-    matching_artists = [artist for artist in artists if any(match[1] >= threshold and match[0] == artist['artist_name'] for match in artist_matches)]
+    matching_artists = []
+    for artist in artists:
+        for match in artist_matches:
+            if match[0] == artist['artist_name'] and match[1] >= threshold:
+                artist['score'] = match[1]
+                matching_artists.append(artist)
+                break
+
+    # Sort matching artists by score in descending order
+    matching_artists = sorted(matching_artists, key=lambda x: x['score'], reverse=True)
 
     response = {
         'matching_songs': matching_songs,
@@ -95,6 +122,7 @@ def play():
         data['currentalbumsongs']=''
         data['currentartistsongs']=''
         data['favoritesongdata']=''
+        data['songdata']=''
         playlistname={}
         if contenttype == 'album':
             album_id= request.form['album_id']
@@ -140,7 +168,16 @@ def play():
         elif contenttype == 'trendingsongs':
             trendingsongdata=get_song_data(uid)
             data['trendingsongdata']=trendingsongdata
+        elif contenttype == 'SearchSong':
+            # Render the template and pass the necessary data
+            song_id=request.form['song_id']
+            q="INSERT INTO clicks(content_id,user_id,content_type) values ('%s','%s','song')"%(song_id,uid)
+            cid=insert(q)
+            q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.song_id='%s'"%(uid,song_id)
+            searchsongdata=select(q)
+            data['searchsongdata']=searchsongdata
 
+            
         return render_template('user/playarea.html', data=data, playlist=playlistname)
     else:
         return redirect(url_for('public.home'))
@@ -163,15 +200,15 @@ def song_click():
         # Return the response as JSON
         return jsonify(response)
 
-@user.route('/recommendation')
-def recommendation():
+@user.route('/explore')
+def explore():
     if 'uid' in session:
         uid=session['uid']
         data={}
         q="select * from user where user_id='%s'"%(uid)
         res=select(q)
         data['userdetails']=res[0]
-        return render_template('user/recommendation.html', data=data)
+        return render_template('user/explore.html', data=data)
     else:
         return redirect(url_for('public.home'))
 

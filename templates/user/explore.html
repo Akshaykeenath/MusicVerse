@@ -156,9 +156,12 @@
   <!-- End Search -->
 
   <!-- Other contents-->
+
   <div class="row">
-  <div class="col-12">
-  <h1> Other Contents</h1>
+  <div class="col-12 ml-5">
+  <div id="OtherContentArea" class="session">
+  {% include 'user/categories.html'%}
+  </div>
   </div>
   </div>
   <!-- End Other contents-->
@@ -231,6 +234,7 @@
     var searchInput = $('#search-input');
     var SearchResultArea = document.getElementById('SearchResultArea');
     var SearchResultNotFound = document.getElementById('SearchResultNotFound');
+    var OtherContentArea = document.getElementById('OtherContentArea');
     var TopResultArea = document.getElementById('TopResultArea');
     var ArtistListArea = document.getElementById('ArtistListArea');
     var AlbumListArea = document.getElementById('AlbumListArea');
@@ -250,6 +254,7 @@
         $('#TopSearchImage').attr('src', '');
         SearchResultArea.classList.add('hidden');
         SearchResultNotFound.classList.add('hidden');
+        OtherContentArea.classList.remove('hidden');
         return; // Exit the function
       }
 
@@ -293,6 +298,7 @@
           if (result === 'matching_songs' || result === 'matching_albums' || result === 'matching_artists') {
             SearchResultNotFound.classList.add('hidden');
             SearchResultArea.classList.remove('hidden');
+            OtherContentArea.classList.add('hidden');
             if (result === 'matching_songs') {
               TopResultArea.classList.remove('hidden');
               // Update the top result
@@ -589,6 +595,7 @@
           else if (response['matching_songs'].length === 0 && response['matching_albums'].length === 0 && response['matching_artists'].length === 0) {
             SearchResultArea.classList.add('hidden');
             SearchResultNotFound.classList.remove('hidden');
+            OtherContentArea.classList.remove('hidden');
           }
         },
         error: function (xhr, status, error) {
@@ -607,6 +614,7 @@
         $('#TopSearchImage').attr('src', '');
         SearchResultArea.classList.add('hidden');
         SearchResultNotFound.classList.add('hidden');
+        OtherContentArea.classList.remove('hidden');
       }
     });
   });

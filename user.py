@@ -4,7 +4,7 @@ import os
 from trending import *
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
-
+from categories import *
 user = Blueprint('user',__name__)
 
 @user.route('/user_home')
@@ -176,7 +176,17 @@ def play():
             q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.song_id='%s'"%(uid,song_id)
             searchsongdata=select(q)
             data['searchsongdata']=searchsongdata
-
+        elif contenttype == 'SongCategories':
+            q=''
+            content_name = request.form.get('content_name')
+            category_type = request.form.get('category_type')
+            if category_type == 'language':
+                q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.language='%s'"%(uid,content_name)
+            elif category_type == 'genre':
+                q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.genre='%s'"%(uid,content_name)
+            songcategorydata=select(q)
+            data['songcategorydata']=songcategorydata
+            data['songcategorytype']={'name':content_name}
             
         return render_template('user/playarea.html', data=data, playlist=playlistname)
     else:
@@ -200,7 +210,7 @@ def song_click():
         # Return the response as JSON
         return jsonify(response)
 
-@user.route('/explore')
+@user.route('/explore' , methods=['GET', 'POST'])
 def explore():
     if 'uid' in session:
         uid=session['uid']
@@ -208,6 +218,12 @@ def explore():
         q="select * from user where user_id='%s'"%(uid)
         res=select(q)
         data['userdetails']=res[0]
+        categories=get_categories_data()
+        data['categories']=categories
+        if request.method == 'POST':
+            song_name = request.form.get('song_name')
+            content_type = request.form.get('content_type')
+            return song_name
         return render_template('user/explore.html', data=data)
     else:
         return redirect(url_for('public.home'))

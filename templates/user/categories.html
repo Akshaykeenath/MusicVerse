@@ -1,0 +1,114 @@
+<h2 class="text-success ml-3 mt-3"> Browse All </h2>
+<ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
+  {% for category in data['categories'] %}
+  <li class="song-card" style="background-color: {{ category['color'] }};" onclick="submitForm('form{{ loop.index }}')">
+    <form id="form{{ loop.index }}" action="{{ url_for('user.play') }}" method="POST" class="song-form">
+      <input type="hidden" name="content_name" value="{{ category['content_name'] }}">
+      <input type="hidden" name="contenttype" value="SongCategories">
+      <input type="hidden" name="category_type" value="{{ category['category_type'] }}">
+      <p class="song-title" title="{{ category['content_name'] }}">{{ category['content_name'] }}</p>
+      <div class="song-image-container">
+        <img src="{{ url_for('static', filename=category['image'])}}" alt="Raised image" class="img-fluid rounded shadow-lg">
+      </div>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+
+<script>
+  function submitForm(formId) {
+    document.getElementById(formId).submit();
+  }
+
+  // Adjust song title font size on page load
+  window.addEventListener('load', adjustFontSize);
+
+  function adjustFontSize() {
+    const songTitles = document.querySelectorAll('.song-title');
+    songTitles.forEach((title) => {
+      while (title.scrollWidth > title.offsetWidth) {
+        const fontSize = parseInt(window.getComputedStyle(title).fontSize);
+        title.style.fontSize = (fontSize - 1) + 'px';
+      }
+    });
+  }
+</script>
+
+<style>
+.song-card {
+  position: relative;
+  width: 190px;
+  height: 254px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align text to the top */
+  padding: 12px;
+  gap: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 50px;
+  margin-bottom: 20px;
+}
+
+.song-image-container {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  transform: translateX(0) rotate(15deg); /* Modified */
+  transition: transform 0.3s ease-out; /* Added transition property */
+}
+
+.song-image-container img {
+  max-width: 60%;
+  max-height: 60%;
+  margin: 20px;
+}
+
+.song-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  left: -5px;
+  margin: auto;
+  width: 200px;
+  height: 264px;
+  border-radius: 10px;
+  background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
+  z-index: -10;
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.song-card::after {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100%);
+  transform: translate3d(0, 0, 0) scale(0.95);
+  filter: blur(20px);
+}
+
+.song-title {
+  font-size: 30px;
+  font-weight: bold;
+  color: #fff;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-card:hover::after {
+  filter: blur(30px);
+}
+
+.song-card:hover::before {
+  transform: rotate(-90deg) scaleX(1.34) scaleY(0.77);
+}
+
+.song-card:hover .song-image-container {
+  transform: translateX(40px) rotate(15deg); /* Added */
+}
+</style>

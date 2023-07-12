@@ -2,10 +2,9 @@
 
 <style>
   /* Hide scroll bars */
-  .section::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     display: none;
   }
-
   .section {
     overflow: -moz-scrollbars-none;
     -ms-overflow-style: none;
@@ -13,26 +12,34 @@
   }
 </style>
 
-<div class="page-header header-filter">
+<div class="content">
+<div class="row mt-5">
+<div class="col mt-5">
+<!-- For space on top -->
+</div>
+</div>
 
-<!-- Side Bar -->
-<div class="myfixleft sidebar">
+<div class="row">
+<!-- Sidebar Area -->
+<div class="col col-1 mr-5 sidebar">
+  <!-- Side Bar -->
+<div class="myfixleft">
   <div style="margin-top: 100px;">
     <div class="row">
       <div class="col-md-11">
         <ul class="nav nav-pills nav-pills-info flex-column">
           <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.user_home') }}">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.user_home') }}">
               <i class="fas fa-home mr-2"></i> Home
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.favorite') }}">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.favorite') }}">
               <i class="fas fa-heart mr-2"></i> Favorites
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active d-flex align-items-center py-2" href="{{ url_for('user.explore') }}">
+            <a class="nav-link d-flex align-items-center py-0 active" href="{{ url_for('user.explore') }}">
               <i class="fas fa-compass mr-2"></i> Explore
             </a>
           </li>
@@ -42,12 +49,14 @@
   </div>
 </div>
 <!-- End Side Bar -->
+  </div>
+<!-- End Sidebar Area -->
 
-  <div class="section" style="margin-top: 50px; margin-left: 220px; overflow-y: scroll; max-height: 660px;">
-  <!-- Search -->
+  <!-- Content Area -->
+  <div class="col col-10 ml-5">
+    <!-- Search -->
     <div>
     <!-- Search Bar -->
-    <div class="container">
       <div class="row">
         <div class="col col-8">
           <div class="input-group">
@@ -58,10 +67,7 @@
           </div>
         </div>
       </div>
-      <div style="margin-top: 30px;">
-        <!-- Space for the content below-->
-      </div>
-    </div>
+
     <!-- End Search Bar -->
 
     <!-- Search Result -->
@@ -158,15 +164,18 @@
   <!-- Other contents-->
 
   <div class="row">
-  <div class="col-12 ml-5">
+  <div class="col-12">
   <div id="OtherContentArea" class="session">
   {% include 'user/categories.html'%}
   </div>
   </div>
   </div>
   <!-- End Other contents-->
-
+  
   </div>
+  <!-- End Content Area -->
+
+</div>
   
 </div>
 

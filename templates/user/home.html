@@ -2,7 +2,7 @@
 
 <style>
   /* Hide scroll bars */
-  .section::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     display: none;
   }
   .section {
@@ -12,26 +12,32 @@
   }
 </style>
 
-<div class="page-header header-filter">
-
-<!-- Side Bar -->
-<div class="myfixleft sidebar">
+<div class="content">
+<div class="row mt-5">
+<div class="col mt-5">
+<!-- For space on top -->
+</div>
+</div>
+  <div class="row">
+  <div class="col col-1 mr-5 sidebar">
+  <!-- Side Bar -->
+<div class="myfixleft">
   <div style="margin-top: 100px;">
     <div class="row">
       <div class="col-md-11">
         <ul class="nav nav-pills nav-pills-info flex-column">
           <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-2 active" href="{{ url_for('user.user_home') }}">
+            <a class="nav-link d-flex align-items-center py-0 active" href="{{ url_for('user.user_home') }}">
               <i class="fas fa-home mr-2"></i> Home
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.favorite') }}">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.favorite') }}">
               <i class="fas fa-heart mr-2"></i> Favorites
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-2" href="{{ url_for('user.explore') }}">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.explore') }}">
               <i class="fas fa-compass mr-2"></i> Explore
             </a>
           </li>
@@ -41,88 +47,117 @@
   </div>
 </div>
 <!-- End Side Bar -->
-
-  <!-- Trendings -->
-  <div class="section" style="margin-top: 50px; margin-left: 250px; overflow-y: scroll; max-height: 660px;">
-
-    {% if data['favoritesongdata'] != [] or data['trendingsongdata'] != [] %}
-    <div>
-        <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
-            <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
-            {% if data['favoritesongdata'] != [] %}
+  </div>
+  <div class="col col-10 ml-5">
+      <!-- Made For -->
+      {% if data['favoritesongdata'] != [] or data['trendingsongdata'] != [] %}
+      <div class="row">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-sm-6 text-left">
+              <h4>Made for <span class="text-success h3"> {{ data['userdetails']['fname'] }} </span></h4>
+            </div>
+          </div>
+          <div class="row">
             <!-- Favorite Songs box -->
-          <li class="nav-item" style="margin-right: 30px;">
-            <form action="{{ url_for('user.play') }}" method="POST" role="tab">
-              <input type="hidden" name="contenttype" value="favoritesongs">
-              <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
-                <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                  <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
-                    <img src="{{ url_for('static', filename='user/assets/img/favoritesongs2.jpg')}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
+            {% if data['favoritesongdata'] != [] %}
+            <div class="col col-2 mr-5">
+              <form action="{{ url_for('user.play') }}" method="POST" role="tab">
+                <input type="hidden" name="contenttype" value="favoritesongs">
+                <button class="btn btn-default btn-round" type="submit" class="nav-link album-button"
+                  style="padding: 0; position: relative; overflow: hidden;">
+                  <div class="d-flex flex-column align-items-center"
+                    style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <div class="image-container"
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
+                      <img src="{{ url_for('static', filename='user/assets/img/favoritesongs2.jpg')}}" alt="Raised image"
+                        class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
+                    </div>
+                    <div class="overlay">
+                      <span class="text-name">Liked Songs: {{ data['favoritesongdata']|length }}</span>
+                    </div>
                   </div>
-                  <div class="overlay" >
-                    <span class="text-name">Liked Songs: {{ data['favoritesongdata']|length }}</span>
-                  </div>
-                </div>
-              </button>
-            </form>
-          </li>
-          <!-- End Favorite Songs box -->
+                </button>
+              </form>
+            </div>
             {% endif %}
-          <!-- Trending Songs -->
-          <li class="nav-item" style="margin-right: 30px;">
-  <form action="{{ url_for('user.play') }}" method="POST" role="tab">
-    <input type="hidden" name="contenttype" value="trendingsongs">
-    <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
-      <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-        <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
-          <img src="{{ url_for('static', filename='user/assets/img/trendingmusic2.jpg')}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
-        </div>
-        <div class="overlay">
-          <span class="text-name">Trending Songs</span>
+            <!-- End Favorite Songs box -->
+            <!-- Trending Songs -->
+            <div class="col col-3">
+              <form action="{{ url_for('user.play') }}" method="POST" role="tab">
+                <input type="hidden" name="contenttype" value="trendingsongs">
+                <button class="btn btn-default btn-round" type="submit" class="nav-link album-button"
+                  style="padding: 0; position: relative; overflow: hidden;">
+                  <div class="d-flex flex-column align-items-center"
+                    style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <div class="image-container"
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
+                      <img src="{{ url_for('static', filename='user/assets/img/trendingmusic2.jpg')}}" alt="Raised image"
+                        class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
+                    </div>
+                    <div class="overlay">
+                      <span class="text-name">Trending Songs</span>
+                    </div>
+                  </div>
+                </button>
+              </form>
+            </div>
+            <!-- End Trending Songs -->
+          </div>
         </div>
       </div>
-    </button>
-  </form>
-</li>
+      {% endif %}
+      <!-- End Made For -->
 
-          <!-- End Trending Songs -->
-        </ul>
-    </div>
-    {% endif %}
-    <div style="margin-top: 20px;">
-        <!-- Space for the content below (album data or artist or what ever. Only needed for this one)-->
-    </div>
-    <!-- Top Albums -->
-    {% if data['albumdata'] != [] %}
-    <h3>Trending Albums</h3>
-    <div>
-        <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
+      <!-- Trending Albums -->
+      {% if data['albumdata'] != [] %}
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-sm-6 text-left">
+              <h4>Trending <span class="text-success h3"> Albums </span></h4>
+            </div>
+          </div>
+          <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
             <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
             {% for row in data['albumdata'] %}
-          <li class="nav-item" style="margin-right: 30px;">
-            <form action="{{ url_for('user.play') }}" method="POST" role="tab">
-              <input type="hidden" name="contenttype" value="album">
-              <input type="hidden" name="album_id" value="{{ row['album_id'] }}">
-              <button class="btn btn-default btn-round" type="submit" class="nav-link album-button" style="padding: 0; position: relative; overflow: hidden;">
-                <div class="d-flex flex-column align-items-center" style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                  <div class="image-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
-                    <img src="{{ url_for('static', filename=row['image_loc'])}}" alt="Raised image" class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
+            <li class="nav-item" style="margin-right: 30px;">
+              <form action="{{ url_for('user.play') }}" method="POST" role="tab">
+                <input type="hidden" name="contenttype" value="album">
+                <input type="hidden" name="album_id" value="{{ row['album_id'] }}">
+                <button class="btn btn-default btn-round" type="submit" class="nav-link album-button"
+                  style="padding: 0; position: relative; overflow: hidden;">
+                  <div class="d-flex flex-column align-items-center"
+                    style="width: 230px; height: 230px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <div class="image-container"
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.3s ease; filter: blur(0);">
+                      <img src="{{ url_for('static', filename=row['image_loc'])}}" alt="Raised image"
+                        class="img-fluid rounded shadow-lg" style="object-fit: cover; width: 100%; height: 100%;">
+                    </div>
+                    <div class="overlay">
+                      <span class="text-name">{{ row['album_name'] }}</span>
+                    </div>
                   </div>
-                  <div class="overlay" >
-                    <span class="text-name">{{ row['album_name'] }}</span>
-                  </div>
-                </div>
-              </button>
-            </form>
-          </li>
-          {% endfor %}
+                </button>
+              </form>
+            </li>
+            {% endfor %}
           </ul>
-    </div>
-    {% endif %}
-    <div style="margin-top: 20px;">
+        </div>
+      </div>
+      {% endif %}
+      <!--End Trending Albums -->
+
+      <!-- Trending Artists -->
       {% if data['artistdata'] != [] %}
-        <h3>Trending Artists</h3>
-        <div>
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-sm-6 text-left">
+              <h4>Trending <span class="text-success h3"> Artists </span></h4>
+            </div>
+          </div>
+          <div class="row">
           <ul class="nav nav-pills nav-pills-success nav-pills-icons" role="tablist">
             <!-- color-classes: "nav-pills-primary", "nav-pills-info", "nav-pills-success", "nav-pills-warning", "nav-pills-danger" -->
             {% for row in data['artistdata'] %}
@@ -146,14 +181,12 @@
             
             <!-- Add more list items as needed -->
             </ul>
+          </div>
         </div>
-        {% endif %}
-    </div>
-    
+      </div>
+      {% endif %}
+      <!--End Trending Artists -->
   </div>
-
-  <!-- Suggestions -->
-  <div style="margin-top: 150px; margin-left: 250px; overflow-y: scroll; max-height: 400px;">
   </div>
 </div>
 

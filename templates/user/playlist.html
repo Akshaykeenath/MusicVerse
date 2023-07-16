@@ -1,0 +1,330 @@
+<link href="{{ url_for('static', filename='uploader/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+
+{% include 'user/user_header.html'%}
+
+<style>
+    /* Hide scroll bars */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    .section {
+        overflow: -moz-scrollbars-none;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+
+<div class="content">
+    <div class="row mt-5">
+        <div class="col mt-5">
+            <!-- For space on top -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-1 mr-5 sidebar">
+            <!-- Side Bar -->
+            <div class="myfixleft">
+                <div style="margin-top: 100px;">
+                    <div class="row">
+                        <div class="col-md-11">
+                            <ul class="nav nav-pills nav-pills-info flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0"
+                                        href="{{ url_for('user.user_home') }}">
+                                        <i class="fas fa-home mr-2"></i> Home
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0"
+                                        href="{{ url_for('user.favorite') }}">
+                                        <i class="fas fa-heart mr-2"></i> Favorites
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0"
+                                        href="{{ url_for('user.explore') }}">
+                                        <i class="fas fa-compass mr-2"></i> Explore
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0 active"
+                                        href="{{ url_for('user.playlist') }}">
+                                        <i class="fa-solid fa-compact-disc mr-2"></i> Playlist
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Side Bar -->
+        </div>
+        <div class="col col-10 ml-5">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% set message = messages|first %}
+            {% set message_type = message.split(': ')[0] %}
+            {% set message_content = message.split(': ')[1] %}
+            <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{ message_content }}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-sm-6 text-left">
+                                    <h4>Created by <span class="text-success h3"> You </span></h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-2">
+                                    <button class="btn btn-dark animation-on-hover" style="width: 190px; height: 254px; border-radius: 1rem; position: relative;" data-toggle="modal" data-target="#AddPlaylist">
+                                        <div class="d-flex flex-column align-items-center justify-content-center" style="height: 100%;">
+                                        <div class="text-center text-success">
+                                            <i class="bi bi-plus-circle-dotted" style="font-size: 4rem;"></i>
+                                        </div>
+                                        <h4 class="text-left mt-3 ml-2" style="position: absolute; top: 0px; left: 10px;">Add <span class="text-success h3">Playlist</span></h4>
+                                        </div>
+                                    </button>
+                                </div>
+                                {% for row in data['playlistdata'] %}
+                                <div class="col col-2">
+                                    <div class="playlistcard">
+                                        <div class="playlistcard-info">
+                                            <div class="playlist-details">
+                                                <div class="text-left">
+                                                    <h5 class="playlist-name">{{ row['playlist_name'] }}</h5>
+                                                </div>
+                                                <div class="buttons text-right text-bottom">
+                                                <form action="{{ url_for('user.playlist_play') }}" method="POST">
+                                                <input type="hidden" name="contenttype" value="userplaylist">
+                                                <input type="hidden" name="playlist_id" value="{{ row['playlist_id'] }}">
+                                                 <button
+                                                        class="btn btn-success btn-lg btn-round btn-icon animation-on-hover">
+                                                        <i class="fas fa-play"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="{{ url_for('user.edit_playlist') }}" method="POST">
+                                                <input type="hidden" name="playlist_id" value="{{ row['playlist_id'] }}">
+                                                <button class="btn btn-info btn-round btn-icon animation-on-hover">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </button>
+                                                </form>
+                                                </div>
+                                            </div>
+                                            <img src="{{ url_for('static', filename=row['image_loc'])}}"
+                                                alt="Playlist Image" class="playlistcard-image">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Playlist Modal -->
+<div class="modal fade" id="AddPlaylist" tabindex="-1" role="dialog" aria-labelledby="AddPlaylistModal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="AddPlaylistModal">Add Playlist</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('user.playlist') }}" enctype="multipart/form-data" id="playlistForm">
+          <div class="row">
+            <div class="col-4 text-right">
+              <label for="playlist_name">Playlist Name:</label>
+            </div>
+            <div class="col-8">
+            <div class="form-group">
+            <input type="text" name="playlist_name" id="playlist_name" class="form-control text-dark">
+            </div>
+              <div class="invalid-feedback" id="nameError">Please enter a playlist name.</div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-4 text-right">
+              <label for="image_file">Playlist Image:</label>
+            </div>
+            <div class="col-8">
+              <input type="file" name="image_file" id="image_file" accept="image/*">
+              <div class="invalid-feedback" id="imageError">Please select a playlist image.</div>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" name="CreatePlaylistBtn" id="CreatePlaylistBtn" class="btn btn-primary">Create Playlist</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  var playlistName = document.getElementById("playlist_name");
+  var imageFile = document.getElementById("image_file");
+  var nameError = document.getElementById("nameError");
+  var imageError = document.getElementById("imageError");
+  var formGroup = document.querySelector(".form-group");
+
+  function validateInputs() {
+    // Reset previous error messages
+    nameError.style.display = "none";
+    imageError.style.display = "none";
+
+    // Remove existing classes
+    formGroup.classList.remove("has-danger");
+    formGroup.classList.remove("has-success");
+
+    var hasErrors = false;
+
+    // Check if playlist name is empty
+    if (!playlistName.value) {
+      nameError.style.display = "block";
+      formGroup.classList.add("has-danger");
+      hasErrors = true;
+    } else {
+      formGroup.classList.add("has-success");
+    }
+
+    // Check if image is empty
+    if (!imageFile.value) {
+      imageError.style.display = "block";
+      hasErrors = true;
+    }
+
+    return !hasErrors;
+  }
+
+  playlistName.addEventListener("input", validateInputs);
+  imageFile.addEventListener("input", validateInputs);
+
+  document.getElementById("playlistForm").addEventListener("submit", function(e) {
+    if (!validateInputs()) {
+      e.preventDefault();
+    }
+  });
+</script>
+
+<!-- End Add Playlist Modal -->
+<style>
+    .playlistcard {
+        --background: linear-gradient(to left, #f7ba2b 0%, #ea5358 100%);
+        width: 190px;
+        height: 254px;
+        padding: 5px;
+        border-radius: 1rem;
+        overflow: visible;
+        background: #f7ba2b;
+        background: var(--background);
+        position: relative;
+        z-index: 1;
+    }
+
+    .playlistcard::after {
+        position: absolute;
+        content: "";
+        top: 30px;
+        left: 0;
+        right: 0;
+        z-index: -1;
+        height: 100%;
+        width: 100%;
+        transform: scale(0.8);
+        filter: blur(25px);
+        background: #f7ba2b;
+        background: var(--background);
+        transition: opacity .5s;
+    }
+
+    .playlistcard-info {
+        --color: #181818;
+        background: var(--color);
+        color: var(--color);
+        display: flex;
+        flex-direction: column;
+        /* Updated */
+        justify-content: space-between;
+        /* Updated */
+        align-items: flex-start;
+        /* Updated */
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        border-radius: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .playlistcard .title {
+        font-weight: bold;
+        letter-spacing: .1em;
+    }
+
+    .playlistcard:hover::after {
+        opacity: 0;
+    }
+
+    .playlistcard:hover .playlistcard-info {
+        color: #f7ba2b;
+        transition: color 1s;
+    }
+
+    .playlistcard-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+
+    .playlist-details {
+        position: absolute;
+        bottom: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #ffffff;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 1rem;
+    }
+
+    .playlistcard:hover .playlist-details {
+        opacity: 1;
+    }
+
+    .playlist-name {
+        font-size: 24px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        /* Added */
+    }
+
+    .buttons {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+    }
+</style>
+
+
+{% include 'user/user_footer.html'%}

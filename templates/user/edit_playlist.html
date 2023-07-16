@@ -1,0 +1,262 @@
+{% include 'user/user_header.html'%}
+
+<style>
+    /* Hide scroll bars */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    .section {
+        overflow: -moz-scrollbars-none;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+
+<div class="content">
+    <div class="row mt-5">
+        <div class="col mt-5">
+            <!-- For space on top -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-1 mr-5 sidebar">
+            <!-- Side Bar -->
+            <div class="myfixleft">
+                <div style="margin-top: 100px;">
+                    <div class="row">
+                        <div class="col-md-11">
+                            <ul class="nav nav-pills nav-pills-info flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0"
+                                        href="{{ url_for('user.user_home') }}">
+                                        <i class="fas fa-home mr-2"></i> Home
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0"
+                                        href="{{ url_for('user.favorite') }}">
+                                        <i class="fas fa-heart mr-2"></i> Favorites
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0"
+                                        href="{{ url_for('user.explore') }}">
+                                        <i class="fas fa-compass mr-2"></i> Explore
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center py-0"
+                                        href="{{ url_for('user.playlist') }}">
+                                        <i class="fa-solid fa-compact-disc mr-2"></i> Playlist
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Side Bar -->
+        </div>
+        <div class="col col-10 ml-5">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% set message = messages|first %}
+            {% set message_type = message.split(': ')[0] %}
+            {% set message_content = message.split(': ')[1] %}
+            <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{ message_content }}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <div class="row">
+                <div class="col d-flex justify-content-start">
+                    <form method="POST" action="{{ url_for('user.playlist') }}">
+                        <button class="btn btn-default btn-sm animation-on-hover"><i class="tim-icons icon-minimal-left"></i> Back</button>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+            <!-- Left Display -->
+                <div class="col-md-6">
+                    <div class="card card-plain">
+                        <!-- Main Display -->
+                        <div class="row">
+                            <div class="col-4">
+                                <div style="width: 200px; height: 200px; position: relative; overflow: hidden;">
+                                    <label for="upload-input">
+                                        {% if data['userdetails']['image_loc'] != 'null' %}
+                                        <img src="{{ url_for('static', filename=data['playlistdata']['image_loc'])}}"
+                                            class="img-center img-fluid rounded-circle" id="profile-image"
+                                            style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+                                        {% else %}
+                                        <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}"
+                                            class="img-center img-fluid rounded-circle" id="profile-image"
+                                            style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-4 ml-4 mt-5">
+                                <div class="row">
+                                    <h5 class="h4 m-0 mt-3 badge badge-pill badge-default">Playlist</h5>
+                                </div>
+                                <div class="row">
+                                    <h5 class="h1 m-0 btn-link text-success">{{data['playlistdata']['playlist_name']}}
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Main Display -->
+                        <!-- Edit Area -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <form id="editPlaylistForm" action="{{ url_for('user.edit_playlist') }}" method="post">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label>Playlist Name</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control"
+                                                    value="{{data['playlistdata']['playlist_name']}}" name="uppname">
+                                            </div>
+                                            <div class="invalid-feedback" id="nameError"></div>
+                                        </div>
+                                        <input type="hidden" name="playlist_id"
+                                            value="{{ data['playlistdata']['playlist_id'] }}">
+                                        <div class="col mt-3">
+                                            <button type="submit" name="UpdatePlaylistName"
+                                                class="btn btn-info btn-round">Update Name</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <form id="editImageForm" action="{{ url_for('user.edit_playlist') }}" method="post"
+                                    enctype="multipart/form-data">
+                                    <div class="row mt-4">
+                                        <div class="col-6">
+                                            <label for="image_file" class="mr-2">Playlist Image</label>
+                                            <div class="d-flex">
+                                                <input type="file" name="update_image_file" id="image_file"
+                                                    accept="image/*" class="mr-2">
+                                            </div>
+                                            <div class="invalid-feedback" id="imageError"></div>
+                                        </div>
+                                        <div class="col mt-2">
+                                            <input type="hidden" name="playlist_id"
+                                                value="{{ data['playlistdata']['playlist_id'] }}" class="mr-2">
+                                            <button type="submit" name="UpdatePlaylistImage"
+                                                class="btn btn-info btn-round">Update Image</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <script>
+                                document.getElementById('editPlaylistForm').addEventListener('submit', function (event) {
+                                    var nameInput = document.querySelector('#editPlaylistForm input[name="uppname"]');
+                                    var nameError = document.getElementById('nameError');
+
+                                    if (nameInput.value.trim() === '') {
+                                        nameError.textContent = 'Please enter a playlist name.';
+                                        nameError.style.display = 'block';
+                                        event.preventDefault(); // Prevent form submission
+                                    } else {
+                                        nameError.textContent = '';
+                                        nameError.style.display = 'none';
+                                    }
+                                });
+
+                                document.getElementById('editImageForm').addEventListener('submit', function (event) {
+                                    var imageInput = document.querySelector('#editImageForm input[name="update_image_file"]');
+                                    var imageError = document.getElementById('imageError');
+
+                                    if (imageInput.value.trim() === '') {
+                                        imageError.textContent = 'Please select a playlist image.';
+                                        imageError.style.display = 'block';
+                                        event.preventDefault(); // Prevent form submission
+                                    } else {
+                                        imageError.textContent = '';
+                                        imageError.style.display = 'none';
+                                    }
+                                });
+                            </script>
+
+                        </div>
+                        <!-- End Edit Area -->
+
+                    </div>
+                </div>
+                <!-- End Left Display -->
+                <!-- Right Display -->
+                <div class="col-6">
+                    <div class="content">
+                    {% if data['playlistsongs'] | length > 0 %}
+                        <div class="col-md-8 ml-auto mr-auto">
+                            <h2 class="text-center">Songs</h2>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card btn-round">
+                                    <div class="card-body">
+                                        <div class="toolbar"></div>
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Song Name</th>
+                                                    <th>Album</th>
+                                                    <th>Duration</th>
+                                                    <th class="text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for row in data['playlistsongs'] %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>{{ row['song_name'] }}</td>
+                                                    <td>{{ row['album_name'] }}</td>
+                                                    <td>{{ row['duration'] }}</td>
+                                                    <form method="post" action="{{ url_for('user.edit_playlist') }}">
+                                                    <td class="text-center">
+                                                        <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
+                                                        <input type="hidden" name="playlist_id" value="{{ data['playlistdata']['playlist_id'] }}">
+                                                        <button href="" name="SongRemove" type="submit" class="btn btn-link btn-danger btn-icon btn-sm remove"><i class="tim-icons icon-simple-remove"></i></button>
+                                                    </td>
+                                                    </form>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                    <div class="col-md-8 ml-auto mr-auto">
+                        <h2 class="text-center text-warning">No songs in playlist</h2>
+                    </div>
+                    {% endif %}
+                    </div>
+                </div>
+                <!-- End Right Display -->
+            </div>
+            <div class="row">
+                <div class="col d-flex justify-content-center">
+                    <form method="POST" action="{{ url_for('user.playlist') }}">
+                        <button class="btn btn-neutral btn-round animation-on-hover mr-2"><i class="tim-icons icon-minimal-left"></i> Back</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('user.edit_playlist') }}">
+                        <button name="DeletePlaylistBtn" class="btn btn-danger btn-round btn-simple animation-on-hover"> Delete Playlist <i class="bi bi-x-circle ml-2"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% include 'user/user_footer.html'%}

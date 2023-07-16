@@ -49,6 +49,48 @@ def favorite():
     else:
         return redirect(url_for('public.home'))
     
+@user.route('/playlist', methods=['GET','POST'])
+def playlist():
+    if 'uid' in session:
+        uid=session['uid']
+        data={}
+        q="select * from user where user_id='%s'"%(uid)
+        res=select(q)
+        data['userdetails']=res[0]
+        q="select * from playlist where user_id='%s' and status='active'"%(uid)
+        playlistdata=select(q)
+        data['playlistdata']=playlistdata
+        if 'CreatePlaylistBtn' in request.form:
+            # CreatePlaylistBtn is clicked
+            playlist_name = request.form.get('playlist_name')
+            q="insert into playlist(playlist_name,image_loc,user_id,status,type) values ('%s','null','%s','active','private')"%(playlist_name,uid)
+            pid=insert(q)
+            if pid > 0:
+                playlist_image = request.files['image_file']
+                # Get the file extensions
+                playlist_image_extension = os.path.splitext(playlist_image.filename)[1]
+
+                # Specify the path where you want to save the uploaded files
+                upload_folder = 'static/uploads/playlist'  # Update the path according to your setup
+
+                # Customize the filenames
+                playlist_image_filename = str(pid) + playlist_image_extension
+
+                # Saving the path for database
+                playlistpath='uploads/playlist/' + str(pid) + playlist_image_extension
+
+                # Save the uploaded files with the customized filenames
+                playlist_image.save(os.path.join(upload_folder, playlist_image_filename))
+
+                q="update playlist set image_loc='%s' where playlist_id='%s'"%(playlistpath,pid)
+                update(q)
+                flash("success: Playlist created successfully")
+                return redirect(url_for('user.playlist'))
+            
+        return render_template('user/playlist.html', data=data)
+    else:
+        return redirect(url_for('public.home'))
+    
 @user.route('/search', methods=['POST'])
 def search():
     search_text = request.form.get('text')
@@ -123,6 +165,9 @@ def play():
         data['currentartistsongs']=''
         data['favoritesongdata']=''
         data['songdata']=''
+        q="select * from playlist where status='active' and user_id='%s'"%(uid)
+        playlistdata=select(q)
+        data['playlistdata']=playlistdata
         playlistname={}
         if contenttype == 'album':
             album_id= request.form['album_id']
@@ -191,7 +236,41 @@ def play():
         return render_template('user/playarea.html', data=data, playlist=playlistname)
     else:
         return redirect(url_for('public.home'))
-    
+
+
+@user.route('/playlist_play', methods=['POST'])
+def playlist_play():
+    if 'uid' in session:
+        contenttype= request.form['contenttype']
+        uid = session['uid']
+        data = {}
+        q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
+        res = select(q)
+        data['userdetails'] = res[0]
+        data['currentalbumsongs']=''
+        data['currentartistsongs']=''
+        data['favoritesongdata']=''
+        data['songdata']=''
+        q="select * from playlist where status='active' and user_id='%s'"%(uid)
+        playlistdata=select(q)
+        data['playlistdata']=playlistdata
+        playlistname={}
+        if contenttype == 'userplaylist':
+            playlist_id= request.form['playlist_id']
+            q="select * from playlist where playlist_id='%s'"%(playlist_id)
+            albumdetails=select(q)
+            playlist_name = albumdetails[0]['playlist_name']
+            playlist_img = albumdetails[0]['image_loc']
+            q="SELECT s.song_id, s.song_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.LANGUAGE, s.duration, al.album_name, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN album al USING (album_id) INNER JOIN playlisttrack pt ON s.song_id=pt.song_id AND pt.playlist_id='%s'  LEFT JOIN likes l ON s.song_id = l.content_id AND l.user_id = '%s' AND l.content_type='song' WHERE s.privacy = 'public' AND s.STATUS = 'approved';"%(playlist_id,uid)
+            playlistsongs=select(q)
+            data['playlistsongs']=playlistsongs
+            playlistname['name']=playlist_name
+            playlistname['main_pic']=playlist_img
+            
+        return render_template('user/playlistplayarea.html', data=data, playlist=playlistname)
+    else:
+        return redirect(url_for('public.home'))
+
 @user.route('/song_click', methods=['POST'])
 def song_click():
     if 'uid' in session:
@@ -294,6 +373,70 @@ def propicupload():
         return redirect(url_for('user.edit_profile'))
     else:
         return redirect(url_for('public.home'))
+
+@user.route('/edit_playlist', methods=['GET','POST'])
+def edit_playlist():
+    if 'uid' in session:
+        uid = session['uid']
+        q = "SELECT * FROM user WHERE user_id='%s'" %(uid)
+        res = select(q)
+        data={}
+        data['userdetails']=res[0]
+        if 'playlist_id' in request.form:
+            playlist_id=request.form['playlist_id']
+        else:
+            playlist_id= session['playlist_id']
+        session['playlist_id']=playlist_id
+        q="select * from playlist where playlist_id='%s'"%(playlist_id)
+        playlistdata=select(q)
+        data['playlistdata']=playlistdata[0]
+        q="select * from playlisttrack pt inner join songs s on pt.song_id=s.song_id and pt.playlist_id='%s' inner join album al on s.album_id=al.album_id"%(playlist_id)
+        playlistsongs=select(q)
+        data['playlistsongs']=playlistsongs
+        if 'UpdatePlaylistName' in request.form:
+            playlist_name=request.form['uppname']
+            q="update playlist set playlist_name='%s' where playlist_id='%s'"%(playlist_name,playlist_id)
+            update(q)
+            flash("success: Name Updated Successfully")
+            return redirect(url_for('user.edit_playlist'))
+        if 'UpdatePlaylistImage' in request.form:
+            playlist_image = request.files['update_image_file']
+            # Get the file extensions
+            playlist_image_extension = os.path.splitext(playlist_image.filename)[1]
+            # Specify the path where you want to save the uploaded files
+            upload_folder = 'static/uploads/playlist'  # Update the path according to your setup
+            # Customize the filenames
+            playlist_image_filename = str(playlist_id) + playlist_image_extension
+            # Saving the path for database
+            playlistpath='uploads/playlist/' + str(playlist_id) + playlist_image_extension
+            # Save the uploaded files with the customized filenames
+            playlist_image.save(os.path.join(upload_folder, playlist_image_filename))
+            q="update playlist set image_loc='%s' where playlist_id='%s'"%(playlistpath,playlist_id)
+            flash("success: Image Updated successfully")
+            return redirect(url_for('user.edit_playlist'))
+        if 'DeletePlaylistBtn' in request.form:
+            q="select image_loc from playlist where playlist_id='%s'"%(playlist_id)
+            imagedata=select(q)
+            imagepath='static/'+imagedata[0]['image_loc']
+            if os.path.exists(imagepath):
+                os.remove(imagepath)
+            else:
+                flash("danger: Error Occured when deleting image")
+            q="delete from playlist where playlist_id='%s'"%(playlist_id)
+            delete(q)
+            flash("warning: Successfully deleted playlist")
+            return redirect(url_for('user.playlist'))
+        if 'SongRemove' in request.form:
+            song_id=request.form['song_id']
+            playlist_id=request.form['playlist_id']
+            q="delete from playlisttrack where playlist_id='%s' and song_id='%s'"%(playlist_id,song_id)
+            delete(q)
+            flash("warning: Song Deleted Successfully.")
+            return redirect(url_for('user.edit_playlist'))
+        return render_template('user/edit_playlist.html', data=data)
+    else:
+        return redirect(url_for('public.home'))
+
     
 @user.route('/like_song', methods=['POST'])
 def like_song():
@@ -347,6 +490,22 @@ def like_artist():
 
         # Return a JSON response indicating success
         return jsonify({'message': 'Like/Unlike action successful'})
+
+@user.route('/add_to_playlist', methods=['POST'])
+def add_to_playlist():
+    data = request.json
+    playlist_id = data.get('playlistId')
+    song_id = data.get('songId')
+    q="select * from playlisttrack where playlist_id='%s' and song_id='%s'"%(playlist_id,song_id)
+    playlisttrack=select(q)
+    print(len(playlisttrack))
+    if len(playlisttrack) == 0:
+        q="insert into playlisttrack(playlist_id,song_id) values ('%s','%s')"%(playlist_id,song_id)
+        ptid=insert(q)
+        if ptid > 0:
+            return 'Success', 200
+    else:
+        return 'Error', 500
 
 
 @user.route('/logout')

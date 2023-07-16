@@ -1,0 +1,347 @@
+{% include 'user/user_header.html'%}
+<div class="wrapper">
+
+  <div class="page-header header-filter">
+    <div class="squares square1"></div>
+    <div class="squares square2"></div>
+    <div class="squares square3"></div>
+    <div class="squares square4"></div>
+    <div class="squares square5"></div>
+    <div class="squares square6"></div>
+    <div class="squares square7"></div>
+
+    <!-- Playlist bar -->
+    <div class="playarea-container container-fluid">
+      <div class="content">
+        <div class="row">
+          <div class="col sidebar" style="flex: 1;">
+            <!-- Side Bar -->
+            <div class="myfixleft">
+              <div style="margin-top: 100px;">
+                <div class="row">
+                  <div class="col-md-11">
+                    <ul class="nav nav-pills nav-pills-info flex-column">
+                      <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.user_home') }}">
+                          <i class="fas fa-home mr-2"></i> Home
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.favorite') }}">
+                          <i class="fas fa-heart mr-2"></i> Favorites
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.explore') }}">
+                          <i class="fas fa-compass mr-2"></i> Explore
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.playlist') }}">
+                          <i class="fa-solid fa-compact-disc mr-2"></i> Playlist
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Side Bar -->
+          </div>
+          <div class="col" style="flex: 8;">
+            <div class="row mb-5">
+              <div class="col-12" id="PlaylistArea" style="z-index: 1;">
+                {% if data['playlistsongs'] %}
+                <div class="card card-coin">
+                  <div class="card-body d-flex" style="background-color: #32325d;">
+                    <div class="align-self-start mr-5">
+                      <img src="{{ url_for('static', filename=playlist['main_pic'])}}"
+                        class="img-fluid rounded-circle shadow-lg " style="min-height: 150px; max-height: 200px;">
+                    </div>
+                    <div class="align-self-center d-flex flex-column">
+                      <h4 class="title" style="font-size: calc(1.5rem + 1vw);">{{ playlist['name'] }}</h4>
+                      <div>
+                        <button class="btn btn-success btn-lg btn-round btn-icon animation-on-hover"
+                          id="play-pause-button-page">
+                          <i class="fas fa-play"></i>
+                        </button>
+                        <span style="margin-left: 10px;">songs count : {{ data['playlistsongs']|length }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th class="text-center">#</th>
+                          <th>Pic</th>
+                          <th>Song</th>
+                          <th>Album</th>
+                          <th>Time</th>
+                          <th class="text-center">Fav</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for row in data['playlistsongs'] %}
+                        <tr class="hover-row">
+                          <td class="text-center">{{ loop.index }}</td>
+                          <td><img src="{{ url_for('static', filename=row['song_image_loc']) }}"
+                              alt="Raised circle image" class="img-fluid rounded shadow" style="width: 50px;"></td>
+                          <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}"
+                              data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
+                          </td>
+                          <td>{{ row['album_name'] }}</td>
+                          <td>{{ row['duration'] }}</td>
+                          <td class="text-center">
+                            {% if row['liked']=='yes' %}
+                            <button type="button" rel="tooltip"
+                              class="btn btn-primary btn-icon btn-round liked like-button animation-on-hover"
+                              data-song-id="{{ row['song_id'] }}">
+                              <i class="fas fa-heart"></i>
+                            </button>
+                            {% else %}
+                            <button type="button" rel="tooltip"
+                              class="btn btn-neutral btn-icon btn-round btn-simple like-button animation-on-hover"
+                              data-song-id="{{ row['song_id'] }}">
+                              <i class="far fa-heart"></i>
+                            </button>
+                            {% endif %}
+                          </td>
+                          <td class="text-left">
+                          <div class="btn-group dropup">
+                            <button type="button" class="btn btn-link btn-neutral btn-icon btn-sm remove dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="bi bi-three-dots-vertical"></i>
+                              <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <div class="dropdown-menu dropdown-black">
+                              <div class="dropdown-header">Add to playlist</div>
+                              {% for row2 in data['playlistdata'] %}
+                              <a class="dropdown-item" href="#" onclick="addToPlaylist({{ row2['playlist_id'] }}, {{ row['song_id'] }})">{{ row2['playlist_name'] }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Playlist bar -->
+
+
+  </div>
+
+
+</div>
+
+<style>
+  .hover-row:hover {
+    background-color: #525f7f;
+    /* Change the background color on hover */
+    /* Add any other styles you want for the hover effect */
+  }
+
+  .playarea-container {
+    position: relative;
+    margin-top: 85px;
+    max-width: 100%;
+    /* Allow the container to grow up to the maximum width of the browser */
+    height: 80vh;
+    /* Adjust the height as needed */
+    overflow: auto;
+    scrollbar-width: none;
+    /* Hide the scrollbar for Firefox */
+    -ms-overflow-style: none;
+    /* Hide the scrollbar for IE and Edge */
+    padding-bottom: 5vh;
+  }
+
+  .playarea-container::-webkit-scrollbar {
+    width: 0;
+  }
+
+  .gradient-overlay {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gradient-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to right, rgba(50, 50, 93, 1) 0%, rgba(50, 50, 93, 0) 100%);
+  }
+</style>
+
+{% include 'user/player.html'%}
+{% include 'user/user_footer.html'%}
+
+<!-- JS for song like -->
+
+<script>
+  $(document).ready(function () {
+    // Attach a click event listener to the like buttons
+    $('.like-button').click(function () {
+      // Get the song ID from the data attribute of the clicked button
+      var songId = $(this).data('song-id');
+
+      // Reference to the clicked button
+      var $button = $(this);
+
+      // Determine the current like status of the song
+      var isLiked = $button.hasClass('liked');
+
+      // Make an AJAX request to your Flask server to handle the like action
+      $.ajax({
+        type: 'POST', // or 'GET' if you prefer
+        url: '{{ url_for("user.like_song") }}', // generate the URL dynamically using Flask's url_for function
+        data: {
+          songId: songId, // Pass the extracted song ID to the server
+          isLiked: !isLiked // Pass the updated like status to the server
+        },
+        success: function (response) {
+          // The like action was successful
+          console.log('Song liked/unliked!', songId);
+
+          // Toggle the button icon and class based on the updated like status
+          if (isLiked) {
+            $button.removeClass('liked');
+            $button.removeClass('btn-primary');
+            $button.addClass('btn-neutral');
+            $button.addClass('btn-simple');
+            $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
+          } else {
+            $button.addClass('liked');
+            $button.removeClass('btn-neutral');
+            $button.removeClass('btn-simple');
+            $button.addClass('btn-primary');
+            $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
+          }
+        },
+        error: function (error) {
+          // An error occurred while processing the like action
+          console.error('Error liking/unliking the song:', error);
+        }
+      });
+    });
+
+    // Album Like code
+    $('.album-like-button').click(function () {
+      // Get the album ID from the data attribute of the clicked button
+      var albumId = $(this).data('album-id');
+
+      // Reference to the clicked button
+      var $button = $(this);
+
+      // Determine the current like status of the album
+      var isLiked = $button.find('i').hasClass('fas fa-heart');
+
+      // Make an AJAX request to your server to handle the like action
+      $.ajax({
+        type: 'POST', // or 'GET' if you prefer
+        url: '{{ url_for("user.like_album") }}', // generate the URL dynamically using Flask's url_for function
+        data: {
+          albumId: albumId, // Pass the extracted album ID to the server
+          isLiked: !isLiked // Pass the updated like status to the server
+        },
+        success: function (response) {
+          // The like action was successful
+          console.log('Album liked/unliked!', albumId);
+
+          // Toggle the button icon based on the updated like status
+          if (isLiked) {
+            $button.removeClass('liked');
+            $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
+          } else {
+            $button.addClass('liked');
+            $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
+          }
+        },
+        error: function (error) {
+          // An error occurred while processing the like action
+          console.error('Error liking/unliking the album:', error);
+        }
+      });
+    });
+
+    // Artist Like code
+    $('.artist-like-button').click(function () {
+      // Get the artist ID from the data attribute of the clicked button
+      var artistId = $(this).data('artist-id');
+
+      // Reference to the clicked button
+      var $button = $(this);
+
+      // Determine the current like status of the artist
+      var isLiked = $button.find('i').hasClass('fas fa-heart');
+
+      // Make an AJAX request to your server to handle the like action
+      $.ajax({
+        type: 'POST', // or 'GET' if you prefer
+        url: '{{ url_for("user.like_artist") }}', // generate the URL dynamically using Flask's url_for function
+        data: {
+          artistId: artistId, // Pass the extracted artist ID to the server
+          isLiked: !isLiked // Pass the updated like status to the server
+        },
+        success: function (response) {
+          // The like action was successful
+          console.log('Artist liked/unliked!', artistId);
+
+          // Toggle the button icon based on the updated like status
+          if (isLiked) {
+            $button.removeClass('liked');
+            $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
+          } else {
+            $button.addClass('liked');
+            $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
+          }
+        },
+        error: function (error) {
+          // An error occurred while processing the like action
+          console.error('Error liking/unliking the artist:', error);
+        }
+      });
+    });
+  });
+
+
+</script>
+<!-- To add song to a playlist -->
+<script>
+  function addToPlaylist(playlistId, songId) {
+    // Create an XMLHttpRequest object
+    var xhr = new XMLHttpRequest();
+
+    // Set up the request
+    xhr.open("POST", "{{ url_for('user.add_to_playlist') }}", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    // Define the data to be sent in the request body
+    var data = JSON.stringify({ playlistId: playlistId, songId: songId });
+
+    // Set up a callback function to handle the response
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        // Request was successful
+        console.log("Song added to playlist!");
+      } else {
+        // Request failed
+        console.error("Failed to add song to playlist.");
+      }
+    };
+
+    // Send the request
+    xhr.send(data);
+  }
+</script>

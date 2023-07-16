@@ -36,6 +36,11 @@
                           <i class="fas fa-compass mr-2"></i> Explore
                         </a>
                       </li>
+                      <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.playlist') }}">
+                          <i class="fa-solid fa-compact-disc mr-2"></i> Playlist
+                        </a>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -45,7 +50,7 @@
           </div>
           <div class="col" style="flex: 8;">
             <div class="row mb-5">
-              <div class="col-12 col-lg-9" id="PlaylistArea" style="z-index: 1;">
+              <div class="col-12" style="z-index: 1;">
                 {% if data['currentalbumsongs'] %}
                 <div class="card card-coin">
                   <div class="card-body d-flex" style="background-color: #32325d;">
@@ -89,20 +94,21 @@
                           <th class="text-center">#</th>
                           <th>Pic</th>
                           <th>Song</th>
+                          <th>Album</th>
                           <th>Time</th>
                           <th class="text-center">Fav</th>
-                          <th class="text-center">Download</th>
                         </tr>
                       </thead>
                       <tbody>
                         {% for row in data['currentalbumsongs'] %}
                         <tr class="hover-row">
                           <td class="text-center">{{ loop.index }}</td>
-                          <td><img src="{{ url_for('static', filename=row['song_image_loc'])}}"
+                          <td><img src="{{ url_for('static', filename=row['song_image_loc']) }}"
                               alt="Raised circle image" class="img-fluid rounded shadow" style="width: 50px;"></td>
                           <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}"
                               data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                           </td>
+                          <td>{{ row['album_name'] }}</td>
                           <td>{{ row['duration'] }}</td>
                           <td class="text-center">
                             {% if row['liked']=='yes' %}
@@ -119,12 +125,20 @@
                             </button>
                             {% endif %}
                           </td>
-                          <td class="text-center">
-                            <button type="button" rel="tooltip"
-                              class="btn btn-success btn-simple btn-icon btn-sm animation-on-hover">
-                              <i class="tim-icons icon-cloud-download-93"></i>
+                          <td class="text-left">
+                          <div class="btn-group dropup">
+                            <button type="button" class="btn btn-link btn-neutral btn-icon btn-sm remove dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="bi bi-three-dots-vertical"></i>
+                              <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                          </td>
+                            <div class="dropdown-menu dropdown-black">
+                              <div class="dropdown-header">Add to playlist</div>
+                              {% for row2 in data['playlistdata'] %}
+                              <a class="dropdown-item" href="#" onclick="addToPlaylist({{ row2['playlist_id'] }}, {{ row['song_id'] }})">{{ row2['playlist_name'] }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -175,9 +189,9 @@
                           <th class="text-center">#</th>
                           <th>Pic</th>
                           <th>Song</th>
+                          <th>Album</th>
                           <th>Time</th>
                           <th class="text-center">Fav</th>
-                          <th class="text-center">Download</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -189,6 +203,7 @@
                           <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}"
                               data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                           </td>
+                          <td>{{ row['album_name'] }}</td>
                           <td>{{ row['duration'] }}</td>
                           <td class="text-center">
                             {% if row['liked']=='yes' %}
@@ -205,12 +220,20 @@
                             </button>
                             {% endif %}
                           </td>
-                          <td class="text-center">
-                            <button type="button" rel="tooltip"
-                              class="btn btn-success btn-simple btn-icon btn-sm animation-on-hover">
-                              <i class="tim-icons icon-cloud-download-93"></i>
+                          <td class="text-left">
+                          <div class="btn-group dropup">
+                            <button type="button" class="btn btn-link btn-neutral btn-icon btn-sm remove dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="bi bi-three-dots-vertical"></i>
+                              <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                          </td>
+                            <div class="dropdown-menu dropdown-black">
+                              <div class="dropdown-header">Add to playlist</div>
+                              {% for row2 in data['playlistdata'] %}
+                              <a class="dropdown-item" href="#" onclick="addToPlaylist({{ row2['playlist_id'] }}, {{ row['song_id'] }})">{{ row2['playlist_name'] }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -246,9 +269,9 @@
                           <th class="text-center">#</th>
                           <th>Pic</th>
                           <th>Song</th>
+                          <th>Album</th>
                           <th>Time</th>
                           <th class="text-center">Fav</th>
-                          <th class="text-center">Download</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -260,28 +283,37 @@
                           <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}"
                               data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                           </td>
+                          <td>{{ row['album_name'] }}</td>
                           <td>{{ row['duration'] }}</td>
                           <td class="text-center">
                             {% if row['liked']=='yes' %}
                             <button type="button" rel="tooltip"
-                              class="btn btn-primary btn-icon btn-round liked like-button  animation-on-hover"
+                              class="btn btn-primary btn-icon btn-round liked like-button animation-on-hover"
                               data-song-id="{{ row['song_id'] }}">
                               <i class="fas fa-heart"></i>
                             </button>
                             {% else %}
                             <button type="button" rel="tooltip"
-                              class="btn btn-neutral btn-icon btn-round btn-simple like-button  animation-on-hover"
+                              class="btn btn-neutral btn-icon btn-round btn-simple like-button animation-on-hover"
                               data-song-id="{{ row['song_id'] }}">
                               <i class="far fa-heart"></i>
                             </button>
                             {% endif %}
                           </td>
-                          <td class="text-center">
-                            <button type="button" rel="tooltip"
-                              class="btn btn-success btn-simple btn-icon btn-sm animation-on-hover">
-                              <i class="tim-icons icon-cloud-download-93"></i>
+                          <td class="text-left">
+                          <div class="btn-group dropup">
+                            <button type="button" class="btn btn-link btn-neutral btn-icon btn-sm remove dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="bi bi-three-dots-vertical"></i>
+                              <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                          </td>
+                            <div class="dropdown-menu dropdown-black">
+                              <div class="dropdown-header">Add to playlist</div>
+                              {% for row2 in data['playlistdata'] %}
+                              <a class="dropdown-item" href="#" onclick="addToPlaylist({{ row2['playlist_id'] }}, {{ row['song_id'] }})">{{ row2['playlist_name'] }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -317,9 +349,9 @@
                           <th class="text-center">#</th>
                           <th>Pic</th>
                           <th>Song</th>
+                          <th>Album</th>
                           <th>Time</th>
                           <th class="text-center">Fav</th>
-                          <th class="text-center">Download</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -331,6 +363,7 @@
                           <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}"
                               data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                           </td>
+                          <td>{{ row['album_name'] }}</td>
                           <td>{{ row['duration'] }}</td>
                           <td class="text-center">
                             {% if row['liked']=='yes' %}
@@ -347,12 +380,20 @@
                             </button>
                             {% endif %}
                           </td>
-                          <td class="text-center">
-                            <button type="button" rel="tooltip"
-                              class="btn btn-success btn-simple btn-icon btn-sm animation-on-hover">
-                              <i class="tim-icons icon-cloud-download-93"></i>
+                          <td class="text-left">
+                          <div class="btn-group dropup">
+                            <button type="button" class="btn btn-link btn-neutral btn-icon btn-sm remove dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="bi bi-three-dots-vertical"></i>
+                              <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                          </td>
+                            <div class="dropdown-menu dropdown-black">
+                              <div class="dropdown-header">Add to playlist</div>
+                              {% for row2 in data['playlistdata'] %}
+                              <a class="dropdown-item" href="#" onclick="addToPlaylist({{ row2['playlist_id'] }}, {{ row['song_id'] }})">{{ row2['playlist_name'] }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -389,9 +430,9 @@
                           <th class="text-center">#</th>
                           <th>Pic</th>
                           <th>Song</th>
+                          <th>Album</th>
                           <th>Time</th>
                           <th class="text-center">Fav</th>
-                          <th class="text-center">Download</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -403,6 +444,7 @@
                           <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}"
                               data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                           </td>
+                          <td>{{ row['album_name'] }}</td>
                           <td>{{ row['duration'] }}</td>
                           <td class="text-center">
                             {% if row['liked']=='yes' %}
@@ -419,12 +461,20 @@
                             </button>
                             {% endif %}
                           </td>
-                          <td class="text-center">
-                            <button type="button" rel="tooltip"
-                              class="btn btn-success btn-simple btn-icon btn-sm animation-on-hover">
-                              <i class="tim-icons icon-cloud-download-93"></i>
+                          <td class="text-left">
+                          <div class="btn-group dropup">
+                            <button type="button" class="btn btn-link btn-neutral btn-icon btn-sm remove dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="bi bi-three-dots-vertical"></i>
+                              <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                          </td>
+                            <div class="dropdown-menu dropdown-black">
+                              <div class="dropdown-header">Add to playlist</div>
+                              {% for row2 in data['playlistdata'] %}
+                              <a class="dropdown-item" href="#" onclick="addToPlaylist({{ row2['playlist_id'] }}, {{ row['song_id'] }})">{{ row2['playlist_name'] }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -461,9 +511,9 @@
                           <th class="text-center">#</th>
                           <th>Pic</th>
                           <th>Song</th>
+                          <th>Album</th>
                           <th>Time</th>
                           <th class="text-center">Fav</th>
-                          <th class="text-center">Download</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -475,6 +525,7 @@
                           <td><a href="#" class="currentSong" data-songid="{{ row['song_id'] }}"
                               data-value="{{ loop.index }}">{{ row['song_name'] }}</a>
                           </td>
+                          <td>{{ row['album_name'] }}</td>
                           <td>{{ row['duration'] }}</td>
                           <td class="text-center">
                             {% if row['liked']=='yes' %}
@@ -491,12 +542,20 @@
                             </button>
                             {% endif %}
                           </td>
-                          <td class="text-center">
-                            <button type="button" rel="tooltip"
-                              class="btn btn-success btn-simple btn-icon btn-sm animation-on-hover">
-                              <i class="tim-icons icon-cloud-download-93"></i>
+                          <td class="text-left">
+                          <div class="btn-group dropup">
+                            <button type="button" class="btn btn-link btn-neutral btn-icon btn-sm remove dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="bi bi-three-dots-vertical"></i>
+                              <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                          </td>
+                            <div class="dropdown-menu dropdown-black">
+                              <div class="dropdown-header">Add to playlist</div>
+                              {% for row2 in data['playlistdata'] %}
+                              <a class="dropdown-item" href="#" onclick="addToPlaylist({{ row2['playlist_id'] }}, {{ row['song_id'] }})">{{ row2['playlist_name'] }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -506,23 +565,6 @@
                 {% endif %}
 
               </div>
-              <!-- Current playing -->
-              <div class="col-12 col-lg-3" id="CurrentTrackArea">
-                <div class="row">
-                  <div class="card">
-                    <div class="m-3">
-                      <div>
-                        <h1> Song Name</h1>
-                        <img src="{{ url_for('static', filename='user/assets/img/favoritesongs2.jpg')}}"
-                          class="img-fluid shadow-lg" alt="Song Image">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-              <!-- Current playing -->
             </div>
           </div>
         </div>
@@ -711,21 +753,31 @@
 
 
 </script>
+<!-- To add song to a playlist -->
 <script>
-  var currentTrackArea = document.getElementById('CurrentTrackArea');
-  var nowPlayingBtn = document.getElementById('now-playing');
+  function addToPlaylist(playlistId, songId) {
+    // Create an XMLHttpRequest object
+    var xhr = new XMLHttpRequest();
 
-  nowPlayingBtn.addEventListener('click', function () {
-    if (currentTrackArea.classList.contains('d-none')) {
-      currentTrackArea.classList.remove('d-none');
-      // Adjust width of playlist area
-      document.getElementById('PlaylistArea').classList.remove('col-lg-12');
-      document.getElementById('PlaylistArea').classList.add('col-lg-7');
-    } else {
-      currentTrackArea.classList.add('d-none');
-      // Adjust width of playlist area
-      document.getElementById('PlaylistArea').classList.remove('col-lg-7');
-      document.getElementById('PlaylistArea').classList.add('col-lg-12');
-    }
-  });
+    // Set up the request
+    xhr.open("POST", "{{ url_for('user.add_to_playlist') }}", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    // Define the data to be sent in the request body
+    var data = JSON.stringify({ playlistId: playlistId, songId: songId });
+
+    // Set up a callback function to handle the response
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        // Request was successful
+        console.log("Song added to playlist!");
+      } else {
+        // Request failed
+        console.error("Failed to add song to playlist.");
+      }
+    };
+
+    // Send the request
+    xhr.send(data);
+  }
 </script>

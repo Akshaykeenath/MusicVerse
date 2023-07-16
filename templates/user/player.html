@@ -81,6 +81,18 @@
         <img src="{{ url_for('static', filename=row['song_image_loc'])}}" class="active" id="_{{ loop.index }}">
         {% endfor %}
         {% endif %}
+
+        {% if data['playlistsongs'] %}
+        {% for row in data['playlistsongs'] %}
+        <input type="hidden" name="songurl{{ loop.index }}" value="{{ row['song_loc'] }}">
+        <input type="hidden" name="songname{{ loop.index }}" value="{{ row['song_name'] }}">
+        <input type="hidden" name="artworks{{ loop.index }}" value="_{{ loop.index }}">
+        <input type="hidden" name="albums{{ loop.index }}" value="{{ row['album_name'] }}">
+        <input type="hidden" name="duration{{ loop.index }}" value="{{ row['duration'] }}">
+        <img src="{{ url_for('static', filename=row['song_image_loc'])}}" class="active" id="_{{ loop.index }}">
+        {% endfor %}
+        {% endif %}
+
         <div id="buffer-box">Buffering ...</div>
       </div>
       <div id="eqblock">
@@ -108,27 +120,22 @@
         </div>
       </div>
       <div id="player-controls">
-        <div class="control" style="padding-left: 60px;">
+        <div class="control" style="padding-left: 2vh;">
           <div class="btn btn-info btn-sm animation-on-hover" id="play-previous">
             <i class="fas fa-backward"></i>
           </div>
         </div>
-        <div class="control" style="padding: 20px;">
+        <div class="control" style="padding: 2vh;">
           <div class="btn btn-info btn-sm animation-on-hover" id="play-pause-button">
             <i class="fas fa-play"></i>
           </div>
         </div>
-        <div class="control" style="padding-right: 300px;">
+        <div class="control" style="padding-right: 60vh;">
           <div class="btn btn-info btn-sm animation-on-hover" id="play-next">
             <i class="fas fa-forward"></i>
           </div>
         </div>
-        <div class="btn btn-neutral btn-icon btn-round btn-simple" id="now-playing" style="margin-right: 50px;">
-          <!-- Now Playing icon -->
-          <i class="fas fa-music"></i>
-        </div>
-
-        <div class="btn btn-neutral btn-icon btn-round btn-simple" id="repeat-icon" style="margin-right: 50px;">
+        <div class="btn btn-neutral btn-icon btn-round btn-simple" id="repeat-icon" style="margin-right: 2vh;">
           <!-- Repeat icon -->
           <i class="fas fa-redo-alt"></i>
         </div>
@@ -160,27 +167,4 @@
       audio.loop = true;
     }
   });
-
-  var nowPlayingButton = document.getElementById("now-playing");
-
-  // Set initial state to active
-  nowPlayingButton.classList.remove("btn-neutral", "btn-simple");
-  nowPlayingButton.classList.add("btn-primary");
-
-  nowPlayingButton.addEventListener("click", function () {
-    if (nowPlayingButton.classList.contains("btn-primary")) {
-      nowPlayingButton.classList.remove("btn-primary");
-      nowPlayingButton.classList.add("btn-neutral", "btn-simple");
-      // Perform actions when the button is not active
-      // For example, pause the audio player
-      // audio.pause();
-    } else {
-      nowPlayingButton.classList.remove("btn-neutral", "btn-simple");
-      nowPlayingButton.classList.add("btn-primary");
-      // Perform actions when the button is active
-      // For example, play the audio player
-      // audio.play();
-    }
-  });
-
 </script>

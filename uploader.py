@@ -921,7 +921,7 @@ def uploadsong():
         q="select * from album"
         albumdata=select(q)
         data['albumdata']=albumdata
-        if request.method == 'POST':
+        if 'SongUploadBtn' in request.form:
             songname=request.form['songname']
             image = request.files['image']
             album=request.form['album']
@@ -965,6 +965,12 @@ def uploadsong():
                     return redirect(url_for('uploader.pendingsongs'))
                 else:
                     return redirect(url_for('uploader.privatesongs'))
+        if 'SongCancelBtn' in request.form:
+            songpath=session['songpath']
+            songpath=songpath[1:]
+            if os.path.exists(songpath):
+                os.remove(songpath)
+            return redirect(url_for('uploader.home'))
         return render_template('uploader/uploadsong.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))

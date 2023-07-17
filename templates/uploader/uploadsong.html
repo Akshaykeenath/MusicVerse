@@ -51,7 +51,8 @@
               <h5 class="card-title">Enter Song Details</h5>
 
               <!-- Song details Form -->
-              <form class="row g-3 needs-validation" novalidate action="{{ url_for('uploader.uploadsong') }}" method="POST" enctype="multipart/form-data">
+              <form class="g-3 needs-validation" novalidate action="{{ url_for('uploader.uploadsong') }}" method="POST" enctype="multipart/form-data">
+                <div class="row">
                 <div class="col-md-12">
                   <div class="form-floating">
                     <input type="text" class="form-control" id="songname" placeholder="Your Name" name="songname" required>
@@ -62,7 +63,7 @@
                   </div>
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-md-12 mt-4 mb-3">
                   <div class="row mb-3 align-items-center">
                     <label for="formFile" class="col-sm-2 col-form-label">Song Image</label>
                     <div class="col-sm-10 position-relative">
@@ -120,7 +121,7 @@
                   </div>
               </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6 mt-3">
                   <div class="col-md-12">
                     <div class="form-floating">
                       <input type="text" class="form-control" id="floatingGenre" placeholder="genre" name="genre" {% if data['predictedgenre'] %}value="{{ data['predictedgenre'] }}"{% endif %} required>
@@ -132,7 +133,7 @@
                   </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-4 mt-4">
                   <div class="row mb-3 align-items-center">
                     <label for="inputDate" class="col-sm-2 col-form-label">Date</label>
                     <div class="col-sm-10 position-relative">
@@ -146,7 +147,7 @@
                   </div>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-2 mt-4">
                   <div class="form-floating">
                     <input type="text" class="form-control" id="floatingLanguage" placeholder="Language" name="language" required>
                     <label for="floatingLanguage">Language</label>
@@ -155,12 +156,22 @@
                     </div>
                   </div>
                 </div>
-
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                  <a href="{{ url_for('uploader.uploadsong') }}" class="btn btn-secondary">Reset</a>
                 </div>
-              </form>
+
+                <div class="justify-content-center row mt-5">
+                  <div class="col-1">
+                  <button type="submit" name="SongUploadBtn" class="btn btn-success">Submit</button>
+                  </div>
+                  </form>
+                  <div class="col-1">
+                  <a href="{{ url_for('uploader.uploadsong') }}" class="btn btn-secondary">Reset</a>
+                  </div>
+                  <div class="col-1">
+                  <form action="{{ url_for('uploader.uploadsong') }}" method="POST">
+                  <button type="submit" name="SongCancelBtn" class="btn btn-primary">Cancel</button>
+                  </form>
+                  </div>
+                </div>
                <!-- End Song details Form -->
             </div>
           </div>

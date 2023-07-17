@@ -8,6 +8,7 @@ import random
 from genre_rec_service import Genre_Recognition_Service
 from pydub import AudioSegment
 from analytics import *
+from deletion import *
 uploader =Blueprint('uploader',__name__)
 
 @uploader.route('/')
@@ -86,9 +87,9 @@ def allsongs():
             elif action.startswith('view_song'):
                  return render_template('uploader/all_songs.html', data=data,count=count, value='viewsong')
             elif action.startswith('delete_song'):
-                # Delete song action
-                # Handle the delete song functionality
-                return 'Delete Song'
+                message = songDeletion(song_id)
+                flash(message)
+                return redirect(url_for('uploader.allsongs'))
         return render_template('uploader/all_songs.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
@@ -133,9 +134,9 @@ def approvedsongs():
                 elif action.startswith('view_song'):
                     return render_template('uploader/approved_songs.html', data=data,count=count, value='viewsong')
                 elif action.startswith('delete_song'):
-                    # Delete song action
-                    # Handle the delete song functionality
-                    return 'Delete Song'
+                    message = songDeletion(song_id)
+                    flash(message)
+                    return redirect(url_for('uploader.approvedsongs'))
 
         return render_template('uploader/approved_songs.html', data=data,count=count)
     else:
@@ -181,9 +182,9 @@ def pendingsongs():
                 elif action.startswith('view_song'):
                     return render_template('uploader/pending_songs.html', data=data,count=count, value='viewsong')
                 elif action.startswith('delete_song'):
-                    # Delete song action
-                    # Handle the delete song functionality
-                    return 'Delete Song'
+                    message = songDeletion(song_id)
+                    flash(message)
+                    return redirect(url_for('uploader.pendingsongs'))
         return render_template('uploader/pending_songs.html', data=data,count=count)
     else:
         return redirect(url_for('public.home'))
@@ -573,6 +574,10 @@ def myartist():
                     return render_template('uploader/myartist.html', data=data,count=count,value='viewartist')
                 elif artistaction.startswith('update_artist'):
                     return render_template('uploader/myartist.html', data=data,count=count,value='editartist')
+                elif artistaction.startswith('delete_artist'):
+                    message=deleteArtist(artist_id)
+                    flash(message)
+                    return redirect(url_for('uploader.myartist'))
             elif 'submitArtistImage' in request.form:
                 artist_image = request.files['artistImage']
                 if artist_image.filename !='':
@@ -661,7 +666,7 @@ def album():
         count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
-        q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' GROUP BY s.album_id ORDER BY al.album_id"
+        q = "SELECT al.album_id, al.album_name, al.image_loc, al.cover_pic, COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id = s.album_id AND s.privacy = 'public' AND s.status = 'approved' GROUP BY al.album_id, al.album_name, al.image_loc, al.cover_pic ORDER BY al.album_id"
         albumdata=select(q)
         data['userdetails'] = res[0]
         data['albumdetails']=albumdata
@@ -726,7 +731,7 @@ def myalbum():
         count['notification']=str(len(data['notificationdata']))
         q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
         res = select(q)
-        q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' WHERE al.user_id = '%s' GROUP BY s.album_id ORDER BY al.album_id"%(uid)
+        q = "SELECT al.album_id, al.album_name, al.image_loc, al.cover_pic, COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id = s.album_id AND s.privacy = 'public' AND s.status = 'approved' WHERE al.user_id = '%s' GROUP BY al.album_id, al.album_name, al.image_loc, al.cover_pic ORDER BY al.album_id"%(uid)
         myalbumdata=select(q)
         data['userdetails'] = res[0]
         data['myalbumdetails']=myalbumdata
@@ -778,6 +783,10 @@ def myalbum():
                     currentalbumdetails=select(q)
                     data['currentalbumdetails']=currentalbumdetails[0]
                     return render_template('uploader/myalbum.html', data=data,count=count, value='editalbum')
+                elif action.startswith('delete_album'):
+                    message=deleteAlbum(album_id)
+                    flash(message)
+                    return redirect(url_for('uploader.myalbum'))
             elif 'submitAlbumImage' in request.form:
                 album_image = request.files['albumImage']
                 if album_image.filename !='':

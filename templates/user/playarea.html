@@ -652,12 +652,14 @@
 
           // Toggle the button icon and class based on the updated like status
           if (isLiked) {
+            demo.showNotification('bottom', 'left', 'Song Disliked', 'tim-icons icon-bell-55', 'warning');
             $button.removeClass('liked');
             $button.removeClass('btn-primary');
             $button.addClass('btn-neutral');
             $button.addClass('btn-simple');
             $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
           } else {
+            demo.showNotification('bottom', 'left', 'Song Liked', 'tim-icons icon-bell-55', 'success');
             $button.addClass('liked');
             $button.removeClass('btn-neutral');
             $button.removeClass('btn-simple');
@@ -697,9 +699,11 @@
 
           // Toggle the button icon based on the updated like status
           if (isLiked) {
+            demo.showNotification('bottom', 'left', 'Album Disliked', 'tim-icons icon-bell-55', 'warning');
             $button.removeClass('liked');
             $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
           } else {
+            demo.showNotification('bottom', 'left', 'Album Liked', 'tim-icons icon-bell-55', 'success');
             $button.addClass('liked');
             $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
           }
@@ -736,9 +740,11 @@
 
           // Toggle the button icon based on the updated like status
           if (isLiked) {
+            demo.showNotification('bottom', 'left', 'Artist Disliked', 'tim-icons icon-bell-55', 'warning');
             $button.removeClass('liked');
             $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
           } else {
+            demo.showNotification('bottom', 'left', 'Artist Liked', 'tim-icons icon-bell-55', 'success');
             $button.addClass('liked');
             $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
           }
@@ -770,10 +776,15 @@
     xhr.onload = function () {
       if (xhr.status === 200) {
         // Request was successful
-        console.log("Song added to playlist!");
-      } else {
-        // Request failed
-        console.error("Failed to add song to playlist.");
+        var response = JSON.parse(xhr.responseText);
+        demo.showNotification('bottom', 'center', response.message, 'tim-icons icon-bell-55', 'success');
+      } else if (xhr.status === 400) {
+        var response = JSON.parse(xhr.responseText);
+        demo.showNotification('bottom', 'center', response.message, 'tim-icons icon-bell-55', 'warning');
+      }
+      else {
+        var response = JSON.parse(xhr.responseText);
+        demo.showNotification('bottom', 'center', response.message, 'tim-icons icon-bell-55', 'danger');
       }
     };
 

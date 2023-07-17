@@ -498,14 +498,13 @@ def add_to_playlist():
     song_id = data.get('songId')
     q="select * from playlisttrack where playlist_id='%s' and song_id='%s'"%(playlist_id,song_id)
     playlisttrack=select(q)
-    print(len(playlisttrack))
     if len(playlisttrack) == 0:
         q="insert into playlisttrack(playlist_id,song_id) values ('%s','%s')"%(playlist_id,song_id)
         ptid=insert(q)
         if ptid > 0:
-            return 'Success', 200
+            return jsonify(message='Song added to playlist'), 200
     else:
-        return 'Error', 500
+        return jsonify(message='Song already in the playlist'), 400
 
 
 @user.route('/logout')

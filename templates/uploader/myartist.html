@@ -107,6 +107,11 @@
                             title="View Artist Details">
                             <i class="bi bi-view-list"></i>
                           </button>
+                          <button type="submit" class="btn btn-danger rounded-pill" name="artistaction"
+                            value="delete_artist_{{ row['artist_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Delete Artist">
+                            <i class="bi bi-x-circle"></i>
+                          </button>
                         </form>
                       </td>
                     </tr>

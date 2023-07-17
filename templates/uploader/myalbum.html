@@ -103,6 +103,9 @@
                           <button type="submit" class="btn btn-primary rounded-pill" name="action" value="view_album_{{ row['album_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Album Details">
                             <i class="bi bi-view-list"></i>
                           </button>
+                          <button type="submit" class="btn btn-danger rounded-pill" name="action" value="delete_album_{{ row['album_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Album">
+                            <i class="bi bi-x-circle"></i>
+                          </button>
                         </form>
                       </td>
                     </tr>

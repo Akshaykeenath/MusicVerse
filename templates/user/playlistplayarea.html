@@ -216,12 +216,14 @@
 
           // Toggle the button icon and class based on the updated like status
           if (isLiked) {
+            demo.showNotification('bottom', 'left', 'Song Disliked', 'tim-icons icon-bell-55', 'warning');
             $button.removeClass('liked');
             $button.removeClass('btn-primary');
             $button.addClass('btn-neutral');
             $button.addClass('btn-simple');
             $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
           } else {
+            demo.showNotification('bottom', 'left', 'Song Liked', 'tim-icons icon-bell-55', 'success');
             $button.addClass('liked');
             $button.removeClass('btn-neutral');
             $button.removeClass('btn-simple');
@@ -232,84 +234,6 @@
         error: function (error) {
           // An error occurred while processing the like action
           console.error('Error liking/unliking the song:', error);
-        }
-      });
-    });
-
-    // Album Like code
-    $('.album-like-button').click(function () {
-      // Get the album ID from the data attribute of the clicked button
-      var albumId = $(this).data('album-id');
-
-      // Reference to the clicked button
-      var $button = $(this);
-
-      // Determine the current like status of the album
-      var isLiked = $button.find('i').hasClass('fas fa-heart');
-
-      // Make an AJAX request to your server to handle the like action
-      $.ajax({
-        type: 'POST', // or 'GET' if you prefer
-        url: '{{ url_for("user.like_album") }}', // generate the URL dynamically using Flask's url_for function
-        data: {
-          albumId: albumId, // Pass the extracted album ID to the server
-          isLiked: !isLiked // Pass the updated like status to the server
-        },
-        success: function (response) {
-          // The like action was successful
-          console.log('Album liked/unliked!', albumId);
-
-          // Toggle the button icon based on the updated like status
-          if (isLiked) {
-            $button.removeClass('liked');
-            $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
-          } else {
-            $button.addClass('liked');
-            $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
-          }
-        },
-        error: function (error) {
-          // An error occurred while processing the like action
-          console.error('Error liking/unliking the album:', error);
-        }
-      });
-    });
-
-    // Artist Like code
-    $('.artist-like-button').click(function () {
-      // Get the artist ID from the data attribute of the clicked button
-      var artistId = $(this).data('artist-id');
-
-      // Reference to the clicked button
-      var $button = $(this);
-
-      // Determine the current like status of the artist
-      var isLiked = $button.find('i').hasClass('fas fa-heart');
-
-      // Make an AJAX request to your server to handle the like action
-      $.ajax({
-        type: 'POST', // or 'GET' if you prefer
-        url: '{{ url_for("user.like_artist") }}', // generate the URL dynamically using Flask's url_for function
-        data: {
-          artistId: artistId, // Pass the extracted artist ID to the server
-          isLiked: !isLiked // Pass the updated like status to the server
-        },
-        success: function (response) {
-          // The like action was successful
-          console.log('Artist liked/unliked!', artistId);
-
-          // Toggle the button icon based on the updated like status
-          if (isLiked) {
-            $button.removeClass('liked');
-            $button.find('i').removeClass('fas fa-heart').addClass('far fa-heart');
-          } else {
-            $button.addClass('liked');
-            $button.find('i').removeClass('far fa-heart').addClass('fas fa-heart');
-          }
-        },
-        error: function (error) {
-          // An error occurred while processing the like action
-          console.error('Error liking/unliking the artist:', error);
         }
       });
     });

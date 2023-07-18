@@ -1,0 +1,120 @@
+{% include 'admin/admin_header.html'%}
+{% include 'admin/admin_sidebar.html'%}
+
+<main id="main" class="main">
+  <!-- (success:, info:, warning:, danger:) -->
+  {% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+  {% set alert_class = '' %}
+  {% if message.startswith('success:') %}
+  {% set alert_class = 'alert-success bg-success text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('info:') %}
+  {% set alert_class = 'alert-info bg-info text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('warning:') %}
+  {% set alert_class = 'alert-warning bg-warning text-dark' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('danger:') %}
+  {% set alert_class = 'alert-danger bg-danger text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% endif %}
+  <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+  {% endwith %}
+
+
+  <div class="pagetitle">
+    <h1>All Users</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
+        <li class="breadcrumb-item">Users</li>
+        <li class="breadcrumb-item active">All Users</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+
+      <!-- Left side columns -->
+      <div class="col-lg-12">
+        <div class="row">
+
+          <!-- All Users -->
+          <div class="col-12">
+            <div class="card top-selling overflow-auto">
+              <div class="card-body pb-0">
+                <h5 class="card-title">All Users </h5>
+                <table class="table table-hover table-borderless datatable">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Preview</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Mobile</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in data['alluserdetails'] %}
+                    <tr>
+                      <td>{{ loop.index }}</td>
+                      <th scope="row">
+                        <a>
+                          <img src="{{ url_for('static', filename=row['image_loc']) }}" alt=""
+                            style="max-width: 80px; max-height: 80px;">
+                        </a>
+                      </th>
+                      <td><a class="text-primary fw-bold">{{ row['fname'] }} {{ row['lname'] }}</a></td>
+                      <td>{{ row['email'] }}</td>
+                      <td>{{ row['mobile'] }}</td>
+                      {% if row['status'] == 'active' %}
+                      <td><a class="badge rounded-pill bg-success">{{ row['status'] }}</a></td>
+                      {% else %}
+                      <td><a class="badge rounded-pill bg-warning">{{ row['status'] }}</a></td>
+                      {% endif %}
+                      <td>
+                        <form action="{{ url_for('admin.allusers') }}" method="POST">
+                          <button type="submit" class="btn btn-primary rounded-pill" name="action"
+                            value="view_user_{{ row['user_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="View User Details">
+                            <i class="bi bi-view-list"></i>
+                          </button>
+                          {% if row['status'] == 'active' %}
+                          <button type="submit" class="btn btn-danger rounded-pill" name="action"
+                            value="deactivate_user_{{ row['user_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Deactivate User">
+                            <i class="bi bi-x-lg"></i>
+                          </button>
+                          {% else %}
+                          <button type="submit" class="btn btn-success rounded-pill" name="action"
+                            value="activate_user_{{ row['user_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Activate User">
+                            <i class="bi bi-check2"></i>
+                          </button>
+                          {% endif %}
+                        </form>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div><!-- End All Users -->
+
+        </div>
+      </div><!-- End Left side columns -->
+    </div>
+  </section>
+
+</main><!-- End #main -->
+
+{% include 'admin/admin_footer.html'%}

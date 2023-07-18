@@ -1,0 +1,200 @@
+{% include 'admin/admin_header.html'%}
+{% include 'admin/admin_sidebar.html'%}
+
+<main id="main" class="main">
+  <!-- (success:, info:, warning:, danger:) -->
+  {% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+  {% set alert_class = '' %}
+  {% if message.startswith('success:') %}
+  {% set alert_class = 'alert-success bg-success text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('info:') %}
+  {% set alert_class = 'alert-info bg-info text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('warning:') %}
+  {% set alert_class = 'alert-warning bg-warning text-dark' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('danger:') %}
+  {% set alert_class = 'alert-danger bg-danger text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% endif %}
+  <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+  {% endwith %}
+
+
+  <div class="pagetitle">
+    <h1>All Artist</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
+        <li class="breadcrumb-item active">Artist</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+
+      <!-- Left side columns -->
+      <div class="col-lg-12">
+        <div class="row">
+
+          <!-- All Artist -->
+          <div class="col-12">
+            <div class="card top-selling overflow-auto">
+              <div class="card-body pb-0">
+                <h5 class="card-title">All Artist </h5>
+
+                <table class="table table-borderless datatable">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Preview</th>
+                      <th scope="col">Cover Pic</th>
+                      <th scope="col">Artist name</th>
+                      <th scope="col">Songs</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    {% for row in data['artistdetails'] %}
+                    <tr>
+                      <td>{{ loop.index }}</td>
+                      <th scope="row">
+                        <a>
+                          <img src="{{ url_for('static', filename=row['image_loc']) }}" alt=""
+                            style="max-width: 80px; max-height: 80px;">
+                        </a>
+                      </th>
+                      <th scope="row">
+                        <a>
+                          <img src="{{ url_for('static', filename=row['cover_pic']) }}" alt=""
+                            style="max-width: 80px; max-height: 80px;">
+                        </a>
+                      </th>
+                      <td><a class="text-primary fw-bold">{{ row['artist_name'] }}</a></td>
+                      <td>{{ row['song_count'] }}</td>
+                      <td>
+                        <form action="{{ url_for('admin.artist') }}" method="POST">
+                          <button type="submit" class="btn btn-primary rounded-pill" name="action"
+                            value="view_artist_{{ row['artist_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="View Artist Details">
+                            <i class="bi bi-view-list"></i>
+                          </button>
+                          <button type="submit" class="btn btn-danger rounded-pill" name="action"
+                            value="delete_artist_{{ row['artist_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Delete Artist">
+                            <i class="bi bi-x-lg"></i>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                    {% endfor %}
+
+
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
+          </div><!-- End Trending -->
+
+        </div>
+      </div><!-- End Left side columns -->
+    </div>
+  </section>
+
+  <!-- View Artist Modal -->
+  <div class="modal fade" id="viewartist" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">View Artist Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <!-- Artist Details -->
+            <div class="col-xl-4">
+              <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                  <img src="{{ url_for('static', filename=data['currentartistdetails']['image_loc']) }}"
+                    alt="ArtistImage" class="rounded-circle mb-3" style="max-width: 200px; max-height: 200px;">
+                  <h4 class="mb-0"><b>{{data['currentartistdetails']['artist_name']}}</b></h4>
+                </div>
+              </div>              
+            </div>
+            <!-- End Artist Details -->
+            <div class="col-xl-8">
+              <!-- Song Details Tabs -->
+              <div class="card">
+                <div class="card-body pt-3">
+                  <ul class="nav nav-tabs nav-tabs-bordered">
+                    <li class="nav-item">
+                      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Songs
+                        List</button>
+                    </li>
+                  </ul>
+                  <div class="tab-content pt-2">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Song name</th>
+                          <th scope="col">Artist</th>
+                          <th scope="col">Song</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for row in data['currentartistsongs'] %}
+                        <tr>
+                          <th scope="row"><a href="#">{{ loop.index }}</a></th>
+                          <td>{{ row['song_name'] }}</td>
+                          <td><a href="#" class="text-primary">{{ row['album_name'] }}</a></td>
+                          <td>
+                            <audio controls>
+                              <source src="{{ row['song_loc'] }}" type="audio/mpeg">
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div><!-- End Song Details Tabs -->
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End View Artist Modal -->
+
+</main><!-- End #main -->
+
+{% include 'admin/admin_footer.html'%}
+
+{% if value == 'viewartist' %}
+<script>
+  // Function to open the modal on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('viewartist'));
+    modal.show();
+  });
+</script>
+{% endif %}

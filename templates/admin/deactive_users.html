@@ -1,0 +1,66 @@
+{% include 'admin/admin_header.html'%}
+{% include 'admin/admin_sidebar.html'%}
+
+<main id="main" class="main">
+  <!-- (success:, info:, warning:, danger:) -->
+  {% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+  {% set alert_class = '' %}
+  {% if message.startswith('success:') %}
+  {% set alert_class = 'alert-success bg-success text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('info:') %}
+  {% set alert_class = 'alert-info bg-info text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('warning:') %}
+  {% set alert_class = 'alert-warning bg-warning text-dark' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('danger:') %}
+  {% set alert_class = 'alert-danger bg-danger text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% endif %}
+  <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+  {% endwith %}
+
+
+  <div class="pagetitle">
+    <h1>Deactive Users</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
+        <li class="breadcrumb-item">Users</li>
+        <li class="breadcrumb-item active">Deactive Users</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+
+      <!-- Left side columns -->
+      <div class="col-lg-12">
+        <div class="row">
+
+          <!-- Deactive Users -->
+          <div class="col-12">
+            <div class="card top-selling overflow-auto">
+              <div class="card-body pb-0">
+                <h5 class="card-title">Deactive Users </h5>
+
+              </div>
+
+            </div>
+          </div><!-- End Deactive Users -->
+
+        </div>
+      </div><!-- End Left side columns -->
+    </div>
+  </section>
+
+</main><!-- End #main -->
+
+{% include 'admin/admin_footer.html'%}

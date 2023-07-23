@@ -13,7 +13,7 @@ def get_mail_id(uid):
 def send_email(uid, subject, message):
     subject = subject + ' | MusicVerse'
     recipient_email = get_mail_id(uid)
-    sender_email = "akshaykeenath1997@gmail.com"
+    sender_email = ""
 
     # Add a new line in the message
     message += "\n\n\n Regards. \n Admin \n admin@musicverse.com"
@@ -30,8 +30,8 @@ def send_email(uid, subject, message):
     # SMTP server configuration
     smtp_host = "smtp.gmail.com"
     smtp_port = 587
-    smtp_username = 'akshaykeenath1997@gmail.com'
-    smtp_password = 'uwsfsixtqoixzhtq'
+    smtp_username = ''
+    smtp_password = ''
 
     # Add an image to the email footer
     with open("static/user/assets/img/musicverse.png", "rb") as f:

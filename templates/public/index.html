@@ -178,37 +178,6 @@
       </div>
     </form>
     <!-- End Signup Area -->
-        <!-- Update Success -->
-{% with messages = get_flashed_messages() %}
-{% if messages[0]=='Insertion Successfull' %}
-<div class="alert alert-success alert-with-icon fixed-bottom">
-  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="tim-icons icon-simple-remove"></i>
-  </button>
-  <span data-notify="icon" class="tim-icons icon-trophy"></span>
-  <span>{{ messages[0] }}</span>
-</div>
-{% endif %}
-{% if messages[0]=='Username already exist' %}
-<div class="alert alert-danger alert-with-icon fixed-bottom">
-  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="tim-icons icon-simple-remove"></i>
-  </button>
-  <span data-notify="icon" class="tim-icons icon-alert-circle-exc"></span>
-  <span>{{ messages[0] }}</span>
-</div>
-{% endif %}
-{% if messages[0]=='Invalid username or password' %}
-<div class="alert alert-danger alert-with-icon fixed-bottom">
-  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="tim-icons icon-simple-remove"></i>
-  </button>
-  <span data-notify="icon" class="tim-icons icon-alert-circle-exc"></span>
-  <span>{{ messages[0] }}</span>
-</div>
-{% endif %}
-{% endwith %}
 
     {% include 'public/public_footer.html'%}
-
 

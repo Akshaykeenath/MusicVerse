@@ -1,6 +1,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{% include 'uploader/uploader_header.html'%}
-{% include 'uploader/uploader_sidebar.html'%}
+{% include 'admin/admin_header.html'%}
+{% include 'admin/admin_sidebar.html'%}
 
 
 <main id="main" class="main">
@@ -15,8 +15,8 @@
     {% endif %}
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('uploader.analytics') }}">Analytics</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.analytics') }}">Analytics</a></li>
         {% if data['contentdata']['song_name'] %}
         <li class="breadcrumb-item active">{{ data['contentdata']['song_name'] }}</li>
         {% elif data['contentdata']['album_name'] %}
@@ -179,9 +179,7 @@
     </div>
   </section>
 </main><!-- End #main -->
-{% include 'uploader/uploader_footer.html'%}
-
-<!-- JS for filter -->
+{% include 'admin/admin_footer.html'%}
 <script>
   // New function to load chart data
   function loadData(lastNRows, timeRange) {

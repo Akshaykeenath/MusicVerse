@@ -43,3 +43,13 @@
 </body>
 
 </html>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% set message = messages|first %}
+    {% set message_type = message.split(': ')[0] %}
+    {% set message_content = message.split(': ')[1] %}
+    <script>
+      demo.showNotification('bottom', 'center', '{{ message_content }}', 'tim-icons icon-bell-55', '{{ message_type }}');
+    </script>
+  {% endif %}
+{% endwith %}

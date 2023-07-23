@@ -1,6 +1,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{% include 'uploader/uploader_header.html'%}
-{% include 'uploader/uploader_sidebar.html'%}
+{% include 'admin/admin_header.html'%}
+{% include 'admin/admin_sidebar.html'%}
 
 
 <main id="main" class="main">
@@ -9,7 +9,7 @@
     <h1>Analytics</h1>
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('uploader.home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
         <li class="breadcrumb-item active">Analytics</li>
       </ol>
     </nav>
@@ -322,7 +322,7 @@
     </div>
   </section>
 </main><!-- End #main -->
-{% include 'uploader/uploader_footer.html'%}
+{% include 'admin/admin_footer.html'%}
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -334,7 +334,7 @@
         var songId = this.dataset.songId;
         var form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/uploader/analytics_overview';
+        form.action = '/admin/analytics_overview';
 
         var input = document.createElement('input');
         input.type = 'hidden';
@@ -354,7 +354,7 @@
         var albumId = this.dataset.albumId;
         var form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/uploader/analytics_overview';
+        form.action = '/admin/analytics_overview';
 
         var input = document.createElement('input');
         input.type = 'hidden';
@@ -374,7 +374,7 @@
         var artistId = this.dataset.artistId;
         var form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/uploader/analytics_overview';
+        form.action = '/admin/analytics_overview';
 
         var input = document.createElement('input');
         input.type = 'hidden';

@@ -1,7 +1,8 @@
 from flask import *
 from database import*
 from deletion import *
-
+from other_functions import *
+from analytics import *
 admin =Blueprint('admin',__name__)
 
 @admin.route('/admin_home')
@@ -205,12 +206,20 @@ def allusers():
                  data['currentuserdetails']=currentuserdetails[0]
                  return render_template('admin/allusers.html', data=data, value='viewuser',count=count)
             elif action.startswith('deactivate_user'):
-                # message = deleteAlbum(album_id)
-                # flash(message)
+                q="update user set status='deactive' where user_id='%s'"%(user_id)
+                update(q)
+                flash("warning: User Deactivated")
+                subject="User Dectivation"
+                message="OOps!!!. Your account has been deactivated. Contact admin"
+                send_email(user_id,subject,message)
                 return redirect(url_for('admin.allusers'))
             elif action.startswith('activate_user'):
-                # message = deleteAlbum(album_id)
-                # flash(message)
+                q="update user set status='active' where user_id='%s'"%(user_id)
+                update(q)
+                flash("success: User Activated")
+                subject="User Activation"
+                message="Congrats. Your account has been activated"
+                send_email(user_id,subject,message)
                 return redirect(url_for('admin.allusers'))
         return render_template('admin/allusers.html',data=data,count=count)
     else:
@@ -226,7 +235,27 @@ def active_users():
         approvalnotificationdata=select(q)
         data['approvalnotificationdata']=approvalnotificationdata
         count['notification']=str(len(data['approvalnotificationdata']))
-
+        q="select * from user where status='active'"
+        activeuserdetails=select(q)
+        data['activeuserdetails']=activeuserdetails
+        if request.method == 'POST':
+            action = request.form.get('action')
+            user_id = action.split('_')[-1]
+            if action.startswith('view_user'):
+                 q="select * from user where user_id='%s'"%(user_id)
+                 currentuserdetails=select(q)
+                 data['currentuserdetails']=currentuserdetails[0]
+                 return render_template('admin/active_users.html', data=data, value='viewuser',count=count)
+            elif action.startswith('deactivate_user'):
+                q="update user set status='deactive' where user_id='%s'"%(user_id)
+                update(q)
+                flash("warning: User Deactivated")
+                return redirect(url_for('admin.active_users'))
+            elif action.startswith('activate_user'):
+                q="update user set status='active' where user_id='%s'"%(user_id)
+                update(q)
+                flash("success: User Activated")
+                return redirect(url_for('admin.active_users'))
         return render_template('admin/active_users.html',data=data,count=count)
     else:
         return redirect(url_for('public.home'))
@@ -241,8 +270,117 @@ def deactive_users():
         approvalnotificationdata=select(q)
         data['approvalnotificationdata']=approvalnotificationdata
         count['notification']=str(len(data['approvalnotificationdata']))
-
+        q="select * from user where status='deactive'"
+        deactiveuserdetails=select(q)
+        data['deactiveuserdetails']=deactiveuserdetails
+        if request.method == 'POST':
+            action = request.form.get('action')
+            user_id = action.split('_')[-1]
+            if action.startswith('view_user'):
+                 q="select * from user where user_id='%s'"%(user_id)
+                 currentuserdetails=select(q)
+                 data['currentuserdetails']=currentuserdetails[0]
+                 return render_template('admin/deactive_users.html', data=data, value='viewuser',count=count)
+            elif action.startswith('deactivate_user'):
+                q="update user set status='deactive' where user_id='%s'"%(user_id)
+                update(q)
+                flash("warning: User Deactivated")
+                return redirect(url_for('admin.deactive_users'))
+            elif action.startswith('activate_user'):
+                q="update user set status='active' where user_id='%s'"%(user_id)
+                update(q)
+                flash("success: User Activated")
+                return redirect(url_for('admin.deactive_users'))
         return render_template('admin/deactive_users.html',data=data,count=count)
+    else:
+        return redirect(url_for('public.home'))
+
+@admin.route('/analytics' , methods=['GET', 'POST'])
+def analytics():
+    if 'login_id' in session:
+        login_id = session['login_id']
+        data = {}
+        count={}
+        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='pending' AND notification_type='approvals' AND n.user_id='1'"
+        approvalnotificationdata=select(q)
+        data['approvalnotificationdata']=approvalnotificationdata
+        count['notification']=str(len(data['approvalnotificationdata']))
+        q="SELECT s.song_id,s.song_name,s.image_loc,COUNT(c.click_id) AS clicks FROM songs s LEFT JOIN clicks c ON s.song_id=c.content_id AND c.content_type='song' WHERE s.privacy='public' and s.status='approved' GROUP BY s.song_id"
+        songdata=select(q)
+        data['songdata']=songdata
+        q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id)) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id )) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id )) GROUP BY DATE(TIMESTAMP)"
+        totalclicks=select(q)
+        clicks, dates = getClicksDatesInc(totalclicks)
+        data['chartdata']={'clicks':clicks,'dates':dates}
+        q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' GROUP BY name"
+        clickdata=select(q)
+        q = "SELECT al.album_id,al.album_name,al.image_loc,COUNT(c.click_id) AS clicks FROM album al LEFT JOIN clicks c ON al.album_id=c.content_id AND c.content_type='album' GROUP BY al.album_id"
+        myalbumdetails=select(q)
+        data['myalbumdetails']=myalbumdetails
+        q = "SELECT ar.artist_id,ar.artist_name,ar.image_loc,COUNT(c.click_id) AS clicks FROM artist ar LEFT JOIN clicks c ON ar.artist_id=c.content_id AND c.content_type='artist' GROUP BY ar.artist_id"
+        myartistdata=select(q)
+        data['myartistdata']=myartistdata
+        if 'contenttype' in request.form:
+            contenttype = request.form.get('contenttype')
+            if contenttype == 'SongClicked':
+                song_id = request.form.get('songId')
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='song' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(song_id)
+                songclickdata=select(q)
+                clicks, dates = getClicksDatesInc(songclickdata)
+                q="select * from songs where song_id='%s'"%(song_id)
+                songdata=select(q)
+                return jsonify({'clicks': clicks, 'dates': dates,'songdata':songdata[0]})
+        return render_template('admin/analytics.html', data=data,count=count,clickdata=clickdata)
+    else:
+        return redirect(url_for('public.home'))
+
+@admin.route('/analytics_overview' , methods=['GET', 'POST'])
+def analytics_overview():
+    if 'login_id' in session:
+        login_id = session['login_id']
+        data = {}
+        count={}
+        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='pending' AND notification_type='approvals' AND n.user_id='1'"
+        approvalnotificationdata=select(q)
+        data['approvalnotificationdata']=approvalnotificationdata
+        count['notification']=str(len(data['approvalnotificationdata']))
+        if request.method == 'POST':
+            song_id = request.form.get('songId')
+            album_id = request.form.get('albumId')
+            artist_id = request.form.get('artistId')
+            if song_id:
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='song' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(song_id)
+                songclickdata=select(q)
+                q="select * from songs where song_id='%s'"%(song_id)
+                songdata=select(q)
+                data['contentdata']=songdata[0] #Song data
+                q="SELECT DATE(l.timestamp) AS dates,COUNT(*) AS likes FROM likes l WHERE l.content_type='song' AND l.content_id='%s' GROUP BY DATE(l.timestamp)"%(song_id)
+                songlikes=select(q)
+                clicks, likes, dates = getClicksLikesDates(songclickdata, songlikes)
+                data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
+                return render_template('admin/analytics_overview.html', data=data, count=count)
+            elif album_id:
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='album' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(album_id)
+                albumclickdata=select(q)
+                q="select * from album where album_id='%s'"%(album_id)
+                albumdata=select(q)
+                data['contentdata']=albumdata[0] #Album data
+                q="SELECT DATE(l.timestamp) AS dates,COUNT(*) AS likes FROM likes l WHERE l.content_type='album' AND l.content_id='%s' GROUP BY DATE(l.timestamp)"%(album_id)
+                albumlikes=select(q)
+                clicks, likes, dates = getClicksLikesDates(albumclickdata, albumlikes)
+                data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
+                return render_template('admin/analytics_overview.html', data=data, count=count)
+            elif artist_id:
+                q="SELECT DATE(c.timestamp) AS dates,COUNT(*) AS clicks FROM clicks c WHERE c.content_type='artist' AND c.content_id='%s' GROUP BY DATE(c.timestamp);"%(artist_id)
+                artistclickdata=select(q)
+                q="select * from artist where artist_id='%s'"%(artist_id)
+                artistdata=select(q)
+                data['contentdata']=artistdata[0] #Artist data
+                q="SELECT DATE(l.timestamp) AS dates,COUNT(*) AS likes FROM likes l WHERE l.content_type='artist' AND l.content_id='%s' GROUP BY DATE(l.timestamp)"%(artist_id)
+                artistlikes=select(q)
+                clicks, likes, dates = getClicksLikesDates(artistclickdata, artistlikes)
+                data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
+                return render_template('admin/analytics_overview.html', data=data, count=count)
     else:
         return redirect(url_for('public.home'))
 

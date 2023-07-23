@@ -50,7 +50,62 @@
             <div class="card top-selling overflow-auto">
               <div class="card-body pb-0">
                 <h5 class="card-title">Active Users </h5>
-
+                <table class="table table-hover table-borderless datatable">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Preview</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Mobile</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in data['activeuserdetails'] %}
+                    <tr>
+                      <td>{{ loop.index }}</td>
+                      <th scope="row">
+                        <a>
+                          <img src="{{ url_for('static', filename=row['image_loc']) }}" alt=""
+                            style="max-width: 80px; max-height: 80px;">
+                        </a>
+                      </th>
+                      <td><a class="text-primary fw-bold">{{ row['fname'] }} {{ row['lname'] }}</a></td>
+                      <td>{{ row['email'] }}</td>
+                      <td>{{ row['mobile'] }}</td>
+                      {% if row['status'] == 'active' %}
+                      <td><a class="badge rounded-pill bg-success">{{ row['status'] }}</a></td>
+                      {% else %}
+                      <td><a class="badge rounded-pill bg-warning">{{ row['status'] }}</a></td>
+                      {% endif %}
+                      <td>
+                        <form action="{{ url_for('admin.active_users') }}" method="POST">
+                          <button type="submit" class="btn btn-primary rounded-pill" name="action"
+                            value="view_user_{{ row['user_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="View User Details">
+                            <i class="bi bi-view-list"></i>
+                          </button>
+                          {% if row['status'] == 'active' %}
+                          <button type="submit" class="btn btn-danger rounded-pill" name="action"
+                            value="deactivate_user_{{ row['user_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Deactivate User">
+                            <i class="bi bi-x-lg"></i>
+                          </button>
+                          {% else %}
+                          <button type="submit" class="btn btn-success rounded-pill" name="action"
+                            value="activate_user_{{ row['user_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Activate User">
+                            <i class="bi bi-check2"></i>
+                          </button>
+                          {% endif %}
+                        </form>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
 
             </div>

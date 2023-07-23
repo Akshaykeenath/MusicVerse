@@ -226,9 +226,9 @@ def play():
             content_name = request.form.get('content_name')
             category_type = request.form.get('category_type')
             if category_type == 'language':
-                q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.language='%s'"%(uid,content_name)
+                q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s LEFT JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.language='%s'"%(uid,content_name)
             elif category_type == 'genre':
-                q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s INNER JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.genre='%s'"%(uid,content_name)
+                q="SELECT s.song_id, s.song_name, al.album_name, s.image_loc AS song_image_loc, s.song_loc, s.genre, s.language, s.duration, CASE WHEN l.content_id IS NOT NULL THEN 'yes' ELSE 'no' END AS liked FROM songs s LEFT JOIN likes l ON s.song_id = l.content_id AND l.content_type = 'song' AND l.user_id = '%s' INNER JOIN album al ON s.album_id = al.album_id WHERE s.genre='%s';"%(uid,content_name)
             songcategorydata=select(q)
             data['songcategorydata']=songcategorydata
             data['songcategorytype']={'name':content_name}

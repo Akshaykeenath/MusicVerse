@@ -3,6 +3,7 @@ from public import public
 from admin import admin
 from user import user
 from uploader import uploader
+from flask_mail import Mail, Message
 
 app=Flask(__name__)
 

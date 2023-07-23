@@ -86,6 +86,8 @@
 <script src="{{ url_for('static', filename='public/js/plugins/bootstrap-datetimepicker.js')}}" type="text/javascript"></script>
 <!-- Control Center for Black UI Kit: parallax effects, scripts for the example pages etc -->
 <script src="{{ url_for('static', filename='public/js/blk-design-system.min.js')}}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename='user/assets/demo/demo.js')}}"></script>
+<script src="{{ url_for('static', filename='user/assets/js/plugins/bootstrap-notify.js')}}"></script>
 <script>
   $(document).ready(function() {
     blackKit.initDatePicker();
@@ -105,3 +107,13 @@
 </body>
 
 </html>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% set message = messages|first %}
+    {% set message_type = message.split(': ')[0] %}
+    {% set message_content = message.split(': ')[1] %}
+    <script>
+      demo.showNotification('bottom', 'center', '{{ message_content }}', 'tim-icons icon-bell-55', '{{ message_type }}');
+    </script>
+  {% endif %}
+{% endwith %}

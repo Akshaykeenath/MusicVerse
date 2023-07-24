@@ -24,8 +24,13 @@ def admin_home():
         q="select count(*) as active_users_count from user where status='active'"
         active_users_count=select(q)
         count['active_users_count']=active_users_count[0]['active_users_count']
-        
-        return render_template('admin/index.html', data=data,count=count)
+        q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id)) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id )) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id )) GROUP BY DATE(TIMESTAMP)"
+        totalclicks=select(q)
+        clicks, dates = getClicksDatesInc(totalclicks)
+        data['chartdata']={'clicks':clicks,'dates':dates}
+        q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' GROUP BY name"
+        clickdata=select(q)
+        return render_template('admin/index.html', data=data,count=count,clickdata=clickdata)
     else:
         return redirect(url_for('public.home'))
 

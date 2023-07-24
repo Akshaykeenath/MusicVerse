@@ -41,8 +41,13 @@ def home():
         q="SELECT s.song_id, s.song_name, IFNULL(al.album_name, 'No album') AS album_name, IFNULL(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar USING (song_id) LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al USING (album_id) WHERE s.user_id = '%s' GROUP BY s.song_id ORDER BY song_id DESC LIMIT 10"%(uid)
         recentsongdata=select(q) #last 10 songs
         data['recentsongdata']=recentsongdata
-        
-        return render_template('uploader/home.html', data=data,count=count)
+        q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id AND s.user_id = '%s')) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id AND a.user_id = '%s')) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id AND ar.user_id = '%s')) GROUP BY DATE(TIMESTAMP)"%(uid,uid,uid)
+        totalclicks=select(q)
+        clicks, dates = getClicksDatesInc(totalclicks)
+        data['chartdata']={'clicks':clicks,'dates':dates}
+        q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' AND s.user_id='%s' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' AND a.user_id='%s' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' AND a.user_id='%s' GROUP BY name"%(uid,uid,uid)
+        clickdata=select(q)
+        return render_template('uploader/home.html', data=data,count=count,clickdata=clickdata)
     else:
         return redirect(url_for('public.home'))
 
@@ -423,7 +428,7 @@ def profile():
         notificationdata=select(q)
         data['notificationdata']=notificationdata
         count['notification']=str(len(data['notificationdata']))
-        q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
+        q = "SELECT u.user_id,u.login_id,u.fname,u.lname,u.email,u.mobile,u.image_loc,u.status,l.username,l.password FROM USER u INNER JOIN login l ON u.login_id=l.login_id WHERE user_id='%s'" % (uid)
         res = select(q)
         data['userdetails'] = res[0]
         return render_template('uploader/uploader_profile.html', data=data,count=count)
@@ -988,36 +993,6 @@ def secondstominute(seconds):
         return f"0:{remaining_seconds:02d}"
     else:
         return f"{minutes}:{remaining_seconds:02d}"
-
-@uploader.route('/samplepage', methods=['GET', 'POST'])
-def samplepage():
-    if 'uid' in session:
-        uid = session['uid']
-        data = {}
-        count={}
-        login_id = session['login_id']
-        q="SELECT n.notification_type,s.song_name,n.content_status,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND n.user_id='%s'"%(login_id)
-        notificationdata=select(q)
-        data['notificationdata']=notificationdata
-        count['notification']=str(len(data['notificationdata']))
-        q = "SELECT * FROM user WHERE user_id='%s'" % (uid)
-        res = select(q)
-        data['userdetails'] = res[0]
-        q="SELECT s.song_id, s.song_name, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(uid)
-        publicsongdata=select(q)
-        data['publicsongdata']=publicsongdata
-        q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id AND s.user_id = '%s')) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id AND a.user_id = '%s')) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id AND ar.user_id = '%s')) GROUP BY DATE(TIMESTAMP)"%(uid,uid,uid)
-        totalclicks=select(q)
-        clicks, dates = getClicksDates(totalclicks)
-        data['chartdata']={'clicks':clicks,'dates':dates}
-        q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' AND s.user_id='%s' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' AND a.user_id='%s' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' AND a.user_id='%s' GROUP BY name"%(uid,uid,uid)
-        clickdata=select(q)
-        q = "SELECT al.album_id,album_name,al.image_loc,al.cover_pic,COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id=s.album_id AND s.privacy='public' AND s.status='approved' WHERE al.user_id = '%s' GROUP BY s.album_id ORDER BY al.album_id"%(uid)
-        myalbumdetails=select(q)
-        data['myalbumdetails']=myalbumdetails
-        return render_template('uploader/samplepage.html', data=data,count=count,clickdata=clickdata)
-    else:
-        return redirect(url_for('public.home'))
     
 def genrePrediction(audio_file):
     # random string of digits for file name

@@ -29,20 +29,6 @@
       </li><!-- End Songs Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ url_for('admin.artist') }}">
-          <i class="bi bi-person-lines-fill"></i>
-          <span>Artist</span>
-        </a>
-      </li><!-- End Artist Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ url_for('admin.album') }}">
-          <i class="bi bi-file-earmark-music-fill"></i>
-          <span>Album</span>
-        </a>
-      </li><!-- End Album Nav -->
-
-      <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-people-fill"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -64,6 +50,20 @@
           </li>
         </ul>
       </li><!-- End Users Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('admin.artist') }}">
+          <i class="bi bi-person-lines-fill"></i>
+          <span>Artist</span>
+        </a>
+      </li><!-- End Artist Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('admin.album') }}">
+          <i class="bi bi-file-earmark-music-fill"></i>
+          <span>Album</span>
+        </a>
+      </li><!-- End Album Nav -->
 
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ url_for('admin.analytics') }}">

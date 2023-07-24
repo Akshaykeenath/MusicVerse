@@ -3,6 +3,7 @@ from database import*
 from deletion import *
 from other_functions import *
 from analytics import *
+from other_processing import *
 admin =Blueprint('admin',__name__)
 
 @admin.route('/admin_home')
@@ -32,6 +33,7 @@ def admin_home():
         clickdata=select(q)
         return render_template('admin/index.html', data=data,count=count,clickdata=clickdata)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @admin.route('/approvals' , methods=['GET', 'POST'])
@@ -76,6 +78,7 @@ def approvals():
                 return redirect(url_for('admin.approvals'))
         return render_template('admin/approvals.html',data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @admin.route('/allsongs' , methods=['GET', 'POST'])
@@ -121,6 +124,7 @@ def allsongs():
                 return redirect(url_for('admin.allsongs'))
         return render_template('admin/allsongs.html',data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @admin.route('/artist', methods=['GET', 'POST'])
@@ -154,6 +158,7 @@ def artist():
                 return redirect(url_for('admin.artist'))
         return render_template('admin/artist.html',data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @admin.route('/album', methods=['GET', 'POST'])
@@ -187,6 +192,7 @@ def album():
                 return redirect(url_for('admin.album'))
         return render_template('admin/album.html',data=data,count=count)
      else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
      
 @admin.route('/allusers', methods=['GET', 'POST'])
@@ -228,6 +234,7 @@ def allusers():
                 return redirect(url_for('admin.allusers'))
         return render_template('admin/allusers.html',data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @admin.route('/active_users', methods=['GET', 'POST'])
@@ -255,14 +262,21 @@ def active_users():
                 q="update user set status='deactive' where user_id='%s'"%(user_id)
                 update(q)
                 flash("warning: User Deactivated")
+                subject="User Dectivation"
+                message="OOps!!!. Your account has been deactivated. Contact admin"
+                send_email(user_id,subject,message)
                 return redirect(url_for('admin.active_users'))
             elif action.startswith('activate_user'):
                 q="update user set status='active' where user_id='%s'"%(user_id)
                 update(q)
                 flash("success: User Activated")
+                subject="User Activation"
+                message="Congrats. Your account has been activated"
+                send_email(user_id,subject,message)
                 return redirect(url_for('admin.active_users'))
         return render_template('admin/active_users.html',data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @admin.route('/deactive_users', methods=['GET', 'POST'])
@@ -290,14 +304,21 @@ def deactive_users():
                 q="update user set status='deactive' where user_id='%s'"%(user_id)
                 update(q)
                 flash("warning: User Deactivated")
+                subject="User Dectivation"
+                message="OOps!!!. Your account has been deactivated. Contact admin"
+                send_email(user_id,subject,message)
                 return redirect(url_for('admin.deactive_users'))
             elif action.startswith('activate_user'):
                 q="update user set status='active' where user_id='%s'"%(user_id)
                 update(q)
                 flash("success: User Activated")
+                subject="User Activation"
+                message="Congrats. Your account has been activated"
+                send_email(user_id,subject,message)
                 return redirect(url_for('admin.deactive_users'))
         return render_template('admin/deactive_users.html',data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @admin.route('/analytics' , methods=['GET', 'POST'])
@@ -337,6 +358,7 @@ def analytics():
                 return jsonify({'clicks': clicks, 'dates': dates,'songdata':songdata[0]})
         return render_template('admin/analytics.html', data=data,count=count,clickdata=clickdata)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @admin.route('/analytics_overview' , methods=['GET', 'POST'])
@@ -387,7 +409,77 @@ def analytics_overview():
                 data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
                 return render_template('admin/analytics_overview.html', data=data, count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
+    
+@admin.route('/playlist' , methods=['GET', 'POST'])
+def playlist():
+    if 'login_id' in session:
+        login_id = session['login_id']
+        data = {}
+        count={}
+        q="SELECT n.notification_type,s.song_name,n.timestamp FROM notification n INNER JOIN songs s ON s.song_id=n.content_id WHERE n.status='toread' AND content_status='pending' AND notification_type='approvals' AND n.user_id='1'"
+        approvalnotificationdata=select(q)
+        data['approvalnotificationdata']=approvalnotificationdata
+        count['notification']=str(len(data['approvalnotificationdata']))
+        q="SELECT p.playlist_id,p.playlist_name,p.image_loc,p.status,COUNT(pt.song_id) as song_count FROM playlist p LEFT JOIN playlisttrack pt ON p.playlist_id=pt.playlist_id WHERE p.type='public' GROUP BY pt.playlist_id"
+        playlistdetails=select(q)
+        data['playlistdetails']=playlistdetails
+        data['currentplaylistsongs']=''
+        data['currentplaylist']=''
+        if 'addplaylistbtn' in request.form:
+            playlistname = request.form['playlistname']
+            q="insert into playlist(playlist_name,image_loc,user_id,status,type) values ('%s','null','0','active','public')"%(playlistname)
+            pid=insert(q)
+            if pid > 0:
+                playlist_image = request.files['image']
+                UpdatePlaylistImage(playlist_image,pid)
+                flash("success: Playlist created successfully")
+                return redirect(url_for('admin.playlist'))
+        if 'action' in request.form:
+            action = request.form.get('action')
+            playlist_id = action.split('_')[-1]
+            q="select * from playlist where playlist_id='%s'"%(playlist_id)
+            currentplaylist=select(q)
+            data['currentplaylist']=currentplaylist[0]
+            q="SELECT * FROM songs INNER JOIN playlisttrack USING(song_id) WHERE playlist_id='%s'"%(playlist_id)
+            currentplaylistsongs=select(q)
+            data['currentplaylistsongs']=currentplaylistsongs
+            if action.startswith('update_playlist'):
+                return render_template('admin/playlist.html', data=data,count=count, value='editplaylist')
+            elif action.startswith('view_playlist'):
+                 return render_template('admin/playlist.html', data=data,count=count, value='viewplaylist')
+            elif action.startswith('delete_playlist'):
+                message=deletePlaylist(playlist_id)
+                flash(message)
+                return redirect(url_for('admin.playlist'))
+            elif action.startswith('activate_playlist'):
+                q="update playlist set status='active' where playlist_id='%s'"%(playlist_id)
+                update(q)
+                return redirect(url_for('admin.playlist'))
+            elif action.startswith('deactivate_playlist'):
+                q="update playlist set status='deactive' where playlist_id='%s'"%(playlist_id)
+                update(q)
+                return redirect(url_for('admin.playlist'))
+        if 'nameupdate' in request.form:
+            playlist_name = request.form['playlist_name']
+            playlistid = request.form['playlistid']
+            q="update playlist set playlist_name='%s' where playlist_id='%s'"%(playlist_name,playlistid)
+            update(q)
+            flash("success: Playlist name updated successfully")
+            return redirect(url_for('admin.playlist'))
+        if 'updatePlaylistImage' in request.form:
+            pid = request.form['playlistid']
+            playlist_image = request.files['playlistImage']
+            # Get the file extensions
+            UpdatePlaylistImage(playlist_image,pid)
+            flash("success: Playlist image updated successfully")
+            return redirect(url_for('admin.playlist'))
+        return render_template('admin/playlist.html', data=data, count=count)
+    else:
+        flash("danger: Session Unavailable. Login Again")
+        return redirect(url_for('public.home'))
+
 
 @admin.route('/logout', methods=['GET', 'POST'])
 def logout():

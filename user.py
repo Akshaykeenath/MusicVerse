@@ -5,6 +5,8 @@ from trending import *
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 from categories import *
+from other_processing import *
+from deletion import *
 user = Blueprint('user',__name__)
 
 @user.route('/user_home')
@@ -26,6 +28,7 @@ def user_home():
         data['trendingsongdata']=trendingsongdata
         return render_template('user/home.html', data=data)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @user.route('/favorite')
@@ -47,6 +50,7 @@ def favorite():
         data['favoritesongdata']=favoritesongdata
         return render_template('user/favorite.html', data=data)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @user.route('/playlist', methods=['GET','POST'])
@@ -67,28 +71,13 @@ def playlist():
             pid=insert(q)
             if pid > 0:
                 playlist_image = request.files['image_file']
-                # Get the file extensions
-                playlist_image_extension = os.path.splitext(playlist_image.filename)[1]
-
-                # Specify the path where you want to save the uploaded files
-                upload_folder = 'static/uploads/playlist'  # Update the path according to your setup
-
-                # Customize the filenames
-                playlist_image_filename = str(pid) + playlist_image_extension
-
-                # Saving the path for database
-                playlistpath='uploads/playlist/' + str(pid) + playlist_image_extension
-
-                # Save the uploaded files with the customized filenames
-                playlist_image.save(os.path.join(upload_folder, playlist_image_filename))
-
-                q="update playlist set image_loc='%s' where playlist_id='%s'"%(playlistpath,pid)
-                update(q)
+                UpdatePlaylistImage(playlist_image,pid)
                 flash("success: Playlist created successfully")
                 return redirect(url_for('user.playlist'))
             
         return render_template('user/playlist.html', data=data)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @user.route('/search', methods=['POST'])
@@ -235,6 +224,7 @@ def play():
             
         return render_template('user/playarea.html', data=data, playlist=playlistname)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 
@@ -269,6 +259,7 @@ def playlist_play():
             
         return render_template('user/playlistplayarea.html', data=data, playlist=playlistname)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @user.route('/song_click', methods=['POST'])
@@ -305,6 +296,7 @@ def explore():
             return song_name
         return render_template('user/explore.html', data=data)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @user.route('/profile')
@@ -317,6 +309,7 @@ def profile():
         data['userdetails']=res[0]
         return render_template('user/profile.html', data=data)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @user.route('/edit_profile' , methods=['GET', 'POST'])
@@ -329,6 +322,7 @@ def edit_profile():
         data['userdetails']=res[0]
         return render_template('user/edit_profile.html', data=data)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 app = Flask(__name__)
@@ -349,6 +343,7 @@ def update_profile():
         flash("Update successful")  # Generate flash message
         return redirect(url_for('user.profile'))
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 
@@ -372,6 +367,7 @@ def propicupload():
         flash("Successfully updated image")
         return redirect(url_for('user.edit_profile'))
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @user.route('/edit_playlist', methods=['GET','POST'])
@@ -401,30 +397,12 @@ def edit_playlist():
             return redirect(url_for('user.edit_playlist'))
         if 'UpdatePlaylistImage' in request.form:
             playlist_image = request.files['update_image_file']
-            # Get the file extensions
-            playlist_image_extension = os.path.splitext(playlist_image.filename)[1]
-            # Specify the path where you want to save the uploaded files
-            upload_folder = 'static/uploads/playlist'  # Update the path according to your setup
-            # Customize the filenames
-            playlist_image_filename = str(playlist_id) + playlist_image_extension
-            # Saving the path for database
-            playlistpath='uploads/playlist/' + str(playlist_id) + playlist_image_extension
-            # Save the uploaded files with the customized filenames
-            playlist_image.save(os.path.join(upload_folder, playlist_image_filename))
-            q="update playlist set image_loc='%s' where playlist_id='%s'"%(playlistpath,playlist_id)
+            UpdatePlaylistImage(playlist_image,playlist_id)
             flash("success: Image Updated successfully")
             return redirect(url_for('user.edit_playlist'))
         if 'DeletePlaylistBtn' in request.form:
-            q="select image_loc from playlist where playlist_id='%s'"%(playlist_id)
-            imagedata=select(q)
-            imagepath='static/'+imagedata[0]['image_loc']
-            if os.path.exists(imagepath):
-                os.remove(imagepath)
-            else:
-                flash("danger: Error Occured when deleting image")
-            q="delete from playlist where playlist_id='%s'"%(playlist_id)
-            delete(q)
-            flash("warning: Successfully deleted playlist")
+            message=deletePlaylist(playlist_id)
+            flash(message)
             return redirect(url_for('user.playlist'))
         if 'SongRemove' in request.form:
             song_id=request.form['song_id']
@@ -435,6 +413,7 @@ def edit_playlist():
             return redirect(url_for('user.edit_playlist'))
         return render_template('user/edit_playlist.html', data=data)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
     

@@ -49,6 +49,7 @@ def home():
         clickdata=select(q)
         return render_template('uploader/home.html', data=data,count=count,clickdata=clickdata)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @uploader.route('/allsongs' , methods=['GET', 'POST'])
@@ -97,6 +98,7 @@ def allsongs():
                 return redirect(url_for('uploader.allsongs'))
         return render_template('uploader/all_songs.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @uploader.route('/approvedsongs' , methods=['GET', 'POST'])
@@ -145,6 +147,7 @@ def approvedsongs():
 
         return render_template('uploader/approved_songs.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @uploader.route('/pendingsongs' , methods=['GET', 'POST'])
@@ -192,6 +195,7 @@ def pendingsongs():
                     return redirect(url_for('uploader.pendingsongs'))
         return render_template('uploader/pending_songs.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @uploader.route('/rejectedsongs')
@@ -214,6 +218,7 @@ def rejectedsongs():
         data['rejectedsongdata']=rejectedsongdata
         return render_template('uploader/rejected_songs.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @uploader.route('/updatesong' , methods=['GET', 'POST'])
@@ -316,6 +321,7 @@ def privatesongs():
                 return 'Delete Song'
         return render_template('uploader/private_songs.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @uploader.route('/analytics' , methods=['GET', 'POST'])
@@ -359,6 +365,7 @@ def analytics():
                 return jsonify({'clicks': clicks, 'dates': dates,'songdata':songdata[0]})
         return render_template('uploader/analytics.html', data=data,count=count,clickdata=clickdata)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @uploader.route('/analytics_overview' , methods=['GET', 'POST'])
@@ -413,6 +420,7 @@ def analytics_overview():
                 data['chartdata']={'clicks':clicks,'dates':dates,'likes':likes}
                 return render_template('uploader/analytics_overview.html', data=data, count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 
@@ -433,6 +441,7 @@ def profile():
         data['userdetails'] = res[0]
         return render_template('uploader/uploader_profile.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 
@@ -506,6 +515,7 @@ def artist():
                 return render_template('uploader/artist.html', data=data,count=count,value='viewartist')
         return render_template('uploader/artist.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @uploader.route('/myartist', methods=['GET', 'POST'])
@@ -654,6 +664,7 @@ def myartist():
                 
         return render_template('uploader/myartist.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 
@@ -720,6 +731,7 @@ def album():
                     return render_template('uploader/album.html', data=data,count=count, value='viewalbum')
         return render_template('uploader/album.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
 @uploader.route('/myalbum', methods=['GET', 'POST'])
@@ -861,6 +873,7 @@ def myalbum():
                 return redirect(url_for('uploader.myalbum'))
         return render_template('uploader/myalbum.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
     
@@ -978,6 +991,7 @@ def uploadsong():
             return redirect(url_for('uploader.home'))
         return render_template('uploader/uploadsong.html', data=data,count=count)
     else:
+        flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
     
 @uploader.route('/logout', methods=['GET', 'POST'])

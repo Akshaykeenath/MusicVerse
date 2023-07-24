@@ -1,0 +1,276 @@
+{% include 'admin/admin_header.html'%}
+{% include 'admin/admin_sidebar.html'%}
+
+<main id="main" class="main">
+  <!-- (success:, info:, warning:, danger:) -->
+  {% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+  {% set alert_class = '' %}
+  {% if message.startswith('success:') %}
+  {% set alert_class = 'alert-success bg-success text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('info:') %}
+  {% set alert_class = 'alert-info bg-info text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('warning:') %}
+  {% set alert_class = 'alert-warning bg-warning text-dark' %}
+  {% set message = message.split(':')[1] %}
+  {% elif message.startswith('danger:') %}
+  {% set alert_class = 'alert-danger bg-danger text-light' %}
+  {% set message = message.split(':')[1] %}
+  {% endif %}
+  <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+  {% endwith %}
+    <div class="pagetitle">
+        <h1>Playlist</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_home') }}">Home</a></li>
+                <li class="breadcrumb-item active">Playlist</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+
+            <!-- Left side columns -->
+            <div class="col-lg-8">
+                <div class="row">
+
+                    <!-- Reports -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Playlist</h5>
+                                <table class="table table-borderless datatable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Preview</th>
+                                            <th scope="col">Playlist name</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Songs</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in data['playlistdetails'] %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <th scope="row">
+                                                <a>
+                                                    <img src="{{ url_for('static', filename=row['image_loc']) }}" alt=""
+                                                        style="max-width: 80px; max-height: 80px;">
+                                                </a>
+                                            </th>
+                                            <td><a class="text-primary fw-bold">{{ row['playlist_name'] }}</a></td>
+                                            <td>
+                                            <form action="{{ url_for('admin.playlist') }}" method="POST">
+                                                {% if row['status'] == 'active' %}
+                                                <button type="submit" class="btn badge bg-success" name="action" value="deactivate_playlist_{{ row['playlist_id'] }}">{{ row['status'] }}</button>
+                                                {% else %}
+                                                <button type="submit" class="btn badge bg-warning" name="action" value="activate_playlist_{{ row['playlist_id'] }}">{{ row['status'] }}</button>
+                                                {% endif %}
+                                            </form>
+                                            </td>
+                                            <td>{{ row['song_count'] }}</td>
+                                            <td>
+                                                <form action="{{ url_for('admin.playlist') }}" method="POST">
+                                                    <button type="submit" class="btn btn-success rounded-pill" name="action" value="update_playlist_{{ row['playlist_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Update Playlist">
+                                                        <i class="bi bi-arrow-up-circle"></i>
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary rounded-pill" name="action" value="view_playlist_{{ row['playlist_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Playlist Details">
+                                                        <i class="bi bi-view-list"></i>
+                                                    </button>
+                                                    <button type="submit" class="btn btn-danger rounded-pill" name="action" value="delete_playlist_{{ row['playlist_id'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Playlist">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div><!-- End Reports -->
+
+                </div>
+            </div><!-- End Left side columns -->
+
+            <!-- Right side columns -->
+            <div class="col-lg-4">
+
+                <!--  Add Playlist -->
+                <div class="card text-center">
+
+                    <div class="card-body">
+                        <div class="activity">
+                            <div>
+                                <img src="{{ url_for('static', filename='uploader/img/uploadsong.png')}}"
+                                    alt="AddPlaylist" style="max-height: 200px;" class="my-4">
+                            </div>
+                            <div>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#addplaylist"
+                                    class="btn btn-primary rounded-pill" style="margin: 20px;">
+                                    Add Playlist
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Add Playlist -->
+
+            </div><!-- End Right side columns -->
+
+        </div>
+    </section>
+
+<!-- Add Playlist Modal -->
+<div class="modal fade" id="addplaylist" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Playlist</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <form class="row g-3 needs-validation" action="{{ url_for('admin.playlist') }}" method="POST"
+                    enctype="multipart/form-data" novalidate>
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="playlistname" placeholder="Playlist Name"
+                                name="playlistname" required>
+                            <label for="playlistname">Playlist Name</label>
+                            <div class="invalid-tooltip">
+                                Please provide the Playlist Name.
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="col-md-12">
+                        <div class="row mb-3 align-items-center">
+                            <label for="formFile" class="col-sm-2 col-form-label">Playlist Image</label>
+                            <div class="col-sm-10 position-relative">
+                                <div class="form-control">
+                                    <input class="form-control" type="file" name="image" id="formFile" accept="image/*" required>
+                                    <div class="invalid-tooltip">
+                                        Please choose an image file to upload.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary" name="addplaylistbtn">Submit</button>
+                        <a href="{{ url_for('admin.playlist') }}" class="btn btn-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Add Playlist Modal -->
+
+  <!-- Edit Playlist Modal -->
+  <div class="modal fade" id="editplaylist" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Playlist Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="needs-validation" action="{{ url_for('admin.playlist') }}" method="post" enctype="multipart/form-data" novalidate>
+            <input type="hidden" name="playlistid" value="{{ data['currentplaylist']['playlist_id'] }}">
+            <div class="row mb-3">
+              <label for="playlist_name" class="col-md-4 col-lg-3 col-form-label">Playlist Name</label>
+              <div class="col-md-8 col-lg-9">
+                <input name="playlist_name" type="text" class="form-control" id="playlist_name"
+                  value="{{ data['currentplaylist']['playlist_name'] }}" required>
+                  <div class="invalid-tooltip">
+                    Please Add Playlist Name.
+                  </div>
+                <button type="submit" name="nameupdate" class="btn btn-success btn-sm mt-2">Update</button>
+              </div>
+            </div>
+            </form>
+            <form class="needs-validation" action="{{ url_for('admin.playlist') }}" method="post" enctype="multipart/form-data" novalidate>
+            <input type="hidden" name="playlistid" value="{{ data['currentplaylist']['playlist_id'] }}">
+            <div class="row mb-3">
+              <label for="playlistImage" class="col-md-4 col-lg-3 col-form-label">Playlist Image</label>
+              <div class="col-md-8 col-lg-9">
+                <img id="playlistImagePreview"
+                  src="{{ url_for('static', filename=data['currentplaylist']['image_loc']) }}" alt="Playlist Image"
+                  style="max-width: 100px;">
+                <div class="pt-2">
+                  <label for="playlistImageInput" class="btn btn-primary btn-sm" title="Upload new playlist image">
+                    <i class="bi bi-upload"></i>
+                  </label>
+                  <input type="file" id="playlistImageInput" name="playlistImage" style="display: none;" required>
+                  <div class="invalid-tooltip">
+                    Please choose an image file to upload.
+                  </div>
+                  <button type="submit" class="btn btn-success btn-sm" name="updatePlaylistImage">Submit</button>
+                  <a href="#" class="btn btn-danger btn-sm" title="Remove current playlist image"><i
+                      class="bi bi-trash"></i></a>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <script>
+            // Function to preview the selected image
+            function previewImage(inputId, previewId) {
+              const input = document.getElementById(inputId);
+              const preview = document.getElementById(previewId);
+              const file = input.files[0];
+
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                  preview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+              }
+            }
+
+            // Add event listeners to the file input elements
+            const playlistImageInput = document.getElementById('playlistImageInput');
+            const coverImageInput = document.getElementById('coverImageInput');
+
+            playlistImageInput.addEventListener('change', function () {
+              previewImage('playlistImageInput', 'playlistImagePreview');
+            });
+          </script>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Edit Playlist Modal -->
+
+</main><!-- End #main -->
+{% include 'admin/admin_footer.html'%}
+
+{% if value == 'editplaylist' %}
+<script>
+  // Function to open the modal on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('editplaylist'));
+    modal.show();
+  });
+</script>
+{% endif %}

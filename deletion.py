@@ -106,3 +106,17 @@ def deleteAlbum(album_id):
         return("warning: Album Deleted Successfully")
     else:
         return("danger: Album Not Available")
+    
+def deletePlaylist(playlist_id):
+    q="select image_loc from playlist where playlist_id='%s'"%(playlist_id)
+    imagedata=select(q)
+    imagepath='static/'+imagedata[0]['image_loc']
+    if os.path.exists(imagepath):
+        os.remove(imagepath)
+    else:
+        return("danger: Error Occured when deleting image")
+    q="delete from playlist where playlist_id='%s'"%(playlist_id)
+    delete(q)
+    q="delete from playlisttrack where playlist_id='%s'"%(playlist_id)
+    delete(q)
+    return("warning: Successfully deleted playlist")

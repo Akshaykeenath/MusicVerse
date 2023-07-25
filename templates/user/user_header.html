@@ -48,17 +48,12 @@
       </div>
       <div class="collapse navbar-collapse" id="example-navbar-success">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#pablo">
-              <i class="tim-icons icon-settings-gear-63"></i>
-            </a>
-          </li>
           <li class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown">
               <i class="tim-icons icon-single-02" aria-hidden="true"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-header">{{data['userdetails']['email']}}</a>
+              <a class="dropdown-header">{{data['userdetails']['fname']}} {{data['userdetails']['lname']}}</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ url_for('user.profile') }}"><i class="tim-icons icon-single-02" aria-hidden="true"></i>My Profile</a>
               <a class="dropdown-item" href="{{ url_for('uploader.home') }}"><i class="tim-icons icon-headphones" aria-hidden="true"></i>Music Studio</a>

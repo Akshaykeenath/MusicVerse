@@ -64,6 +64,9 @@ def playlist():
         q="select * from playlist where user_id='%s' and status='active'"%(uid)
         playlistdata=select(q)
         data['playlistdata']=playlistdata
+        q="SELECT p.playlist_id,p.playlist_name,p.image_loc,p.status FROM playlist p INNER JOIN playlisttrack pt ON p.playlist_id=pt.playlist_id WHERE p.type='public' AND p.status='active' GROUP BY pt.playlist_id"
+        publicplaylistdata=select(q)
+        data['publicplaylistdata']=publicplaylistdata
         if 'CreatePlaylistBtn' in request.form:
             # CreatePlaylistBtn is clicked
             playlist_name = request.form.get('playlist_name')
@@ -340,7 +343,7 @@ def update_profile():
         mob = request.form['upmob']
         q = "UPDATE user SET fname='%s', lname='%s', mobile='%s' WHERE user_id='%s'" % (fname, lname, mob, uid)
         update(q)
-        flash("Update successful")  # Generate flash message
+        flash("success: Update successful")  # Generate flash message
         return redirect(url_for('user.profile'))
     else:
         flash("danger: Session Unavailable. Login Again")
@@ -364,7 +367,7 @@ def propicupload():
         image.save('static/'+imgpath)
         q="update user set image_loc='%s' where user_id='%s'"%(imgpath,uid)
         insert(q)
-        flash("Successfully updated image")
+        flash("success: Successfully updated image")
         return redirect(url_for('user.edit_profile'))
     else:
         flash("danger: Session Unavailable. Login Again")

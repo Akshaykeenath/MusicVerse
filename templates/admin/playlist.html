@@ -2,29 +2,6 @@
 {% include 'admin/admin_sidebar.html'%}
 
 <main id="main" class="main">
-  <!-- (success:, info:, warning:, danger:) -->
-  {% with messages = get_flashed_messages() %}
-  {% for message in messages %}
-  {% set alert_class = '' %}
-  {% if message.startswith('success:') %}
-  {% set alert_class = 'alert-success bg-success text-light' %}
-  {% set message = message.split(':')[1] %}
-  {% elif message.startswith('info:') %}
-  {% set alert_class = 'alert-info bg-info text-light' %}
-  {% set message = message.split(':')[1] %}
-  {% elif message.startswith('warning:') %}
-  {% set alert_class = 'alert-warning bg-warning text-dark' %}
-  {% set message = message.split(':')[1] %}
-  {% elif message.startswith('danger:') %}
-  {% set alert_class = 'alert-danger bg-danger text-light' %}
-  {% set message = message.split(':')[1] %}
-  {% endif %}
-  <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {% endfor %}
-  {% endwith %}
     <div class="pagetitle">
         <h1>Playlist</h1>
         <nav>
@@ -262,6 +239,127 @@
   </div>
   <!-- End Edit Playlist Modal -->
 
+    <!-- View Playlist Modal -->
+    <div class="modal fade" id="viewplaylist" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">View Playlist Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <!-- Playlist Details -->
+              <div class="col-xl-4">
+                <div class="card">
+                  <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                    <img src="{{ url_for('static', filename=data['currentplaylist']['image_loc']) }}"
+                      alt="PlaylistImage" class="rounded-circle mb-3" style="max-width: 200px; max-height: 200px;">
+                    <h4 class="mb-0"><b>{{data['currentplaylist']['playlist_name']}}</b></h4>
+                  </div>
+                </div>              
+              </div>
+              <!-- End Playlist Details -->
+              <div class="col-xl-8">
+                <!-- Song Details Tabs -->
+                <div class="card">
+                  <div class="card-body pt-3">
+                    <ul class="nav nav-tabs nav-tabs-bordered">
+                      <li class="nav-item">
+                        <button class="nav-link active" id="SongsList-tab" data-bs-toggle="tab" data-bs-target="#SongsList">Songs List</button>
+                      </li>
+                      <li class="nav-item">
+                        <button class="nav-link" id="Addsongs-tab" data-bs-toggle="tab" data-bs-target="#Addsongs">Add Songs</button>
+                      </li>
+                    </ul>
+                    <div class="tab-content pt-2">
+                      <div class="tab-pane fade show active" id="SongsList" role="tabpanel" aria-labelledby="SongsList-tab">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Song name</th>
+                              <th scope="col">Album</th>
+                              <th scope="col">Song</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for row in data['currentplaylistsongs'] %}
+                            <tr>
+                              <th scope="row"><a>{{ loop.index }}</a></th>
+                              <td><a class="text-primary">{{ row['song_name'] }}</a></td>
+                              <td>{{ row['album_name'] }}</td>
+                              <td>
+                                <audio controls>
+                                  <source src="{{ row['song_loc'] }}" type="audio/mpeg">
+                                  Your browser does not support the audio element.
+                                </audio>
+                              </td>
+                              <td>
+                                <form action="{{ url_for('admin.remove_playlist_song') }}" method="post">
+                                  <input type="hidden" name="playlist_id" value="{{ data['currentplaylist']['playlist_id'] }}">
+                                  <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
+                                  <button type="submit" class="btn btn-danger rounded-pill plus-button"><i class="bi bi-x-lg"></i></button>
+                                </form>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade show" id="Addsongs" role="tabpanel" aria-labelledby="Addsongs-tab">
+                        <table id="otherSongList" class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Song name</th>
+                              <th scope="col">Album</th>
+                              <th scope="col">Song</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for row in data['othersongs'] %}
+                            <tr>
+                              <th scope="row"><a>{{ loop.index }}</a></th>
+                              <td><a class="text-primary">{{ row['song_name'] }}</a></td>
+                              <td>{{ row['album_name'] }}</td>
+                              <td>
+                                <audio controls>
+                                  <source src="{{ row['song_loc'] }}" type="audio/mpeg">
+                                  Your browser does not support the audio element.
+                                </audio>
+                              </td>
+                              <td>
+                                <form action="{{ url_for('admin.add_playlist_song') }}" method="post">
+                                  <input type="hidden" name="playlist_id" value="{{ data['currentplaylist']['playlist_id'] }}">
+                                  <input type="hidden" name="song_id" value="{{ row['song_id'] }}">
+                                  <button type="submit" class="btn btn-success rounded-pill plus-button"><i class="bi bi-plus-lg"></i></button>
+                                </form>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div><!-- End Song Details Tabs -->
+  
+                  </div>
+                </div>
+  
+              </div>
+            </div>
+  
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End View Playlist Modal -->
+
 </main><!-- End #main -->
 {% include 'admin/admin_footer.html'%}
 
@@ -274,3 +372,14 @@
   });
 </script>
 {% endif %}
+
+{% if value == 'viewplaylist' %}
+<script>
+  // Function to open the modal on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('viewplaylist'));
+    modal.show();
+  });
+</script>
+{% endif %}
+

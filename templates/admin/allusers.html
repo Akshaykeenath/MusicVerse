@@ -2,31 +2,6 @@
 {% include 'admin/admin_sidebar.html'%}
 
 <main id="main" class="main">
-  <!-- (success:, info:, warning:, danger:) -->
-  {% with messages = get_flashed_messages() %}
-  {% for message in messages %}
-  {% set alert_class = '' %}
-  {% if message.startswith('success:') %}
-  {% set alert_class = 'alert-success bg-success text-light' %}
-  {% set message = message.split(':')[1] %}
-  {% elif message.startswith('info:') %}
-  {% set alert_class = 'alert-info bg-info text-light' %}
-  {% set message = message.split(':')[1] %}
-  {% elif message.startswith('warning:') %}
-  {% set alert_class = 'alert-warning bg-warning text-dark' %}
-  {% set message = message.split(':')[1] %}
-  {% elif message.startswith('danger:') %}
-  {% set alert_class = 'alert-danger bg-danger text-light' %}
-  {% set message = message.split(':')[1] %}
-  {% endif %}
-  <div class="alert {{ alert_class }} border-0 alert-dismissible fade show" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {% endfor %}
-  {% endwith %}
-
-
   <div class="pagetitle">
     <h1>All Users</h1>
     <nav>
@@ -115,6 +90,158 @@
     </div>
   </section>
 
+    <!-- View User Modal -->
+    <div class="modal fade" id="viewuser" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">View User Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <!-- User Details -->
+              <div class="col-xl-4">
+                <div class="card">
+                  <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                    <img src="{{ url_for('static', filename=data['currentuserdetails']['image_loc']) }}"
+                      alt="UserImage" class="rounded-circle mb-3" style="max-width: 200px; max-height: 200px;">
+                    <h4 class="mb-2"><b>{{data['currentuserdetails']['fname']}} {{data['currentuserdetails']['lname']}}</b></h4>
+                    <h6 class="mb-2">{{data['currentuserdetails']['email']}}</h6>
+                    <h6 class="mb-2">{{data['currentuserdetails']['mobile']}}</h6>
+                    {% if data['currentuserdetails']['status'] == 'active' %}
+                      <h6 ><a class="badge rounded-pill bg-success">{{ data['currentuserdetails']['status'] }}</a></h6>
+                      {% else %}
+                      <h6 ><a class="badge rounded-pill bg-warning">{{ data['currentuserdetails']['status'] }}</a></h6>
+                      {% endif %}
+                  </div>
+                </div>              
+              </div>
+              <!-- End User Details -->
+              <div class="col-xl-8">
+                <!-- Song Details Tabs -->
+                <div class="card">
+                  <div class="card-body pt-3">
+                    <ul class="nav nav-tabs nav-tabs-bordered">
+                      <li class="nav-item">
+                        <button class="nav-link active" id="userSongs-tab" data-bs-toggle="tab" data-bs-target="#userSongs">Songs List</button>
+                      </li>
+                      <li class="nav-item">
+                        <button class="nav-link" id="userAlbums-tab" data-bs-toggle="tab" data-bs-target="#userAlbums">Album List</button>
+                      </li>
+                      <li class="nav-item">
+                        <button class="nav-link" id="userArtists-tab" data-bs-toggle="tab" data-bs-target="#userArtists">Artist List</button>
+                      </li>
+                    </ul>
+                    <div class="tab-content pt-2">
+                      <div class="tab-pane fade show active" id="userSongs" role="tabpanel" aria-labelledby="userSongs-tab">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Song name</th>
+                              <th scope="col">Artist</th>
+                              <th scope="col">Song</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for row in data['usersongs'] %}
+                            <tr>
+                              <th scope="row"><a href="#">{{ loop.index }}</a></th>
+                              <td>{{ row['song_name'] }}</td>
+                              <td><a href="#" class="text-primary">{{ row['album_name'] }}</a></td>
+                              <td>
+                                <audio controls>
+                                  <source src="{{ row['song_loc'] }}" type="audio/mpeg">
+                                  Your browser does not support the audio element.
+                                </audio>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="userAlbums" role="tabpanel" aria-labelledby="userAlbums-tab">
+                        <table class="table table-hover datatable">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Preview</th>
+                              <th scope="col">Album name</th>
+                              <th scope="col">Songs</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for row in data['useralbums'] %}
+                            <tr>
+                              <td>{{ loop.index }}</td>
+                              <th scope="row">
+                                <a href="#">
+                                  <img src="{{ url_for('static', filename=row['image_loc']) }}" alt=""
+                                    style="max-width: 80px; max-height: 80px;">
+                                </a>
+                              </th>
+                              <td><a href="#" class="text-primary fw-bold">{{ row['album_name'] }}</a></td>
+                              <td>{{ row['song_count'] }}</td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="userArtists" role="tabpanel" aria-labelledby="userArtists-tab">
+                        <table class="table table-hover datatable">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Preview</th>
+                              <th scope="col">Artist name</th>
+                              <th scope="col">Songs</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for row in data['userartists'] %}
+                            <tr>
+                              <td>{{ loop.index }}</td>
+                              <th scope="row">
+                                <a href="#">
+                                  <img src="{{ url_for('static', filename=row['image_loc']) }}" alt=""
+                                    style="max-width: 80px; max-height: 80px;">
+                                </a>
+                              </th>
+                              <td><a href="#" class="text-primary fw-bold">{{ row['artist_name'] }}</a></td>
+                              <td>{{ row['song_count'] }}</td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+  
+                  </div>
+                </div>
+  
+              </div>
+            </div>
+  
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End View User Modal -->
+
 </main><!-- End #main -->
 
 {% include 'admin/admin_footer.html'%}
+
+{% if value == 'viewuser' %}
+<script>
+  // Function to open the modal on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('viewuser'));
+    modal.show();
+  });
+</script>
+{% endif %}

@@ -15,8 +15,51 @@
   
   <!-- Template Main JS File -->
   <script src="{{ url_for('static', filename='admin/js/main.js') }}"></script>
-  
 
+  <!-- Notification pop up-->
+  <script>
+    // Function to show the notification
+    function showNotification(form, align, message, type) {
+      // Determine the text color class based on the type
+      const textColorClass = type === 'warning' ? 'text-dark' : 'text-light';
+  
+      // Determine the close button class based on the type
+      const closeButtonClass = type === 'warning' ? '' : 'btn-close-white';
+  
+      $.notify(
+        {
+          message: message
+        },
+        {
+          type: type,
+          placement: {
+            from: form,
+            align: align
+          },
+          template:
+            '<div class="alert alert-{0} bg-{0} ' +
+            textColorClass +
+            ' border-0 alert-dismissible fade show col-3 text-center">' +
+            '<button type="button" class="btn-close ' +
+            closeButtonClass +
+            '" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '{2}</div>'
+        }
+      );
+    }
+  </script>
+  
+  
 </body>
 
 </html>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% set message = messages|first %}
+    {% set message_type = message.split(': ')[0] %}
+    {% set message_content = message.split(': ')[1] %}
+    <script>
+      showNotification("bottom","center",'{{ message_content }}', '{{ message_type }}');
+    </script>
+  {% endif %}
+{% endwith %}

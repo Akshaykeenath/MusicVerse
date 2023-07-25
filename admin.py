@@ -207,6 +207,7 @@ def allusers():
         count['notification']=str(len(data['approvalnotificationdata']))
         q="select * from user"
         alluserdetails=select(q)
+        data['currentuserdetails']=''
         data['alluserdetails']=alluserdetails
         if request.method == 'POST':
             action = request.form.get('action')
@@ -215,6 +216,15 @@ def allusers():
                  q="select * from user where user_id='%s'"%(user_id)
                  currentuserdetails=select(q)
                  data['currentuserdetails']=currentuserdetails[0]
+                 q="SELECT s.song_id, s.song_name,s.song_loc, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(user_id)
+                 usersongs=select(q)
+                 data['usersongs']=usersongs
+                 q = "SELECT al.album_id, al.album_name, al.image_loc, al.cover_pic, COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id = s.album_id AND s.privacy = 'public' AND s.status = 'approved' WHERE al.user_id = '%s' GROUP BY al.album_id, al.album_name, al.image_loc, al.cover_pic ORDER BY al.album_id"%(user_id)
+                 useralbums=select(q)
+                 data['useralbums']=useralbums
+                 q = "SELECT ar.artist_id, ar.artist_name, ar.image_loc, ar.cover_pic, COUNT(s.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar ON ar.artist_id = sar.artist_id LEFT JOIN songs s ON s.song_id = sar.song_id AND s.privacy = 'public' AND s.status = 'approved' WHERE ar.user_id='%s' GROUP BY ar.artist_id ORDER BY ar.artist_id"%(user_id)
+                 userartists=select(q)
+                 data['userartists']=userartists
                  return render_template('admin/allusers.html', data=data, value='viewuser',count=count)
             elif action.startswith('deactivate_user'):
                 q="update user set status='deactive' where user_id='%s'"%(user_id)
@@ -250,6 +260,7 @@ def active_users():
         q="select * from user where status='active'"
         activeuserdetails=select(q)
         data['activeuserdetails']=activeuserdetails
+        data['currentuserdetails']=''
         if request.method == 'POST':
             action = request.form.get('action')
             user_id = action.split('_')[-1]
@@ -257,6 +268,15 @@ def active_users():
                  q="select * from user where user_id='%s'"%(user_id)
                  currentuserdetails=select(q)
                  data['currentuserdetails']=currentuserdetails[0]
+                 q="SELECT s.song_id, s.song_name,s.song_loc, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(user_id)
+                 usersongs=select(q)
+                 data['usersongs']=usersongs
+                 q = "SELECT al.album_id, al.album_name, al.image_loc, al.cover_pic, COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id = s.album_id AND s.privacy = 'public' AND s.status = 'approved' WHERE al.user_id = '%s' GROUP BY al.album_id, al.album_name, al.image_loc, al.cover_pic ORDER BY al.album_id"%(user_id)
+                 useralbums=select(q)
+                 data['useralbums']=useralbums
+                 q = "SELECT ar.artist_id, ar.artist_name, ar.image_loc, ar.cover_pic, COUNT(s.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar ON ar.artist_id = sar.artist_id LEFT JOIN songs s ON s.song_id = sar.song_id AND s.privacy = 'public' AND s.status = 'approved' WHERE ar.user_id='%s' GROUP BY ar.artist_id ORDER BY ar.artist_id"%(user_id)
+                 userartists=select(q)
+                 data['userartists']=userartists
                  return render_template('admin/active_users.html', data=data, value='viewuser',count=count)
             elif action.startswith('deactivate_user'):
                 q="update user set status='deactive' where user_id='%s'"%(user_id)
@@ -292,6 +312,7 @@ def deactive_users():
         q="select * from user where status='deactive'"
         deactiveuserdetails=select(q)
         data['deactiveuserdetails']=deactiveuserdetails
+        data['currentuserdetails']=''
         if request.method == 'POST':
             action = request.form.get('action')
             user_id = action.split('_')[-1]
@@ -299,6 +320,15 @@ def deactive_users():
                  q="select * from user where user_id='%s'"%(user_id)
                  currentuserdetails=select(q)
                  data['currentuserdetails']=currentuserdetails[0]
+                 q="SELECT s.song_id, s.song_name,s.song_loc, COALESCE(al.album_name, 'No album') AS album_name, COALESCE(GROUP_CONCAT(ar.artist_name SEPARATOR ', '), 'No artist') AS artist_name, s.date, s.status, s.privacy FROM songs s LEFT JOIN songartist sar ON s.song_id = sar.song_id LEFT JOIN artist ar ON ar.artist_id = sar.artist_id LEFT JOIN album al ON al.album_id = s.album_id WHERE s.privacy = 'public' AND s.status = 'approved' AND s.user_id = '%s' GROUP BY s.song_id"%(user_id)
+                 usersongs=select(q)
+                 data['usersongs']=usersongs
+                 q = "SELECT al.album_id, al.album_name, al.image_loc, al.cover_pic, COUNT(s.song_id) AS song_count FROM album al LEFT JOIN songs s ON al.album_id = s.album_id AND s.privacy = 'public' AND s.status = 'approved' WHERE al.user_id = '%s' GROUP BY al.album_id, al.album_name, al.image_loc, al.cover_pic ORDER BY al.album_id"%(user_id)
+                 useralbums=select(q)
+                 data['useralbums']=useralbums
+                 q = "SELECT ar.artist_id, ar.artist_name, ar.image_loc, ar.cover_pic, COUNT(s.song_id) AS song_count FROM artist ar LEFT JOIN songartist sar ON ar.artist_id = sar.artist_id LEFT JOIN songs s ON s.song_id = sar.song_id AND s.privacy = 'public' AND s.status = 'approved' WHERE ar.user_id='%s' GROUP BY ar.artist_id ORDER BY ar.artist_id"%(user_id)
+                 userartists=select(q)
+                 data['userartists']=userartists
                  return render_template('admin/deactive_users.html', data=data, value='viewuser',count=count)
             elif action.startswith('deactivate_user'):
                 q="update user set status='deactive' where user_id='%s'"%(user_id)
@@ -442,12 +472,15 @@ def playlist():
             q="select * from playlist where playlist_id='%s'"%(playlist_id)
             currentplaylist=select(q)
             data['currentplaylist']=currentplaylist[0]
-            q="SELECT * FROM songs INNER JOIN playlisttrack USING(song_id) WHERE playlist_id='%s'"%(playlist_id)
+            q="SELECT s.song_id,al.album_name,s.song_name,s.image_loc,s.song_loc FROM songs s INNER JOIN playlisttrack USING(song_id) INNER JOIN album al USING (album_id) WHERE playlist_id='%s'"%(playlist_id)
             currentplaylistsongs=select(q)
             data['currentplaylistsongs']=currentplaylistsongs
             if action.startswith('update_playlist'):
                 return render_template('admin/playlist.html', data=data,count=count, value='editplaylist')
             elif action.startswith('view_playlist'):
+                 q="SELECT s.song_id,al.album_name,s.song_name,s.image_loc,s.song_loc FROM songs s INNER JOIN album al USING (album_id) WHERE s.status='approved' AND s.privacy='public' AND s.song_id NOT IN (SELECT song_id FROM songs INNER JOIN playlisttrack USING(song_id) WHERE playlist_id='%s')"%(playlist_id)
+                 othersongs=select(q)
+                 data['othersongs']=othersongs
                  return render_template('admin/playlist.html', data=data,count=count, value='viewplaylist')
             elif action.startswith('delete_playlist'):
                 message=deletePlaylist(playlist_id)
@@ -456,10 +489,12 @@ def playlist():
             elif action.startswith('activate_playlist'):
                 q="update playlist set status='active' where playlist_id='%s'"%(playlist_id)
                 update(q)
+                flash("success: Playlist Reactivated")
                 return redirect(url_for('admin.playlist'))
             elif action.startswith('deactivate_playlist'):
                 q="update playlist set status='deactive' where playlist_id='%s'"%(playlist_id)
                 update(q)
+                flash("warning: Playlist Deactivated")
                 return redirect(url_for('admin.playlist'))
         if 'nameupdate' in request.form:
             playlist_name = request.form['playlist_name']
@@ -480,6 +515,24 @@ def playlist():
         flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
+@admin.route("/add_playlist_song", methods=["POST"])
+def add_playlist_song():
+    playlist_id = request.form.get("playlist_id")
+    song_id = request.form.get("song_id")
+    q="insert into playlisttrack (playlist_id,song_id) values('%s','%s')"%(playlist_id,song_id)
+    ptid=insert(q)
+    if (ptid > 0):
+        flash("success: Song Added Successfully")
+    return redirect(url_for('admin.playlist'))
+
+@admin.route("/remove_playlist_song", methods=["POST"])
+def remove_playlist_song():
+    playlist_id = request.form.get("playlist_id")
+    song_id = request.form.get("song_id")
+    q="delete from playlisttrack where playlist_id='%s' and song_id='%s'"%(playlist_id,song_id)
+    delete(q)
+    flash("warning: Song Removed Successfully")
+    return redirect(url_for('admin.playlist'))
 
 @admin.route('/logout', methods=['GET', 'POST'])
 def logout():

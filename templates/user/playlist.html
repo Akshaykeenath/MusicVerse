@@ -63,6 +63,44 @@
         <div class="col col-10 ml-5">
             <div class="row">
                 <div class="col-12">
+                    {% if data['publicplaylistdata'] | length > 0 %}
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-sm-6 text-left">
+                                    <h4> Public <span class="text-success h3"> Playlist </span></h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                {% for row in data['publicplaylistdata'] %}
+                                <div class="col col-2">
+                                    <div class="playlistcard">
+                                        <div class="playlistcard-info">
+                                            <div class="playlist-details">
+                                                <div class="text-left">
+                                                    <h5 class="playlist-name">{{ row['playlist_name'] }}</h5>
+                                                </div>
+                                                <div class="buttons text-right text-bottom">
+                                                <form action="{{ url_for('user.playlist_play') }}" method="POST">
+                                                <input type="hidden" name="contenttype" value="userplaylist">
+                                                <input type="hidden" name="playlist_id" value="{{ row['playlist_id'] }}">
+                                                 <button
+                                                        class="btn btn-success btn-lg btn-round btn-icon animation-on-hover">
+                                                        <i class="fas fa-play"></i>
+                                                    </button>
+                                                </form>
+                                                </div>
+                                            </div>
+                                            <img src="{{ url_for('static', filename=row['image_loc'])}}"
+                                                alt="Playlist Image" class="playlistcard-image">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="row">
                         <div class="col-12">
                             <div class="row">

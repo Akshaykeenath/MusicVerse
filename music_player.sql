@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 17, 2023 at 03:50 PM
+-- Generation Time: Jul 25, 2023 at 05:51 PM
 -- Server version: 5.7.9
 -- PHP Version: 5.6.16
 
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `clicks` (
   `content_type` varchar(25) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`click_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=410 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=441 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `clicks`
@@ -498,7 +498,35 @@ INSERT INTO `clicks` (`click_id`, `content_id`, `user_id`, `content_type`, `time
 (403, '3', '1', 'album', '2023-07-17 08:54:27'),
 (404, '3', '1', 'album', '2023-07-17 08:54:31'),
 (405, '1', '2', 'artist', '2023-07-17 10:45:49'),
-(406, '1', '2', 'artist', '2023-07-17 10:47:52');
+(406, '1', '2', 'artist', '2023-07-17 10:47:52'),
+(410, '1', '1', 'album', '2023-07-18 10:51:15'),
+(411, '1', '1', 'album', '2023-07-19 06:08:55'),
+(412, '1', '1', 'song', '2023-07-19 06:09:02'),
+(413, '1', '1', 'song', '2023-07-19 06:55:43'),
+(414, '1', '1', 'song', '2023-07-19 06:55:46'),
+(415, '1', '1', 'album', '2023-07-19 06:56:39'),
+(416, '1', '1', 'album', '2023-07-19 06:56:55'),
+(417, '3', '1', 'album', '2023-07-19 06:57:05'),
+(418, '2', '1', 'artist', '2023-07-19 06:57:17'),
+(419, '2', '1', 'song', '2023-07-19 06:57:39'),
+(420, '1', '2', 'album', '2023-07-19 07:14:23'),
+(422, '1', '1', 'album', '2023-07-19 18:55:16'),
+(424, '1', '1', 'album', '2023-07-19 18:56:21'),
+(425, '1', '2', 'album', '2023-07-19 19:01:44'),
+(426, '1', '1', 'album', '2023-07-23 07:08:38'),
+(438, '1', '1', 'album', '2023-07-23 18:49:33'),
+(428, '2', '1', 'album', '2023-07-23 07:14:32'),
+(429, '2', '1', 'song', '2023-07-23 07:14:36'),
+(430, '1', '1', 'album', '2023-07-23 07:14:43'),
+(431, '1', '1', 'song', '2023-07-23 07:14:45'),
+(432, '1', '1', 'album', '2023-07-23 07:35:09'),
+(433, '2', '1', 'album', '2023-07-23 07:35:30'),
+(434, '1', '1', 'album', '2023-07-23 07:37:52'),
+(435, '1', '1', 'artist', '2023-07-23 07:43:28'),
+(436, '2', '1', 'artist', '2023-07-23 07:43:35'),
+(437, '1', '1', 'artist', '2023-07-23 07:43:48'),
+(439, '3', '1', 'album', '2023-07-23 18:49:38'),
+(440, '2', '1', 'album', '2023-07-23 18:49:41');
 
 -- --------------------------------------------------------
 
@@ -514,7 +542,7 @@ CREATE TABLE IF NOT EXISTS `likes` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `content_type` varchar(50) NOT NULL,
   PRIMARY KEY (`like_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=68 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `likes`
@@ -529,7 +557,6 @@ INSERT INTO `likes` (`like_id`, `content_id`, `user_id`, `timestamp`, `content_t
 (59, '3', '1', '2023-07-17 08:54:21', 'song'),
 (52, '3', '1', '2023-07-01 11:55:03', 'album'),
 (38, '1', '1', '2023-06-25 15:38:22', 'artist'),
-(41, '2', '1', '2023-06-25 18:15:49', 'song'),
 (42, '4', '1', '2023-06-25 18:15:49', 'song'),
 (47, '1', '2', '2023-06-26 11:56:13', 'song'),
 (51, '3', '2', '2023-07-01 10:27:05', 'album'),
@@ -557,9 +584,9 @@ CREATE TABLE IF NOT EXISTS `login` (
 --
 
 INSERT INTO `login` (`login_id`, `username`, `password`, `user_type`, `status`) VALUES
-(1, 'admin@musicverse.com', 'Admin', 'admin', 'active'),
-(2, 'akshay@gmail.com', 'Akshay', 'user', 'active'),
-(3, 'anjuk@gmail.com', 'Anju', 'user', 'active');
+(1, 'admin', 'Admin', 'admin', 'active'),
+(2, 'akshay', 'Akshay', 'user', 'active'),
+(3, 'anjuk', 'Anju', 'user', 'active');
 
 -- --------------------------------------------------------
 
@@ -578,7 +605,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
   `status` varchar(50) NOT NULL,
   `notification_type` varchar(50) NOT NULL,
   PRIMARY KEY (`notification_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `notification`
@@ -604,7 +631,13 @@ INSERT INTO `notification` (`notification_id`, `user_id`, `content_id`, `content
 (17, '3', '5', 'Song Approved', 'approved', '2023-07-17 14:05:43', 'read', 'approvals'),
 (18, '1', '6', 'Song pending for approval', 'pending', '2023-07-17 15:20:52', 'read', 'approvals'),
 (19, '3', '6', 'Song Approved', 'approved', '2023-07-17 15:21:53', 'read', 'approvals'),
-(20, '3', '6', 'Song removed from artist', 'artistremoved', '2023-07-17 15:22:30', 'read', 'songremoval');
+(20, '3', '6', 'Song removed from artist', 'artistremoved', '2023-07-17 15:22:30', 'read', 'songremoval'),
+(21, '1', '7', 'Song pending for approval', 'pending', '2023-07-19 07:09:09', 'read', 'approvals'),
+(22, '2', '7', 'Song Approved', 'approved', '2023-07-19 07:11:31', 'read', 'approvals'),
+(23, '1', '8', 'Song pending for approval', 'pending', '2023-07-19 18:53:40', 'read', 'approvals'),
+(24, '2', '8', 'Song Approved', 'approved', '2023-07-19 18:55:02', 'read', 'approvals'),
+(25, '1', '9', 'Song pending for approval', 'pending', '2023-07-19 18:58:06', 'read', 'approvals'),
+(26, '2', '9', 'Song Approved', 'approved', '2023-07-19 18:58:46', 'read', 'approvals');
 
 -- --------------------------------------------------------
 
@@ -621,7 +654,7 @@ CREATE TABLE IF NOT EXISTS `playlist` (
   `status` varchar(50) NOT NULL,
   `type` varchar(50) NOT NULL,
   PRIMARY KEY (`playlist_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `playlist`
@@ -629,7 +662,9 @@ CREATE TABLE IF NOT EXISTS `playlist` (
 
 INSERT INTO `playlist` (`playlist_id`, `playlist_name`, `image_loc`, `user_id`, `status`, `type`) VALUES
 (1, 'My Songs', 'uploads/playlist/1.jpg', '1', 'active', 'private'),
-(2, 'Romantic songs', 'uploads/playlist/2.jpg', '1', 'active', 'private');
+(2, 'Romantic songs', 'uploads/playlist/2.jpg', '1', 'active', 'private'),
+(11, 'Daily', 'uploads/playlist/11.jpg', '0', 'active', 'public'),
+(10, 'Discover Weekly', 'uploads/playlist/10.jpg', '0', 'active', 'public');
 
 -- --------------------------------------------------------
 
@@ -643,7 +678,7 @@ CREATE TABLE IF NOT EXISTS `playlisttrack` (
   `playlist_id` varchar(50) NOT NULL,
   `song_id` varchar(50) NOT NULL,
   PRIMARY KEY (`playlisttrack_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `playlisttrack`
@@ -653,7 +688,11 @@ INSERT INTO `playlisttrack` (`playlisttrack_id`, `playlist_id`, `song_id`) VALUE
 (6, '1', '3'),
 (3, '1', '4'),
 (4, '1', '2'),
-(7, '2', '1');
+(7, '2', '1'),
+(23, '11', '1'),
+(21, '10', '3'),
+(20, '10', '1'),
+(24, '11', '4');
 
 -- --------------------------------------------------------
 
@@ -667,7 +706,7 @@ CREATE TABLE IF NOT EXISTS `songartist` (
   `song_id` varchar(25) NOT NULL,
   `artist_id` varchar(25) NOT NULL,
   PRIMARY KEY (`songartist_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `songartist`
@@ -700,7 +739,7 @@ CREATE TABLE IF NOT EXISTS `songs` (
   `duration` varchar(25) NOT NULL,
   `status` varchar(50) NOT NULL,
   PRIMARY KEY (`song_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `songs`
@@ -736,7 +775,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 
 INSERT INTO `user` (`user_id`, `login_id`, `fname`, `lname`, `email`, `mobile`, `image_loc`, `status`) VALUES
-(1, '2', 'Akshay', 'K S', 'akshay@gmail.com', '8848223249', 'uploads/Akshay2.jpg', 'active'),
+(1, '2', 'Akshay', 'K S', 'akshaykeenath@gmail.com', '8848223249', 'uploads/Akshay2.jpg', 'active'),
 (2, '3', 'Anju', 'K', 'anjuk@gmail.com', '8765986451', 'uploads/Anju3.jpg', 'active');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

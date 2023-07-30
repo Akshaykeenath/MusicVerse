@@ -359,14 +359,8 @@ def propicupload():
         res = select(q)
         data={}
         data['userdetails']=res[0]
-        # Get the uploaded image file
         image = request.files['image']
-        file_extension = os.path.splitext(image.filename)[1]
-        # Save the image to a desired location
-        imgpath='uploads/' +res[0]['fname']+res[0]['login_id'] + file_extension
-        image.save('static/'+imgpath)
-        q="update user set image_loc='%s' where user_id='%s'"%(imgpath,uid)
-        insert(q)
+        UpdateProfileImage(image,uid)
         flash("success: Successfully updated image")
         return redirect(url_for('user.edit_profile'))
     else:

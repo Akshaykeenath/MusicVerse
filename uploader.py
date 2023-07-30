@@ -9,6 +9,7 @@ from genre_rec_service import Genre_Recognition_Service
 from pydub import AudioSegment
 from analytics import *
 from deletion import *
+from other_processing import *
 uploader =Blueprint('uploader',__name__)
 
 @uploader.route('/')
@@ -470,33 +471,10 @@ def artist():
                 artistname = request.form['artistname']
                 artist_image = request.files['image']
                 cover_image = request.files['coverimage']
-
-                # Get the file extensions
-                artist_image_extension = os.path.splitext(artist_image.filename)[1]
-                cover_image_extension = os.path.splitext(cover_image.filename)[1]
-
-                # Specify the path where you want to save the uploaded files
-                upload_folder = 'static/uploads/artist'  # Update the path according to your setup
-
-                # Create the upload folder if it doesn't exist
-                os.makedirs(upload_folder, exist_ok=True)
-
-                # Customize the filenames
-                artist_image_filename = artistname + 'propic' + artist_image_extension
-                cover_image_filename = artistname + 'coverpic' + cover_image_extension
-
-                # Saving the path for database
-                profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
-                coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
-
-
-                # Save the uploaded files with the customized filenames
-                artist_image.save(os.path.join(upload_folder, artist_image_filename))
-                cover_image.save(os.path.join(upload_folder, cover_image_filename))
-
-                # Saving to database
-                q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(artistname,profilepath,coverpath,uid)
+                q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','null','null','%s')"%(artistname,uid)
                 id=insert(q)
+                updateArtistImage(artist_image,id)
+                updateArtistCover(cover_image,id)
                 if q :
                     flash('success: Artist added successfully')
                     return redirect(url_for('uploader.artist'))
@@ -543,25 +521,10 @@ def myartist():
                 artistname = request.form['artistname']
                 artist_image = request.files['image']
                 cover_image = request.files['coverimage']
-                # Get the file extensions
-                artist_image_extension = os.path.splitext(artist_image.filename)[1]
-                cover_image_extension = os.path.splitext(cover_image.filename)[1]
-                # Specify the path where you want to save the uploaded files
-                upload_folder = 'static/uploads/artist'  # Update the path according to your setup
-                # Create the upload folder if it doesn't exist
-                os.makedirs(upload_folder, exist_ok=True)
-                # Customize the filenames
-                artist_image_filename = artistname + 'propic' + artist_image_extension
-                cover_image_filename = artistname + 'coverpic' + cover_image_extension
-                # Saving the path for database
-                profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
-                coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
-                # Save the uploaded files with the customized filenames
-                artist_image.save(os.path.join(upload_folder, artist_image_filename))
-                cover_image.save(os.path.join(upload_folder, cover_image_filename))
-                # Saving to database
-                q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(artistname,profilepath,coverpath,uid)
+                q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','null','null','%s')"%(artistname,uid)
                 id=insert(q)
+                updateArtistImage(artist_image,id)
+                updateArtistCover(cover_image,id)
                 if q :
                     flash('success: Artist added successfully')
                     return redirect(url_for('uploader.myartist'))
@@ -589,22 +552,7 @@ def myartist():
                 artist_image = request.files['artistImage']
                 if artist_image.filename !='':
                     artistid = request.form['artistid']
-                    artistname = request.form['artistname']
-                    # Get the file extensions
-                    artist_image_extension = os.path.splitext(artist_image.filename)[1]
-                    # Specify the path where you want to save the uploaded files
-                    upload_folder = 'static/uploads/artist'  # Update the path according to your setup
-                    # Create the upload folder if it doesn't exist
-                    os.makedirs(upload_folder, exist_ok=True)
-                    # Customize the filenames
-                    artist_image_filename = artistname + 'propic' + artist_image_extension
-                    # Saving the path for database
-                    profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
-                    # Save the uploaded files with the customized filenames
-                    artist_image.save(os.path.join(upload_folder, artist_image_filename))
-                    # Saving to database
-                    q="update artist set image_loc='%s' where artist_id='%s'"%(profilepath,artistid)
-                    update(q)
+                    updateArtistImage(artist_image,artistid)
                     flash("success: Updated Artist Image successfully")
                     return redirect(url_for('uploader.myartist'))
                 else:
@@ -613,22 +561,7 @@ def myartist():
                 cover_image = request.files['coverImage']
                 if cover_image.filename !='':
                     artistid = request.form['artistid']
-                    artistname = request.form['artistname']
-                    # Get the file extensions
-                    cover_image_extension = os.path.splitext(cover_image.filename)[1]
-                    # Specify the path where you want to save the uploaded files
-                    upload_folder = 'static/uploads/artist'  # Update the path according to your setup
-                    # Create the upload folder if it doesn't exist
-                    os.makedirs(upload_folder, exist_ok=True)
-                    # Customize the filenames
-                    cover_image_filename = artistname + 'coverpic' + cover_image_extension
-                    # Saving the path for database
-                    coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
-                    # Save the uploaded files with the customized filenames
-                    cover_image.save(os.path.join(upload_folder, cover_image_filename))
-                    # Saving to database
-                    q="update artist set cover_pic='%s' where artist_id='%s'"%(coverpath,artistid)
-                    update(q)
+                    updateArtistCover(cover_image,artistid)
                     flash("success: Updated Artist Cover successfully")
                     return redirect(url_for('uploader.myartist'))
                 else:
@@ -685,25 +618,10 @@ def album():
                 albumname = request.form['albumname']
                 album_image = request.files['image']
                 cover_image = request.files['coverimage']
-                # Get the file extensions
-                album_image_extension = os.path.splitext(album_image.filename)[1]
-                cover_image_extension = os.path.splitext(cover_image.filename)[1]
-                # Specify the path where you want to save the uploaded files
-                upload_folder = 'static/uploads/album'  # Update the path according to your setup
-                # Create the upload folder if it doesn't exist
-                os.makedirs(upload_folder, exist_ok=True)
-                # Customize the filenames
-                album_image_filename = albumname + 'propic' + album_image_extension
-                cover_image_filename = albumname + 'coverpic' + cover_image_extension
-                # Saving the path for database
-                profilepath='uploads/album/' + albumname + 'propic' + album_image_extension
-                coverpath='uploads/album/' + albumname + 'coverpic' + cover_image_extension
-                # Save the uploaded files with the customized filenames
-                album_image.save(os.path.join(upload_folder, album_image_filename))
-                cover_image.save(os.path.join(upload_folder, cover_image_filename))
-                # Saving to database
-                q="insert into album (album_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(albumname,profilepath,coverpath,uid)
+                q="insert into album (album_name,image_loc,cover_pic,user_id) values ('%s','null','null','%s')"%(albumname,uid)
                 id=insert(q)
+                updateAlbumCover(cover_image,id)
+                updateAlbumImage(album_image,id)
                 if q :
                     flash('success: Album added successfully')
                     return redirect(url_for('uploader.album'))
@@ -751,25 +669,10 @@ def myalbum():
                 albumname = request.form['albumname']
                 album_image = request.files['image']
                 cover_image = request.files['coverimage']
-                # Get the file extensions
-                album_image_extension = os.path.splitext(album_image.filename)[1]
-                cover_image_extension = os.path.splitext(cover_image.filename)[1]
-                # Specify the path where you want to save the uploaded files
-                upload_folder = 'static/uploads/album'  # Update the path according to your setup
-                # Create the upload folder if it doesn't exist
-                os.makedirs(upload_folder, exist_ok=True)
-                # Customize the filenames
-                album_image_filename = albumname + 'propic' + album_image_extension
-                cover_image_filename = albumname + 'coverpic' + cover_image_extension
-                # Saving the path for database
-                profilepath='uploads/album/' + albumname + 'propic' + album_image_extension
-                coverpath='uploads/album/' + albumname + 'coverpic' + cover_image_extension
-                # Save the uploaded files with the customized filenames
-                album_image.save(os.path.join(upload_folder, album_image_filename))
-                cover_image.save(os.path.join(upload_folder, cover_image_filename))
-                # Saving to database
-                q="insert into album (album_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(albumname,profilepath,coverpath,uid)
+                q="insert into album (album_name,image_loc,cover_pic,user_id) values ('%s','null','null','%s')"%(albumname,uid)
                 id=insert(q)
+                updateAlbumCover(cover_image,id)
+                updateAlbumImage(album_image,id)
                 if q :
                     flash('success: Album added successfully')
                     return redirect(url_for('uploader.myalbum'))
@@ -801,21 +704,7 @@ def myalbum():
                 if album_image.filename !='':
                     albumid = request.form['albumid']
                     albumname = request.form['albumname']
-                    # Get the file extensions
-                    album_image_extension = os.path.splitext(album_image.filename)[1]
-                    # Specify the path where you want to save the uploaded files
-                    upload_folder = 'static/uploads/album'  # Update the path according to your setup
-                    # Create the upload folder if it doesn't exist
-                    os.makedirs(upload_folder, exist_ok=True)
-                    # Customize the filenames
-                    album_image_filename = albumname + 'propic' + album_image_extension
-                    # Saving the path for database
-                    profilepath='uploads/album/' + albumname + 'propic' + album_image_extension
-                    # Save the uploaded files with the customized filenames
-                    album_image.save(os.path.join(upload_folder, album_image_filename))
-                    # Saving to database
-                    q="update album set image_loc='%s' where album_id='%s'"%(profilepath,albumid)
-                    update(q)
+                    updateAlbumImage(album_image,albumid)
                     flash("success: Updated Album Image successfully")
                     return redirect(url_for('uploader.myalbum'))
                 else:
@@ -825,21 +714,7 @@ def myalbum():
                 if cover_image.filename !='':
                     albumid = request.form['albumid']
                     albumname = request.form['albumname']
-                    # Get the file extensions
-                    cover_image_extension = os.path.splitext(cover_image.filename)[1]
-                    # Specify the path where you want to save the uploaded files
-                    upload_folder = 'static/uploads/album'  # Update the path according to your setup
-                    # Create the upload folder if it doesn't exist
-                    os.makedirs(upload_folder, exist_ok=True)
-                    # Customize the filenames
-                    cover_image_filename = albumname + 'coverpic' + cover_image_extension
-                    # Saving the path for database
-                    coverpath='uploads/album/' + albumname + 'coverpic' + cover_image_extension
-                    # Save the uploaded files with the customized filenames
-                    cover_image.save(os.path.join(upload_folder, cover_image_filename))
-                    # Saving to database
-                    q="update album set cover_pic='%s' where album_id='%s'"%(coverpath,albumid)
-                    update(q)
+                    updateAlbumCover(cover_image,albumid)
                     flash("success: Updated Album Cover successfully")
                     return redirect(url_for('uploader.myalbum'))
                 else:
@@ -1026,6 +901,8 @@ def update_profile():
         print('File name of image :',image.filename)
         q="update user set fname='%s', lname='%s', email='%s', mobile='%s' where user_id='%s'"%(fname,lname,email,mob,uid)
         update(q)
+        if image.filename != '':
+            UpdateProfileImage(image,uid)
         flash("success: Profile successfully updated")
         return redirect(url_for('uploader.profile'))
     else:

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 25, 2023 at 05:51 PM
+-- Generation Time: Jul 30, 2023 at 11:44 AM
 -- Server version: 5.7.9
 -- PHP Version: 5.6.16
 
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `clicks` (
   `content_type` varchar(25) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`click_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=441 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=446 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `clicks`
@@ -526,7 +526,12 @@ INSERT INTO `clicks` (`click_id`, `content_id`, `user_id`, `content_type`, `time
 (436, '2', '1', 'artist', '2023-07-23 07:43:35'),
 (437, '1', '1', 'artist', '2023-07-23 07:43:48'),
 (439, '3', '1', 'album', '2023-07-23 18:49:38'),
-(440, '2', '1', 'album', '2023-07-23 18:49:41');
+(440, '2', '1', 'album', '2023-07-23 18:49:41'),
+(441, '2', '2', 'artist', '2023-07-26 09:10:30'),
+(442, '2', '2', 'artist', '2023-07-26 09:10:30'),
+(443, '4', '2', 'song', '2023-07-26 09:10:57'),
+(444, '1', '2', 'song', '2023-07-26 09:11:50'),
+(445, '2', '1', 'album', '2023-07-30 06:56:14');
 
 -- --------------------------------------------------------
 
@@ -542,14 +547,13 @@ CREATE TABLE IF NOT EXISTS `likes` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `content_type` varchar(50) NOT NULL,
   PRIMARY KEY (`like_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=68 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=69 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `likes`
 --
 
 INSERT INTO `likes` (`like_id`, `content_id`, `user_id`, `timestamp`, `content_type`) VALUES
-(50, '2', '2', '2023-06-26 14:24:14', 'song'),
 (48, '1', '2', '2023-06-26 11:56:16', 'album'),
 (62, '1', '1', '2023-07-17 10:41:18', 'song'),
 (31, '1', '1', '2023-06-25 11:49:09', 'album'),
@@ -557,6 +561,7 @@ INSERT INTO `likes` (`like_id`, `content_id`, `user_id`, `timestamp`, `content_t
 (59, '3', '1', '2023-07-17 08:54:21', 'song'),
 (52, '3', '1', '2023-07-01 11:55:03', 'album'),
 (38, '1', '1', '2023-06-25 15:38:22', 'artist'),
+(68, '4', '2', '2023-07-26 09:11:16', 'song'),
 (42, '4', '1', '2023-06-25 18:15:49', 'song'),
 (47, '1', '2', '2023-06-26 11:56:13', 'song'),
 (51, '3', '2', '2023-07-01 10:27:05', 'album'),
@@ -664,7 +669,7 @@ INSERT INTO `playlist` (`playlist_id`, `playlist_name`, `image_loc`, `user_id`, 
 (1, 'My Songs', 'uploads/playlist/1.jpg', '1', 'active', 'private'),
 (2, 'Romantic songs', 'uploads/playlist/2.jpg', '1', 'active', 'private'),
 (11, 'Daily', 'uploads/playlist/11.jpg', '0', 'active', 'public'),
-(10, 'Discover Weekly', 'uploads/playlist/10.jpg', '0', 'active', 'public');
+(10, 'Discover Weekly', 'uploads/playlist/10.jpg', '0', 'deactive', 'public');
 
 -- --------------------------------------------------------
 
@@ -678,7 +683,7 @@ CREATE TABLE IF NOT EXISTS `playlisttrack` (
   `playlist_id` varchar(50) NOT NULL,
   `song_id` varchar(50) NOT NULL,
   PRIMARY KEY (`playlisttrack_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `playlisttrack`
@@ -691,7 +696,7 @@ INSERT INTO `playlisttrack` (`playlisttrack_id`, `playlist_id`, `song_id`) VALUE
 (7, '2', '1'),
 (23, '11', '1'),
 (21, '10', '3'),
-(20, '10', '1'),
+(25, '10', '1'),
 (24, '11', '4');
 
 -- --------------------------------------------------------
@@ -775,8 +780,8 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 
 INSERT INTO `user` (`user_id`, `login_id`, `fname`, `lname`, `email`, `mobile`, `image_loc`, `status`) VALUES
-(1, '2', 'Akshay', 'K S', 'akshaykeenath@gmail.com', '8848223249', 'uploads/Akshay2.jpg', 'active'),
-(2, '3', 'Anju', 'K', 'anjuk@gmail.com', '8765986451', 'uploads/Anju3.jpg', 'active');
+(1, '2', 'Akshay', 'K S', 'akshaykeenath@gmail.com', '8848223249', 'uploads/users/1.jpg', 'active'),
+(2, '3', 'Anju', 'K', 'anjugangadharan00@gmail.com', '8765986451', 'uploads/Anju3.jpg', 'active');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

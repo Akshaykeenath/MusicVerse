@@ -543,30 +543,22 @@ def myartist():
                 artistname = request.form['artistname']
                 artist_image = request.files['image']
                 cover_image = request.files['coverimage']
-
                 # Get the file extensions
                 artist_image_extension = os.path.splitext(artist_image.filename)[1]
                 cover_image_extension = os.path.splitext(cover_image.filename)[1]
-
                 # Specify the path where you want to save the uploaded files
                 upload_folder = 'static/uploads/artist'  # Update the path according to your setup
-
                 # Create the upload folder if it doesn't exist
                 os.makedirs(upload_folder, exist_ok=True)
-
                 # Customize the filenames
                 artist_image_filename = artistname + 'propic' + artist_image_extension
                 cover_image_filename = artistname + 'coverpic' + cover_image_extension
-
                 # Saving the path for database
                 profilepath='uploads/artist/' + artistname + 'propic' + artist_image_extension
                 coverpath='uploads/artist/' + artistname + 'coverpic' + cover_image_extension
-
-
                 # Save the uploaded files with the customized filenames
                 artist_image.save(os.path.join(upload_folder, artist_image_filename))
                 cover_image.save(os.path.join(upload_folder, cover_image_filename))
-
                 # Saving to database
                 q="insert into artist (artist_name,image_loc,cover_pic,user_id) values ('%s','%s','%s','%s')"%(artistname,profilepath,coverpath,uid)
                 id=insert(q)
@@ -990,6 +982,52 @@ def uploadsong():
                 os.remove(songpath)
             return redirect(url_for('uploader.home'))
         return render_template('uploader/uploadsong.html', data=data,count=count)
+    else:
+        flash("danger: Session Unavailable. Login Again")
+        return redirect(url_for('public.home'))
+    
+@uploader.route('/changepassword', methods=['GET', 'POST'])
+def changepassword():
+    if 'uid' in session:
+        login_id = session['login_id']
+        uid = session['uid']
+        current_pass = request.form['password']
+        new_pass = request.form['newpassword']
+        renew_pass = request.form['renewpassword']
+        q="select * from login where login_id='%s'"%(login_id)
+        logindetails=select(q)
+        if len(logindetails) > 0 :
+            if logindetails[0]['password'] == current_pass:
+                if new_pass == renew_pass:
+                    q="update login set password='%s' where login_id='%s'"%(new_pass,login_id)
+                    update(q)
+                    flash("success: Password Changed successfully")
+                else:
+                    flash("danger: New password and Re entered password does not match")
+            else:
+                flash("danger: Current password does not match")
+        else:
+            flash("danger: Error changing the password")
+        return redirect(url_for('uploader.profile'))
+    else:
+        flash("danger: Session Unavailable. Login Again")
+        return redirect(url_for('public.home'))
+
+@uploader.route('/update_profile', methods=['GET', 'POST'])
+def update_profile():
+    if 'uid' in session:
+        login_id = session['login_id']
+        uid = session['uid']
+        fname = request.form['fName']
+        lname = request.form['lName']
+        mob = request.form['phone']
+        email = request.form['email']
+        image = request.files['profileImage']
+        print('File name of image :',image.filename)
+        q="update user set fname='%s', lname='%s', email='%s', mobile='%s' where user_id='%s'"%(fname,lname,email,mob,uid)
+        update(q)
+        flash("success: Profile successfully updated")
+        return redirect(url_for('uploader.profile'))
     else:
         flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))

@@ -16,14 +16,14 @@
             <table align="Center">
               <td>
                 <div>
-                  <a a href="#" data-dismiss="modal" data-toggle="modal" data-target="#myModal3" class="btn btn-warning" name="musicplayer">
+                  <a a href="#" data-dismiss="modal" data-toggle="modal" data-target="#verificationemailmodal" class="btn btn-warning" name="musicplayer">
                     Register
                   </a>
                 </div>                
               </td>
               <td>
                 <div class="col-md-4">
-                  <button type="submit" class="btn btn-success" data-toggle="modal" data-target="#myModal2">
+                  <button type="submit" class="btn btn-success" data-toggle="modal" data-target="#signinmodal">
                     Login
                   </button>
                 </div>
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Signin page -->
-    <div class="modal fade modal-black" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade modal-black" id="signinmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header justify-content-center">
@@ -68,19 +68,15 @@
                   <input class="form-control" placeholder="Password" type="password" name="pwd" required>
                 </div>
               </div>
-              <div class="form-check mt-3">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" checked>
-                  <span class="form-check-sign"></span>
-                  Remember me!
-                </label>
-              </div>
               <div class="text-center">
                 <button type="submit" class="btn btn-primary my-4" name="signin">Sign in</button>
               </div>
-            </form>
+            </form> 
+            <div class="text-center text-muted">
+              <small>Forgot Password? <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#forgotpasswordmodal">click here</a></small>
+            </div>
             <div class="text-center text-muted mb-4 mt-3">
-              <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#myModal3">Sign Up</a></small>
+              <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#verificationemailmodal">Sign Up</a></small>
             </div>
           </div>
           
@@ -91,7 +87,7 @@
 
     <!-- Signup Area -->
     <form method="post" action="/signup">
-      <div class="modal fade modal-black" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal fade modal-black" id="signupmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content" style="margin-top: -100px;">
             <div class="modal-header justify-content-center">
@@ -131,7 +127,7 @@
                         <i class="tim-icons icon-email-85"></i>
                       </span>
                     </div>
-                    <input class="form-control" placeholder="Email" type="email" id="regemail" name="regemail" required>
+                    <input class="form-control" placeholder="Email" type="email" id="regemail" name="regemail" value="{{ data['email'] }}" disabled>
                   </div>
                 </div>           
                 <div class="form-group">
@@ -169,7 +165,7 @@
                   <button type="submit" class="btn btn-primary my-4">Sign Up</button>
                 </div>
               <div class="text-center text-muted mb-4 mt-3">
-                <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#myModal2"> Sign In</a></small>
+                <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#signinmodal"> Sign In</a></small>
               </div>
             </form>
             </div>
@@ -178,6 +174,153 @@
       </div>
     </form>
     <!-- End Signup Area -->
+ <!-- Email Area -->
+ <form method="post" action="/verification">
+  <div class="modal fade modal-black" id="verificationemailmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="tim-icons icon-simple-remove text-white"></i>
+          </button>
+          <div class="text-muted text-center ml-auto mr-auto">
+            <h3 class="mb-0">Sign Up</h3>
+          </div>
+        </div>
+        <div class="modal-body">
+          <form role="form" method="post">
+            <div class="form-group mb-3">
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="tim-icons icon-email-85"></i>
+                  </span>
+                </div>
+                <input class="form-control" placeholder="Email" type="email" id="verifyemail" name="verifyemail" required>
+              </div>
+            </div>            
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary my-4">Verify Email</button>
+            </div>
+          <div class="text-center text-muted mb-4 mt-3">
+            <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#signinmodal"> Sign In</a></small>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<!-- End Email Area -->
+
+ <!-- Forgot password Area -->
+ <form method="post" action="/forgotpassword">
+  <div class="modal fade modal-black" id="forgotpasswordmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="tim-icons icon-simple-remove text-white"></i>
+          </button>
+          <div class="text-muted text-center ml-auto mr-auto">
+            <h3 class="mb-0">Forgot Password?</h3>
+          </div>
+        </div>
+        <div class="modal-body">
+          <form role="form" method="post">
+            <div class="form-group mb-3">
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="tim-icons icon-email-85"></i>
+                  </span>
+                </div>
+                <input class="form-control" placeholder="Email" type="email" id="verifyemail" name="verifyemail" required>
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="tim-icons icon-mobile"></i>
+                  </span>
+                </div>
+                <input class="form-control" placeholder="Mobile number" type="text" id="verifymobile" name="verifymobile" required>
+              </div>
+            </div>          
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary my-4">Submit</button>
+            </div>
+          <div class="text-center text-muted mb-4 mt-3">
+            <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#signinmodal"> Sign In</a></small>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<!-- End Forgot password Area -->
+
+  <!-- Email Area -->
+  <form method="post" action="/validation">
+    <div class="modal fade modal-black" id="otpmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header justify-content-center">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="tim-icons icon-simple-remove text-white"></i>
+            </button>
+            <div class="text-muted text-center ml-auto mr-auto">
+              <h3 class="mb-0">Sign Up</h3>
+            </div>
+          </div>
+          <div class="modal-body">
+            <form role="form" method="post">
+              <div class="form-group mb-3">
+                <div class="input-group input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="tim-icons icon-key-25"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" placeholder="Enter OTP" type="text" id="validateotp" name="validateotp" required>
+                  <input type="hidden" name="validateemail" value="{{ data['email'] }}">
+                </div>
+              </div>            
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary my-4">Verify OTP</button>
+              </div>
+            <div class="text-center text-muted mb-4 mt-3">
+              <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#signinmodal"> Sign In</a></small>
+            </div>
+          </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <!-- End Email Area -->
 
     {% include 'public/public_footer.html'%}
+
+    {% if value == 'otpmodal' %}
+    <script>
+      // Function to open the modal on page load
+      document.addEventListener('DOMContentLoaded', function () {
+        var modal = new bootstrap.Modal(document.getElementById('otpmodal'));
+        modal.show();
+      });
+    </script>
+    {% endif %}
+
+    {% if value == 'signupmodal' %}
+    <script>
+      // Function to open the modal on page load
+      document.addEventListener('DOMContentLoaded', function () {
+        var modal = new bootstrap.Modal(document.getElementById('signupmodal'));
+        modal.show();
+      });
+    </script>
+    {% endif %}
 

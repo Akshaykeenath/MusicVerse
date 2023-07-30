@@ -1,13 +1,12 @@
 from flask import *
 from database import*
-
-
+from other_functions import *
+data={} 
 public=Blueprint('public',__name__)
 
 @public.route('/')
 def home():
-    return render_template('public/index.html')
-    
+    return render_template('public/index.html',data=data)
 
 @public.route('/login', methods=['POST', 'GET'])
 def login():
@@ -48,7 +47,6 @@ def signup():
         email = request.form['regemail']
         mobile_number = request.form['regmobile']
         password = request.form['regpass1']
-        cnfpassword = request.form['regpass2']
         
         q="select * from login where username='%s'"%(email,)
         res=select(q)
@@ -61,4 +59,51 @@ def signup():
             v=insert(q)
             if v:
                 flash('success: Insertion Successfull')
+        return redirect(url_for('public.home')) 
+
+
+@public.route('/verification', methods=['POST', 'GET'])
+def verification():
+    email = request.form['verifyemail']
+    q="select * from user where email='%s'"%(email)
+    uid=select(q)
+    if len(uid) > 0:
+        flash("danger: Email already exists. Select login")
+        return redirect(url_for('public.home')) 
+    else:
+        send_otp(email)
+        data={
+            'email': email
+        }
+        return render_template('Public/index.html',value='otpmodal',data=data)
+
+@public.route('/validation', methods=['POST', 'GET'])
+def validation():
+    otp = request.form['validateotp']
+    email = request.form['validateemail']
+    send_otp(email)
+    data={
+        'email': email
+    }
+    if is_valid_otp(otp):
+        return render_template('Public/index.html',value='signupmodal',data=data)
+    else:
+        flash("danger: OTP is invalid. Try again.")
+        return redirect(url_for('public.home')) 
+    
+@public.route('/forgotpassword', methods=['POST', 'GET'])
+def forgotpassword():
+    mob = request.form['verifymobile']
+    email = request.form['verifyemail']
+    q="select * from user where mobile='%s' and email='%s'"%(mob,email)
+    userdet=select(q)
+    if len(userdet)>0 :
+        login_id=userdet[0]['login_id']
+        q="select password from login where login_id='%s'"%(login_id)
+        passwords=select(q)
+        send_password(passwords[0]['password'],email)
+        flash("success: Password send to registered mail id")
+        return redirect(url_for('public.home')) 
+    else:
+        flash("danger: Invalid mail id or mobile number")
         return redirect(url_for('public.home')) 

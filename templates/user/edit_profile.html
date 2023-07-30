@@ -69,50 +69,61 @@
       </div>
   </div>
             <div class="card-body">
-              <form action="/user/update_profile" method="post">
-                <div class="row">
-                  <div class="col-md-6">
-                    <label>First Name</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-user"></i></span>
-                      </div>
-                      <input type="text" class="form-control" value="{{data['userdetails']['fname']}}" name="upfname">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label>Last Name</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-user"></i></span>
-                      </div>
-                      <input type="text" class="form-control" value="{{data['userdetails']['lname']}}" name="uplname">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <label>Mobile</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-mobile"></i></span>
-                      </div>
-                      <input type="text" class="form-control" value="{{data['userdetails']['mobile']}}" name="upmob">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label>Email</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                      </div>
-                      <input type="text" class="form-control" value="{{data['userdetails']['email']}}" disabled>
-                    </div>
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-round" id="updatedetails">Submit</button>
-                <a href="{{ url_for('user.profile') }}" class="btn btn-neutral btn-round">Cancel</a>
-              </form>
+              <!-- The form remains the same -->
+
+<form action="/user/update_profile" class="needs-validation" method="post" novalidate>
+  <div class="row">
+    <div class="col-md-6">
+      <label>First Name</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-user"></i></span>
+        </div>
+        <input type="text" class="form-control" value="{{data['userdetails']['fname']}}" name="upfname" required>
+        <div class="invalid-feedback">
+          Please enter your first name.
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label>Last Name</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-user"></i></span>
+        </div>
+        <input type="text" class="form-control" value="{{data['userdetails']['lname']}}" name="uplname" required>
+        <div class="invalid-feedback">
+          Please enter your last name.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <label>Mobile</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-mobile"></i></span>
+        </div>
+        <input type="text" class="form-control" value="{{data['userdetails']['mobile']}}" name="upmob" required>
+        <div class="invalid-feedback">
+          Please enter your mobile number.
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label>Email</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+        </div>
+        <input type="text" class="form-control" value="{{data['userdetails']['email']}}" disabled>
+      </div>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary btn-round" id="updatedetails">Submit</button>
+  <a href="{{ url_for('user.profile') }}" class="btn btn-neutral btn-round">Cancel</a>
+</form>
             </div>
           </div>
         </div>

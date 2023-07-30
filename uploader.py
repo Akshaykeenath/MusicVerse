@@ -317,9 +317,8 @@ def privatesongs():
             elif action.startswith('view_song'):
                  return render_template('uploader/private_songs.html', data=data,count=count, value='viewsong')
             elif action.startswith('delete_song'):
-                # Delete song action
-                # Handle the delete song functionality
-                return 'Delete Song'
+                message = songDeletion(song_id)
+                flash(message)
         return render_template('uploader/private_songs.html', data=data,count=count)
     else:
         flash("danger: Session Unavailable. Login Again")

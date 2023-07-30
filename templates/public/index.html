@@ -86,7 +86,7 @@
     <!-- End Signin page -->
 
     <!-- Signup Area -->
-    <form method="post" action="/signup">
+    <form method="post" class="needs-validation" action="/signup" novalidate>
       <div class="modal fade modal-black" id="signupmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content" style="margin-top: -100px;">
@@ -108,6 +108,9 @@
                       </span>
                     </div>
                     <input class="form-control" placeholder="First Name" type="text" id="regfname" name="regfname" required>
+                    <div class="invalid-feedback">
+                      Please enter a valid First Name.
+                    </div>
                   </div>
                 </div>
                 <div class="form-group mb-3">
@@ -118,6 +121,9 @@
                       </span>
                     </div>
                     <input class="form-control" placeholder="Last Name" type="text" id="reglname" name="reglname" required>
+                    <div class="invalid-feedback">
+                      Please enter a valid Last Name.
+                    </div>
                   </div>
                 </div>
                 <div class="form-group mb-3">
@@ -138,6 +144,9 @@
                       </span>
                     </div>
                     <input class="form-control" placeholder="Mobile Number" type="text" id="regmobile" name="regmobile" required>
+                    <div class="invalid-feedback">
+                      Please enter a valid Mobile Number.
+                    </div>
                   </div>
                 </div>
                 <div class="form-group">
@@ -148,6 +157,9 @@
                       </span>
                     </div>
                     <input class="form-control" placeholder="Password" type="password" id="regpass1" name="regpass1" required>
+                    <div class="invalid-feedback">
+                      Please enter a valid password.
+                    </div>
                   </div>
                 </div>   
                 <div class="form-group">
@@ -158,6 +170,9 @@
                       </span>
                     </div>
                     <input class="form-control" placeholder="Confirm Password" type="password" id="regpass2" name="regpass2" required>
+                    <div class="invalid-feedback">
+                      Please re enter a valid password.
+                    </div>
                   </div>
                 </div>
   
@@ -175,7 +190,7 @@
     </form>
     <!-- End Signup Area -->
  <!-- Email Area -->
- <form method="post" action="/verification">
+ <form method="post" class="needs-validation" action="/verification" novalidate>
   <div class="modal fade modal-black" id="verificationemailmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -188,24 +203,26 @@
           </div>
         </div>
         <div class="modal-body">
-          <form role="form" method="post">
-            <div class="form-group mb-3">
-              <div class="input-group input-group-alternative">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">
-                    <i class="tim-icons icon-email-85"></i>
-                  </span>
-                </div>
-                <input class="form-control" placeholder="Email" type="email" id="verifyemail" name="verifyemail" required>
+          <!-- The form remains the same -->
+          <div class="form-group mb-3">
+            <div class="input-group input-group-alternative">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="tim-icons icon-email-85"></i>
+                </span>
               </div>
-            </div>            
-            <div class="text-center">
-              <button type="submit" class="btn btn-primary my-4">Verify Email</button>
+              <input class="form-control" placeholder="Email" type="email" id="verifyemail" name="verifyemail" required>
+              <div class="invalid-feedback">
+                Please enter a valid email address.
+              </div>
             </div>
+          </div>            
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary my-4">Verify Email</button>
+          </div>
           <div class="text-center text-muted mb-4 mt-3">
             <small>Or Click here to <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#signinmodal"> Sign In</a></small>
           </div>
-        </form>
         </div>
       </div>
     </div>
@@ -263,7 +280,7 @@
 <!-- End Forgot password Area -->
 
   <!-- Email Area -->
-  <form method="post" action="/validation">
+  <form method="post" action="/validation" class="needs-validation" novalidate>
     <div class="modal fade modal-black" id="otpmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -285,6 +302,9 @@
                     </span>
                   </div>
                   <input class="form-control" placeholder="Enter OTP" type="text" id="validateotp" name="validateotp" required>
+                  <div class="invalid-feedback">
+                    Please enter the otp.
+                  </div>
                   <input type="hidden" name="validateemail" value="{{ data['email'] }}">
                 </div>
               </div>            

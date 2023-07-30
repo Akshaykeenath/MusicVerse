@@ -1,176 +1,182 @@
 
-  {% include 'user/user_header.html' %}
-  <style>
-    body {
-      overflow: hidden;
-    }
-    .image-container {
-  width: 200px;
-  height: 150px;
-  overflow: hidden;
-  border-radius: 50%;
-}
-.image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-  </style>
+{% include 'user/user_header.html'%}
 
-  <div style="margin-top: 150px;">
-    <div class="container align-items-center">
-      <div class="row">
-        <div class="col-lg-6 col-md-6">
-          <h1 class="profile-title text-left">{{data['userdetails']['fname']}} {{data['userdetails']['lname']}}</h1>
-          <h5 class="text-on-back">01</h5>
-          <p class="profile-description">Offices parties lasting outward nothing age few resolve. Impression to discretion understood to we interested he excellence. Him remarkably use projection collecting. Going about eat forty world has round miles.</p>
-          <div class="btn-wrapper profile pt-3">
-            <a target="_blank" href="https://twitter.com/creativetim" class="btn btn-icon btn-twitter btn-round" data-toggle="tooltip" data-original-title="Follow us">
-              <i class="fab fa-twitter"></i>
+<style>
+  /* Hide scroll bars */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .section {
+    overflow: -moz-scrollbars-none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<div class="content">
+<div class="row mt-5">
+<div class="col mt-5">
+<!-- For space on top -->
+</div>
+</div>
+  <div class="row">
+  <div class="col col-1 mr-5 sidebar">
+  <!-- Side Bar -->
+<div class="myfixleft">
+  <div style="margin-top: 100px;">
+    <div class="row">
+      <div class="col-md-11">
+        <ul class="nav nav-pills nav-pills-info flex-column">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.user_home') }}">
+              <i class="fas fa-home mr-2"></i> Home
             </a>
-            <a target="_blank" href="https://www.facebook.com/creativetim" class="btn btn-icon btn-facebook btn-round" data-toggle="tooltip" data-original-title="Like us">
-              <i class="fab fa-facebook-square"></i>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.favorite') }}">
+              <i class="fas fa-heart mr-2"></i> Favorites
             </a>
-            <a target="_blank" href="https://dribbble.com/creativetim" class="btn btn-icon btn-dribbble  btn-round" data-toggle="tooltip" data-original-title="Follow us">
-              <i class="fab fa-dribbble"></i>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.explore') }}">
+              <i class="fas fa-compass mr-2"></i> Explore
             </a>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6 ml-auto mr-auto">
-          <div class="card card-coin card-plain">
-            <div class="card-header">
-              <div class="image-container">
-                {% if data['userdetails']['image_loc'] != 'null' %}
-                  <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image">
-                {% else %}
-                <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" class="img-center img-fluid rounded-circle" id="profile-image">
-                {% endif %}
-              </div>
-              <div style="margin-left: 30px;">
-                <a href="{{ url_for('user.edit_profile') }}" class="btn btn-success btn-round" style="margin-top: 40px;">Edit Profile</a>
-              </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-0" href="{{ url_for('user.playlist') }}">
+              <i class="fa-solid fa-compact-disc mr-2"></i> Playlist
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Side Bar -->
+  </div>
+  <div class="col col-10 ml-5 mt-5">
+    <div class="mt-5">
+      <div class=" align-items-center">
+        <div class="row">
+          <div class="col-lg-6 col-md-6">
+            <h1 class="profile-title text-left">{{data['userdetails']['fname']}} {{data['userdetails']['lname']}}</h1>
+            <h5 class="text-on-back">01</h5>
+            <p class="profile-description">Offices parties lasting outward nothing age few resolve. Impression to discretion understood to we interested he excellence. Him remarkably use projection collecting. Going about eat forty world has round miles.</p>
+            <div class="btn-wrapper profile pt-3">
+              <a target="_blank" href="https://twitter.com/creativetim" class="btn btn-icon btn-twitter btn-round" data-toggle="tooltip" data-original-title="Follow us">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a target="_blank" href="https://www.facebook.com/creativetim" class="btn btn-icon btn-facebook btn-round" data-toggle="tooltip" data-original-title="Like us">
+                <i class="fab fa-facebook-square"></i>
+              </a>
+              <a target="_blank" href="https://dribbble.com/creativetim" class="btn btn-icon btn-dribbble  btn-round" data-toggle="tooltip" data-original-title="Follow us">
+                <i class="fab fa-dribbble"></i>
+              </a>
             </div>
-            <div class="card-body">
-              <ul class="nav nav-tabs nav-tabs-primary justify-content-center">
-                <li class="nav-item">
-                  <a class="nav-link active" data-toggle="tab" href="#linka">
-                    Wallet
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="tab" href="#linkb">
-                    Send
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="tab" href="#linkc">
-                    News
-                  </a>
-                </li>
-              </ul>
-              <div class="tab-content tab-subcategories">
-                <div class="tab-pane active" id="linka">
-                  <div class="table-responsive">
-                    <table class="table tablesorter" id="plain-table">
-                      <thead class="text-primary">
-                        <tr>
-                          <th class="header">
-                            COIN
-                          </th>
-                          <th class="header">
-                            AMOUNT
-                          </th>
-                          <th class="header">
-                            VALUE
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            BTC
-                          </td>
-                          <td>
-                            7.342
-                          </td>
-                          <td>
-                            48,870.75 USD
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            ETH
-                          </td>
-                          <td>
-                            30.737
-                          </td>
-                          <td>
-                            64,53.30 USD
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            XRP
-                          </td>
-                          <td>
-                            19.242
-                          </td>
-                          <td>
-                            18,354.96 USD
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+          </div>
+          <div class="col-lg-5 col-md-6 ml-auto mr-auto">
+            <div class="card card-coin card-plain">
+              <div class="card-header">
+                <div class="image-container">
+                  {% if data['userdetails']['image_loc'] != 'null' %}
+                    <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image">
+                  {% else %}
+                  <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" class="img-center img-fluid rounded-circle" id="profile-image">
+                  {% endif %}
                 </div>
-                <div class="tab-pane" id="linkb">
-                  <div class="row">
-                    <label class="col-sm-3 col-form-label">Pay to</label>
-                    <div class="col-sm-9">
-                      <div class="form-group">
-                        <input type="text" class="form-control" placeholder="e.g. 1Nasd92348hU984353hfid">
-                        <span class="form-text">Please enter a valid address.</span>
+              </div>
+              <div class="card-body">
+                <ul class="nav nav-tabs nav-tabs-primary justify-content-center">
+                  <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#Overview-tab">
+                      Overview
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#profile-change-password">
+                      Change Password
+                    </a>
+                  </li>
+                </ul>
+                <div class="tab-content tab-subcategories">
+                  <div class="tab-pane active" id="Overview-tab">
+                    <div class="table-responsive">
+                      <div class="ml-3">
+                        <h5 class="h4 text-primary">Profile Details</h5>
+                        <div class="row mt-2">
+                          <div class="col-lg-3 col-md-4 text-muted">Full Name</div>
+                          <div class="col-lg-9 col-md-8 text-light">{{data['userdetails']['fname']}} {{data['userdetails']['lname']}}</div>
+                        </div>
+      
+                        <div class="row mt-2">
+                          <div class="col-lg-3 col-md-4 text-muted">Username</div>
+                          <div class="col-lg-9 col-md-8 text-light">{{data['userdetails']['username']}}</div>
+                        </div>
+      
+                        <div class="row mt-2">
+                          <div class="col-lg-3 col-md-4 text-muted">Email</div>
+                          <div class="col-lg-9 col-md-8 text-light">{{data['userdetails']['email']}}</div>
+                        </div>
+      
+                        <div class="row mt-2">
+                          <div class="col-lg-3 col-md-4 text-muted">Mobile</div>
+                          <div class="col-lg-9 col-md-8 text-light">{{data['userdetails']['mobile']}}</div>
+                        </div>
+                        <div class="row mt-4">
+                          <div class="m-1">
+                            <a href="{{ url_for('user.edit_profile') }}" class="btn btn-success btn-round" name="editprofile" type="submit">Edit Profile</a>                            
+                          </div>
+                          <div class="m-1">
+                            <a href="{{ url_for('user.disable_profile') }}" class="btn btn-danger btn-simple btn-round" name="disableprofile" type="submit">Disable Profile</a>
+                          </div>
+                        </div>
+      
                       </div>
                     </div>
                   </div>
-                  <div class="row">
-                    <label class="col-sm-3 col-form-label">Amount</label>
-                    <div class="col-sm-9">
-                      <div class="form-group">
-                        <input type="text" class="form-control" placeholder="1.587">
-                      </div>
+                  <div class="tab-pane" id="profile-change-password">
+                    <div class="table-responsive">
+                      <!-- Change Password Form -->
+                      <h5 class="h4 text-primary">Change Password</h5>
+                      <form class="needs-validation" action="{{ url_for('user.changepassword') }}" method="post" novalidate id="changePasswordForm">
+                        <div class="row mb-3 position-relative">
+                          <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
+                          <div class="col-md-8 col-lg-9">
+                            <input name="password" type="password" class="form-control" id="currentPassword" required>
+                            <div class="invalid-feedback">
+                              Please enter the current password.
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row mb-3 position-relative">
+                          <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
+                          <div class="col-md-8 col-lg-9">
+                            <input name="newpassword" type="password" class="form-control" id="newPassword" required>
+                            <div class="invalid-feedback">
+                              Please enter the new password.
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row mb-3 position-relative">
+                          <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
+                          <div class="col-md-8 col-lg-9">
+                            <input name="renewpassword" type="password" class="form-control" id="renewPassword" required>
+                            <div class="invalid-feedback">
+                              Please re-enter the new password.
+                            </div>
+                            <div class="invalid-feedback mismatch-feedback" style="display: none;">
+                              New password and re-entered password do not match.
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row position-relative justify-content-center">
+                          <div class="">
+                            <button type="submit" class="btn btn-success btn-round">Change Password</button>
+                          </div>
+                        </div>
+                      </form>
+                  <!-- End Change Password Form -->
                     </div>
-                  </div>
-                  <a href="{{ url_for('user.edit_profile') }}" class="btn btn-success btn-round" name="editprofile" type="submit">Edit Profile</a>
-                </div>
-                <div class="tab-pane" id="linkc">
-                  <div class="table-responsive">
-                    <table class="table tablesorter" id="plain-table">
-                      <thead class="text-primary">
-                        <tr>
-                          <th class="header">
-                            Latest Crypto News
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            The Daily: Nexo to Pay on Stable...
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            Venezuela Begins Public of Nation...
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            PR: BitCanna – Dutch Blockchain...
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
                   </div>
                 </div>
               </div>
@@ -180,22 +186,38 @@
       </div>
     </div>
   </div>
-
-
-
-<!-- Update Success -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class="alert alert-success alert-with-icon fixed-bottom">
-  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="tim-icons icon-simple-remove"></i>
-  </button>
-  <span data-notify="icon" class="tim-icons icon-trophy"></span>
-  <span>{{ messages[0] }}</span>
+  </div>
 </div>
-{% endif %}
-{% endwith %}
-<!-- End Modal -->
 
-  {% include 'user/user_footer.html' %}
+{% include 'user/user_footer.html'%}
 
+<script>
+  // Function to check if the new password and re-entered password match
+  function passwordsMatch() {
+    var newPassword = document.getElementById("newPassword").value;
+    var renewPassword = document.getElementById("renewPassword").value;
+    var mismatchFeedback = document.querySelector(".mismatch-feedback");
+
+    if (newPassword !== renewPassword) {
+      mismatchFeedback.style.display = "block";
+      return false;
+    } else {
+      mismatchFeedback.style.display = "none";
+      return true;
+    }
+  }
+
+  // Function to handle form validation
+  function validateForm(event) {
+    var form = event.target;
+    if (!form.checkValidity() || !passwordsMatch()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add("was-validated");
+  }
+
+  // Attach the validation function to the form's submit event
+  var form = document.getElementById("changePasswordForm");
+  form.addEventListener("submit", validateForm, false);
+</script>

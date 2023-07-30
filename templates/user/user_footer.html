@@ -53,3 +53,24 @@
     </script>
   {% endif %}
 {% endwith %}
+  <!-- Generic validation script -->
+  <script>
+    // Function to handle form validation
+    function validateForm(event) {
+      var form = event.target;
+      var isValid = form.checkValidity();
+  
+      if (!isValid) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+  
+      form.classList.add("was-validated");
+    }
+  
+    // Attach the validation function to all forms with the "needs-validation" class
+    var forms = document.querySelectorAll(".needs-validation");
+    forms.forEach(function (form) {
+      form.addEventListener("submit", validateForm, false);
+    });
+  </script>

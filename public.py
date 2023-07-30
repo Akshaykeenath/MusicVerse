@@ -16,7 +16,7 @@ def login():
         q = "SELECT * FROM login WHERE username='%s' AND password='%s'" % (u, pa)
         res = select(q)
 
-        if res:
+        if res[0]['password'] == pa:
             session['login_id'] = res[0]['login_id']
             lid = session['login_id']
             if res[0]['user_type'] == "admin":

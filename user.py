@@ -7,6 +7,7 @@ from fuzzywuzzy import process
 from categories import *
 from other_processing import *
 from deletion import *
+from other_functions import *
 user = Blueprint('user',__name__)
 
 @user.route('/user_home')
@@ -328,8 +329,6 @@ def edit_profile():
         flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
-app = Flask(__name__)
-
 @user.route('/update_profile', methods=['POST'])
 def update_profile():
     if 'uid' in session:
@@ -348,8 +347,6 @@ def update_profile():
     else:
         flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
-    
-
 
 @user.route('/propicupload', methods=['POST'])
 def propicupload():
@@ -413,6 +410,47 @@ def edit_playlist():
         flash("danger: Session Unavailable. Login Again")
         return redirect(url_for('public.home'))
 
+@user.route('/changepassword', methods=['GET', 'POST'])
+def changepassword():
+    if 'uid' in session:
+        login_id = session['login_id']
+        uid = session['uid']
+        current_pass = request.form['password']
+        new_pass = request.form['newpassword']
+        renew_pass = request.form['renewpassword']
+        q="select * from login where login_id='%s'"%(login_id)
+        logindetails=select(q)
+        if len(logindetails) > 0 :
+            if logindetails[0]['password'] == current_pass:
+                if new_pass == renew_pass:
+                    q="update login set password='%s' where login_id='%s'"%(new_pass,login_id)
+                    update(q)
+                    flash("success: Password Changed successfully")
+                else:
+                    flash("danger: New password and Re entered password does not match")
+            else:
+                flash("danger: Current password does not match")
+        else:
+            flash("danger: Error changing the password")
+        return redirect(url_for('user.profile'))
+    else:
+        flash("danger: Session Unavailable. Login Again")
+        return redirect(url_for('public.home'))
+
+@user.route('/disable_profile', methods=['GET', 'POST'])
+def disable_profile():
+    if 'uid' in session:
+        login_id = session['login_id']
+        uid = session['uid']
+        q="update user set status='deactive' where user_id='%s'"%(uid)
+        update(q)
+        subject="User Dectivation"
+        message="Your account have deactivated your account successfully. Contact admin if you feels to reactivate."
+        send_email(uid,subject,message)
+        return redirect(url_for('user.logout'))
+    else:
+        flash("danger: Session Unavailable. Login Again")
+        return redirect(url_for('public.home'))
     
 @user.route('/like_song', methods=['POST'])
 def like_song():
@@ -486,6 +524,7 @@ def add_to_playlist():
 @user.route('/logout')
 def logout():
     session.clear()
+    flash("warning: You have logged out")
     return redirect(url_for('public.home'))
 
 

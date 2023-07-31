@@ -54,35 +54,48 @@
 </div>
 <!-- End Side Bar -->
   </div>
-  <div class="col col-10 ml-5 mt-5">
+  <div class="col col-10 ml-4">
+    <div class="">
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('user.user_home') }}">Home</a></li>
+          <li class="breadcrumb-item active">Profile</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
     <div class="mt-5">
       <div class=" align-items-center">
         <div class="row">
-          <div class="col-lg-6 col-md-6">
-            <h1 class="profile-title text-left">{{data['userdetails']['fname']}} {{data['userdetails']['lname']}}</h1>
-            <h5 class="text-on-back">01</h5>
-            <p class="profile-description">Offices parties lasting outward nothing age few resolve. Impression to discretion understood to we interested he excellence. Him remarkably use projection collecting. Going about eat forty world has round miles.</p>
-            <div class="btn-wrapper profile pt-3">
-              <a target="_blank" href="https://twitter.com/creativetim" class="btn btn-icon btn-twitter btn-round" data-toggle="tooltip" data-original-title="Follow us">
-                <i class="fab fa-twitter"></i>
+          <div class="col-lg-4 col-md-6">
+            <!-- <h5 class="text-on-back">Music Verse</h5> -->
+            <div class="d-flex justify-content-center align-items-center"> <!-- Use flexbox to center content horizontally and vertically -->
+              <div class="col-8 mb-2">
+                {% if data['userdetails']['image_loc'] != 'null' %}
+                  <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image">
+                {% else %}
+                  <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" class="img-center img-fluid rounded-circle" id="profile-image">
+                {% endif %}
+              </div>
+            </div>
+            <h1 class="profile-title text-center">{{data['userdetails']['fname']}} {{data['userdetails']['lname']}}</h1>
+            <div class="btn-wrapper text-center pt-3">
+              <a target="_blank" href="{{ url_for('uploader.myalbum') }}" class="btn btn-icon btn-info btn-round">
+                <i class="fas fa-compact-disc"></i>
               </a>
-              <a target="_blank" href="https://www.facebook.com/creativetim" class="btn btn-icon btn-facebook btn-round" data-toggle="tooltip" data-original-title="Like us">
-                <i class="fab fa-facebook-square"></i>
+              <a target="_blank" href="{{ url_for('uploader.allsongs') }}" class="btn btn-icon btn-facebook btn-round" data-toggle="tooltip" data-original-title="Like us">
+                <i class="fas fa-music"></i>
               </a>
-              <a target="_blank" href="https://dribbble.com/creativetim" class="btn btn-icon btn-dribbble  btn-round" data-toggle="tooltip" data-original-title="Follow us">
-                <i class="fab fa-dribbble"></i>
+              <a target="_blank" href="{{ url_for('uploader.myartist') }}" class="btn btn-icon btn-dribbble  btn-round" data-toggle="tooltip" data-original-title="Follow us">
+                <i class="fas fa-user"></i>
               </a>
             </div>
           </div>
+          
           <div class="col-lg-5 col-md-6 ml-auto mr-auto">
             <div class="card card-coin card-plain">
               <div class="card-header">
                 <div class="image-container">
-                  {% if data['userdetails']['image_loc'] != 'null' %}
-                    <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image">
-                  {% else %}
-                  <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" class="img-center img-fluid rounded-circle" id="profile-image">
-                  {% endif %}
+                  <div class="p-5"></div>
                 </div>
               </div>
               <div class="card-body">
@@ -98,7 +111,7 @@
                     </a>
                   </li>
                 </ul>
-                <div class="tab-content tab-subcategories">
+                <div class="tab-content tab-subcategories pl-5">
                   <div class="tab-pane active" id="Overview-tab">
                     <div class="table-responsive">
                       <div class="ml-3">
@@ -109,8 +122,8 @@
                         </div>
       
                         <div class="row mt-2">
-                          <div class="col-lg-3 col-md-4 text-muted">Username</div>
-                          <div class="col-lg-9 col-md-8 text-light">{{data['userdetails']['username']}}</div>
+                          <div class="col-lg-3 col-md-6 text-muted">Username</div>
+                          <div class="col-lg-9 col-md-6 text-light">{{data['userdetails']['username']}}</div>
                         </div>
       
                         <div class="row mt-2">

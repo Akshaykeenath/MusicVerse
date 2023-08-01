@@ -1,174 +1,196 @@
 {% include 'user/user_header.html'%}
-<style>
-    body {
-      overflow: hidden;
-    }
-    /* Styles for the modal */
-    .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
 
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-</style>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 <section class="section">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="card card-plain">
-
-            <!-- Image Upload -->
-            <div style="width: 200px; height: 200px; position: relative; overflow: hidden;">
-              <label for="upload-input" onclick="openModal()">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 mt-5">
+        <div class="card card-plain">
+          <!-- Image Upload -->
+          <div style="width: 200px; height: 200px; position: relative; overflow: hidden;">
+            <label for="upload-input" class="profile-image-container">
+              {% if data['userdetails']['image_loc'] != 'null' %}
+              <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}"
+                class="img-center img-fluid rounded-circle" id="profile-image">
+              {% else %}
+              <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}"
+                class="img-center img-fluid rounded-circle" id="profile-image">
+              {% endif %}
+              <!-- Buttons container -->
+              <div class="buttons-container">
+                <button class="btn btn-primary btn-fab btn-icon btn-round" id="button1" data-toggle="modal"
+                  data-target="#picupldmodal">
+                  <i class="fas fa-edit"></i>
+                </button>
                 {% if data['userdetails']['image_loc'] != 'null' %}
-                <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}" class="img-center img-fluid rounded-circle" id="profile-image" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
-                {% else %}
-                <img src="{{ url_for('static', filename='public/img/defaultavathar.png') }}" class="img-center img-fluid rounded-circle" id="profile-image" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+                <button class="btn btn-danger btn-fab btn-icon btn-round" id="button2" data-toggle="modal"
+                  data-target="#DeleteConfirmModal">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
                 {% endif %}
-              </label>
-            </div>
-            
-            <!-- The modal -->
-    <div id="picupldmodal" class="modal">
+              </div>
+            </label>
+          </div>
+          <div class="card-body">
+            <!-- The form remains the same -->
+            <form action="/user/update_profile" class="needs-validation" method="post" novalidate>
+              <div class="row">
+                <div class="col-md-6">
+                  <label>First Name</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-user"></i></span>
+                    </div>
+                    <input type="text" class="form-control" value="{{data['userdetails']['fname']}}" name="upfname"
+                      required>
+                    <div class="invalid-feedback">
+                      Please enter your first name.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label>Last Name</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-user"></i></span>
+                    </div>
+                    <input type="text" class="form-control" value="{{data['userdetails']['lname']}}" name="uplname"
+                      required>
+                    <div class="invalid-feedback">
+                      Please enter your last name.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <label>Mobile</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-mobile"></i></span>
+                    </div>
+                    <input type="text" class="form-control" value="{{data['userdetails']['mobile']}}" name="upmob"
+                      required>
+                    <div class="invalid-feedback">
+                      Please enter your mobile number.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label>Email</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                    </div>
+                    <input type="email" class="form-control" value="{{data['userdetails']['email']}}" name="upemail" required>
+                    <div class="invalid-feedback">
+                      Please enter your valid email.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-round" id="updatedetails">Submit</button>
+              <a href="{{ url_for('user.profile') }}" class="btn btn-neutral btn-round">Cancel</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- The modal -->
+  <div class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Upload Image</h2>
+      <form method="POST" action="/user/propicupload" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" />
+        <input type="submit" value="Upload" />
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirm modal -->
+  <div class="modal fade modal-mini modal-primary modal-mini" id="DeleteConfirmModal" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
       <div class="modal-content">
-          <span class="close" onclick="closeModal()">&times;</span>
-          <h2>Upload Image</h2>
-          <form method="POST" action="/user/propicupload" enctype="multipart/form-data">
-              <input type="file" name="image" accept="image/*" />
-              <input type="submit" value="Upload" />
-          </form>
-      </div>
-  </div>
-            <div class="card-body">
-              <!-- The form remains the same -->
-
-<form action="/user/update_profile" class="needs-validation" method="post" novalidate>
-  <div class="row">
-    <div class="col-md-6">
-      <label>First Name</label>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fa fa-user"></i></span>
-        </div>
-        <input type="text" class="form-control" value="{{data['userdetails']['fname']}}" name="upfname" required>
-        <div class="invalid-feedback">
-          Please enter your first name.
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <label>Last Name</label>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fa fa-user"></i></span>
-        </div>
-        <input type="text" class="form-control" value="{{data['userdetails']['lname']}}" name="uplname" required>
-        <div class="invalid-feedback">
-          Please enter your last name.
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-6">
-      <label>Mobile</label>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fa fa-mobile"></i></span>
-        </div>
-        <input type="text" class="form-control" value="{{data['userdetails']['mobile']}}" name="upmob" required>
-        <div class="invalid-feedback">
-          Please enter your mobile number.
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <label>Email</label>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-        </div>
-        <input type="text" class="form-control" value="{{data['userdetails']['email']}}" disabled>
-      </div>
-    </div>
-  </div>
-  <button type="submit" class="btn btn-primary btn-round" id="updatedetails">Submit</button>
-  <a href="{{ url_for('user.profile') }}" class="btn btn-neutral btn-round">Cancel</a>
-</form>
-            </div>
+        <div class="modal-header justify-content-center">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="tim-icons icon-simple-remove text-white"></i>
+          </button>
+          <div class="modal-profile">
+            <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}"
+              class="img-center img-fluid rounded-circle" id="profile-image">
           </div>
         </div>
-        <div class="col-md-4 ml-auto">
-          <div class="info info-horizontal">
-            <div class="icon icon-primary">
-              <i class="tim-icons icon-square-pin"></i>
-            </div>
-            <div class="description">
-              <h4 class="info-title">Find us at the office</h4>
-              <p> Bld Mihail Kogalniceanu, nr. 8,
-                <br> 7652 Bucharest,
-                <br> Romania
-              </p>
-            </div>
-          </div>
+        <div class="modal-body">
+          <p>Are you sure to delete profile picture ?</p>
+        </div>
+        <div class="modal-footer">
+          <a type="button" class="btn btn-link btn-neutral" href="{{ url_for('user.deletepropic') }}">Yes</a>
+          <button type="button" class="btn btn-link btn-neutral" data-dismiss="modal">No</button>
         </div>
       </div>
-          <!-- Update Success -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class="alert alert-success alert-with-icon fixed-bottom">
-  <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="tim-icons icon-simple-remove"></i>
-  </button>
-  <span data-notify="icon" class="tim-icons icon-trophy"></span>
-  <span>{{ messages[0] }}</span>
-</div>
-{% endif %}
-{% endwith %}
     </div>
-  </section>
+  </div>
+  <!-- End Delete Confirm modal -->
 
-  <script>
-    // Open the modal
-    function openModal() {
-        var modal = document.getElementById("picupldmodal");
-        modal.style.display = "block";
-    }
+  <!-- Modal Template with Image Upload -->
+  <div class="modal fade" id="picupldmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Upload Image</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="POST" action="/user/propicupload" enctype="multipart/form-data">
+          <div class="modal-body">
+            <input type="file" name="image" accept="image/*" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
 
-    // Close the modal
-    function closeModal() {
-        var modal = document.getElementById("picupldmodal");
-        modal.style.display = "none";
-    }
+<script>
+  // Open the modal
+  function openModal() {
+    var modal = new bootstrap.Modal(document.getElementById('picupldmodal'));
+    modal.show();
+  }
 </script>
 
-  {% include 'user/user_footer.html'%}
+{% include 'user/user_footer.html'%}
+<style>
+  .profile-image-container {
+    position: relative;
+  }
+
+  /* Initially hide the buttons container */
+  .buttons-container {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Show the buttons container on hover */
+  .profile-image-container:hover .buttons-container {
+    display: block;
+  }
+
+  /* Style the buttons */
+  .buttons-container button {
+    margin: 5px;
+  }
+</style>

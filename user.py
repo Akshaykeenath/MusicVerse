@@ -27,6 +27,9 @@ def user_home():
         data['favoritesongdata']=favoritesongdata
         trendingsongdata=get_song_data(uid)
         data['trendingsongdata']=trendingsongdata
+        q="SELECT p.playlist_id,p.playlist_name,p.image_loc,p.status FROM playlist p INNER JOIN playlisttrack pt ON p.playlist_id=pt.playlist_id WHERE p.type='public' AND p.status='active' GROUP BY pt.playlist_id"
+        publicplaylistdata=select(q)
+        data['publicplaylistdata']=publicplaylistdata
         return render_template('user/home.html', data=data)
     else:
         flash("danger: Session Unavailable. Login Again")
@@ -308,7 +311,7 @@ def profile():
     if 'uid' in session:
         uid=session['uid']
         data={}
-        q="select * from user where user_id='%s'"%(uid)
+        q="select * from user inner join login using (login_id) where user_id='%s'"%(uid)
         res=select(q)
         data['userdetails']=res[0]
         return render_template('user/profile.html', data=data)
@@ -340,7 +343,8 @@ def update_profile():
         fname = request.form['upfname']
         lname = request.form['uplname']
         mob = request.form['upmob']
-        q = "UPDATE user SET fname='%s', lname='%s', mobile='%s' WHERE user_id='%s'" % (fname, lname, mob, uid)
+        email=request.form['upemail']
+        q = "UPDATE user SET fname='%s', lname='%s', mobile='%s',email='%s' WHERE user_id='%s'" % (fname, lname, mob,email, uid)
         update(q)
         flash("success: Update successful")  # Generate flash message
         return redirect(url_for('user.profile'))
@@ -357,8 +361,22 @@ def propicupload():
         data={}
         data['userdetails']=res[0]
         image = request.files['image']
-        UpdateProfileImage(image,uid)
-        flash("success: Successfully updated image")
+        if image.filename != '':
+            UpdateProfileImage(image,uid)
+            flash("success: Successfully updated image")
+        else:
+            flash("danger: Please select an image first")
+        return redirect(url_for('user.edit_profile'))
+    else:
+        flash("danger: Session Unavailable. Login Again")
+        return redirect(url_for('public.home'))
+
+@user.route('/deletepropic', methods=['POST','GET'])
+def deletepropic():
+    if 'uid' in session:
+        uid = session['uid']
+        DeleteProfileImage(uid)
+        flash("warning: Profile Picture Deleted Successfully.")
         return redirect(url_for('user.edit_profile'))
     else:
         flash("danger: Session Unavailable. Login Again")

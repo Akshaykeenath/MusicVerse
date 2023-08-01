@@ -15,22 +15,26 @@ def login():
         pa = request.form['pwd']
         q = "SELECT * FROM login WHERE username='%s' AND password='%s'" % (u, pa)
         res = select(q)
-
-        if res[0]['password'] == pa:
-            session['login_id'] = res[0]['login_id']
-            lid = session['login_id']
-            if res[0]['user_type'] == "admin":
-                return redirect(url_for('admin.admin_home'))
-            elif res[0]['user_type'] == "user":
-                q = "SELECT * FROM user WHERE login_id='%s'" % lid
-                res = select(q)
-                if res:
-                    if res[0]['status'] == 'active':
-                        session['uid'] = res[0]['user_id']
-                        return redirect(url_for('user.user_home'))
-                    else:
-                        flash('danger: User Deactivated. Contact Administrator')
-                        return redirect(url_for('public.home'))
+        if len(res) > 0:
+            if res[0]['password'] == pa:
+                session['login_id'] = res[0]['login_id']
+                lid = session['login_id']
+                if res[0]['user_type'] == "admin":
+                    return redirect(url_for('admin.admin_home'))
+                elif res[0]['user_type'] == "user":
+                    q = "SELECT * FROM user WHERE login_id='%s'" % lid
+                    res = select(q)
+                    if res:
+                        if res[0]['status'] == 'active':
+                            session['uid'] = res[0]['user_id']
+                            return redirect(url_for('user.user_home'))
+                        else:
+                            flash('danger: User Deactivated. Contact Administrator')
+                            return redirect(url_for('public.home'))
+            else:
+                # Password doesn't match or user doesn't exist
+                flash('danger: Invalid username or password')
+                return redirect(url_for('public.home'))
         else:
             # Password doesn't match or user doesn't exist
             flash('danger: Invalid username or password')

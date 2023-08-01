@@ -1,28 +1,20 @@
-<style>
-  .hidden {
-    display: none;
-  }
-  #audioPlayer {
-      display: none;
-    }
-</style>
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link " href="{{ url_for('uploader.home') }}">
+        <a class="nav-link collapsed" href="{{ url_for('uploader.home') }}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
       </li><!-- End Dashboard Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#songs-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-music-note-beamed"></i><span>Songs</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="songs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
             <a href="{{ url_for('uploader.allsongs') }}">
               <i class="bi bi-circle"></i><span>All Songs</span>
@@ -111,65 +103,3 @@
     </ul>
 
   </aside><!-- End Sidebar-->
-  
-<!-- Music Upload Modal -->
-<div class="modal fade" id="uploadmusic" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Music Upload</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body d-flex justify-content-center align-items-center">
-        <div style="border: 2px dashed #ccc; padding: 30px;">
-          <div class="text-center mb-4">
-            <audio id="audioPlayer" controls></audio>
-          </div>
-          <form method="POST" action="{{ url_for('uploader.uploadmusic') }}" enctype="multipart/form-data" onsubmit="showLoader()">
-            <input type="file" name="file" id="musicFileInput" accept=".mp3">
-            <input type="submit" id="uploadButton" class="btn btn-primary" value="Upload">
-            <button id="loadingButton" class="btn btn-primary hidden" type="button" disabled>
-              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              Analysing...
-            </button>
-          </form>
-        </div>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- End Music Upload Modal -->
-
-<script>
- function showLoader() {
-    var uploadButton = document.getElementById('uploadButton');
-    var loadingButton = document.getElementById('loadingButton');
-    
-    uploadButton.classList.add('hidden'); // Hide the upload button
-    loadingButton.classList.remove('hidden'); // Show the loading button
-    
-    // Add your logic here to handle the form submission via AJAX or other means
-    // For example, you can use the fetch API to send the form data to the server
-  }
-
-</script>
-<script>
-  const musicFileInput = document.getElementById("musicFileInput");
-    const audioPlayer = document.getElementById("audioPlayer");
-
-    musicFileInput.addEventListener("change", function(event) {
-      const file = event.target.files[0];
-      const fileURL = URL.createObjectURL(file);
-      
-      const source = document.createElement("source");
-      source.src = fileURL;
-      audioPlayer.innerHTML = "";
-      audioPlayer.appendChild(source);
-
-      audioPlayer.style.display = "block";
-    });
-</script>

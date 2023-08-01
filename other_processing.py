@@ -35,6 +35,8 @@ def DeleteProfileImage(uid):
         imagepath= 'static/'+imagepath
         if os.path.exists(imagepath):
             os.remove(imagepath)
+            q="update user set image_loc='null' where user_id='%s'"%(uid)
+            update(q)
 
 def updateAlbumCover(cover_image,albumid):
     deleteAlbumCover(albumid)

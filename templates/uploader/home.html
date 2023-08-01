@@ -1,5 +1,109 @@
 {% include 'uploader/uploader_header.html'%}
-{% include 'uploader/uploader_sidebar.html'%}
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link " href="{{ url_for('uploader.home') }}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#songs-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-music-note-beamed"></i><span>Songs</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="songs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('uploader.allsongs') }}">
+              <i class="bi bi-circle"></i><span>All Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.approvedsongs') }}">
+              <i class="bi bi-circle"></i><span>Approved Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.pendingsongs') }}">
+              <i class="bi bi-circle"></i><span>Pending Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.rejectedsongs') }}">
+              <i class="bi bi-circle"></i><span>Rejected Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.privatesongs') }}">
+              <i class="bi bi-circle"></i><span>Private Songs</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Songs Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#artist-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-person-lines-fill"></i><span>Artist</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="artist-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('uploader.artist') }}">
+              <i class="bi bi-circle"></i><span>All Artist</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.myartist') }}">
+              <i class="bi bi-circle"></i><span>My Artist</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Artist Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#album-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-file-earmark-music-fill"></i><span>Albums</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="album-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('uploader.album') }}">
+              <i class="bi bi-circle"></i><span>All Albums</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('uploader.myalbum') }}">
+              <i class="bi bi-circle"></i><span>My Albums</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Album Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#uploadmusic">
+          <i class="bi bi-upload"></i>
+          <span>Upload Music</span>
+        </a>
+      </li><!-- End Upload Music Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('uploader.analytics') }}">
+          <i class="bi bi-file-bar-graph"></i>
+          <span>Analytics</span>
+        </a>
+      </li><!-- End Analytics Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('uploader.profile') }}">
+          <i class="bi bi-person-circle"></i>
+          <span>Profile</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
     {% with messages = get_flashed_messages() %}

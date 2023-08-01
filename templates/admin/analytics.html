@@ -1,7 +1,89 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% include 'admin/admin_header.html'%}
-{% include 'admin/admin_sidebar.html'%}
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
 
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('admin.admin_home') }}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#songs-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-music-note-beamed"></i><span>Songs</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="songs-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin.allsongs') }}">
+              <i class="bi bi-circle"></i><span>All Songs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('admin.approvals') }}">
+              <i class="bi bi-circle"></i><span>Approvals</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Songs Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-people-fill"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin.allusers') }}">
+              <i class="bi bi-circle"></i><span>All Users</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('admin.active_users') }}">
+              <i class="bi bi-circle"></i><span>Active Users</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('admin.deactive_users') }}">
+              <i class="bi bi-circle"></i><span>Deactive Users</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Users Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('admin.artist') }}">
+          <i class="bi bi-person-lines-fill"></i>
+          <span>Artist</span>
+        </a>
+      </li><!-- End Artist Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('admin.album') }}">
+          <i class="bi bi-file-earmark-music-fill"></i>
+          <span>Album</span>
+        </a>
+      </li><!-- End Album Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{{ url_for('admin.analytics') }}">
+          <i class="bi bi-file-bar-graph"></i>
+          <span>Analytics</span>
+        </a>
+      </li><!-- End Analytics Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('admin.playlist') }}">
+          <i class="bi bi-music-note-list"></i>
+          <span>Playlist</span>
+        </a>
+      </li><!-- End Analytics Nav -->
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
 
 <main id="main" class="main">
 

@@ -140,7 +140,7 @@
                             <a href="{{ url_for('user.edit_profile') }}" class="btn btn-success btn-round" name="editprofile" type="submit">Edit Profile</a>                            
                           </div>
                           <div class="m-1">
-                            <a href="{{ url_for('user.disable_profile') }}" class="btn btn-danger btn-simple btn-round" name="disableprofile" type="submit">Disable Profile</a>
+                            <button class="btn btn-danger btn-simple btn-round" name="disableprofile" data-toggle="modal" data-target="#DeleteConfirmModal">Deactivate Profile</button>
                           </div>
                         </div>
       
@@ -201,6 +201,30 @@
   </div>
   </div>
 </div>
+<!-- Delete Confirm modal -->
+<div class="modal fade modal-mini modal-primary modal-mini" id="DeleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="tim-icons icon-simple-remove text-white"></i>
+        </button>
+        <div class="modal-profile">
+          <img src="{{ url_for('static', filename=data['userdetails']['image_loc'])}}"
+          class="img-center img-fluid rounded-circle" id="profile-image">
+        </div>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure to deactivate your profile ?</p>
+      </div>
+      <div class="modal-footer">
+        <a type="button" class="btn btn-link btn-neutral" href="{{ url_for('user.disable_profile') }}">Yes</a>
+        <button type="button" class="btn btn-link btn-neutral" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Delete Confirm modal -->
 
 {% include 'user/user_footer.html'%}
 

@@ -250,7 +250,6 @@
     // Set up the request
     xhr.open("POST", "{{ url_for('user.add_to_playlist') }}", true);
     xhr.setRequestHeader("Content-Type", "application/json");
-
     // Define the data to be sent in the request body
     var data = JSON.stringify({ playlistId: playlistId, songId: songId });
 
@@ -258,10 +257,15 @@
     xhr.onload = function () {
       if (xhr.status === 200) {
         // Request was successful
-        console.log("Song added to playlist!");
-      } else {
-        // Request failed
-        console.error("Failed to add song to playlist.");
+        var response = JSON.parse(xhr.responseText);
+        demo.showNotification('bottom', 'center', response.message, 'tim-icons icon-bell-55', 'success');
+      } else if (xhr.status === 400) {
+        var response = JSON.parse(xhr.responseText);
+        demo.showNotification('bottom', 'center', response.message, 'tim-icons icon-bell-55', 'warning');
+      }
+      else {
+        var response = JSON.parse(xhr.responseText);
+        demo.showNotification('bottom', 'center', response.message, 'tim-icons icon-bell-55', 'danger');
       }
     };
 

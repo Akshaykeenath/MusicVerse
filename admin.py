@@ -537,4 +537,5 @@ def remove_playlist_song():
 @admin.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
+    flash("warning: You have logged out")
     return redirect(url_for('public.home'))

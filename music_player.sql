@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 30, 2023 at 11:44 AM
+-- Generation Time: Aug 01, 2023 at 03:03 PM
 -- Server version: 5.7.9
 -- PHP Version: 5.6.16
 
@@ -34,17 +34,18 @@ CREATE TABLE IF NOT EXISTS `album` (
   `cover_pic` varchar(255) NOT NULL,
   `user_id` varchar(25) NOT NULL,
   PRIMARY KEY (`album_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `album`
 --
 
 INSERT INTO `album` (`album_id`, `album_name`, `image_loc`, `cover_pic`, `user_id`) VALUES
-(1, 'Athiran', 'uploads/album/Athiranpropic.jpg', 'uploads/album/Athirancoverpic.jpg', '1'),
+(1, 'Athiran', 'uploads/album/Athiranpropic.jpg', 'uploads/album/1coverpic.jpg', '1'),
 (2, 'Hridhyam', 'uploads/album/Hridhyampropic.jpg', 'uploads/album/Hridhyamcoverpic.jpg', '1'),
 (3, 'Sita Ramam', 'uploads/album/Sita Ramampropic.jpg', 'uploads/album/Sita Ramamcoverpic.jpg', '2'),
-(4, 'Urumi', 'uploads/album/Urumipropic.jpg', 'uploads/album/Urumicoverpic.jpg', '2');
+(4, 'Urumi', 'uploads/album/Urumipropic.jpg', 'uploads/album/Urumicoverpic.jpg', '2'),
+(14, 'meeshaye murukku', 'uploads/album/14propic.jpg', 'uploads/album/14coverpic.jpg', '1');
 
 -- --------------------------------------------------------
 
@@ -60,14 +61,14 @@ CREATE TABLE IF NOT EXISTS `artist` (
   `cover_pic` varchar(255) NOT NULL,
   `user_id` varchar(25) NOT NULL,
   PRIMARY KEY (`artist_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `artist`
 --
 
 INSERT INTO `artist` (`artist_id`, `artist_name`, `image_loc`, `cover_pic`, `user_id`) VALUES
-(1, 'K S Harishankar', 'uploads/artist/K S Harishankarpropic.png', 'uploads/artist/K S Harishankarcoverpic.jpg', '1'),
+(1, 'K S Harishankar', 'uploads/artist/1propic.png', 'uploads/artist/1cover.jpg', '1'),
 (2, 'Vineeth Sreenivasan', 'uploads/artist/Vineeth Sreenivasanpropic.jpg', 'uploads/artist/Vineeth Sreenivasancoverpic.jpg', '1'),
 (3, 'Swetha Mohan', 'uploads/artist/Swetha Mohanpropic.jpg', 'uploads/artist/Swetha Mohancoverpic.jpg', '2'),
 (4, 'Shreya Ghoshal', 'uploads/artist/Shreya Ghoshalpropic.jpeg', 'uploads/artist/Shreya Ghoshalcoverpic.jpg', '1');
@@ -86,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `clicks` (
   `content_type` varchar(25) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`click_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=446 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=454 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `clicks`
@@ -531,7 +532,15 @@ INSERT INTO `clicks` (`click_id`, `content_id`, `user_id`, `content_type`, `time
 (442, '2', '2', 'artist', '2023-07-26 09:10:30'),
 (443, '4', '2', 'song', '2023-07-26 09:10:57'),
 (444, '1', '2', 'song', '2023-07-26 09:11:50'),
-(445, '2', '1', 'album', '2023-07-30 06:56:14');
+(445, '2', '1', 'album', '2023-07-30 06:56:14'),
+(446, '1', '1', 'artist', '2023-07-30 14:53:20'),
+(447, '3', '1', 'album', '2023-08-01 13:54:00'),
+(448, '3', '1', 'song', '2023-08-01 13:54:03'),
+(449, '3', '1', 'album', '2023-08-01 14:06:33'),
+(450, '1', '1', 'album', '2023-08-01 14:08:05'),
+(451, '1', '1', 'song', '2023-08-01 14:08:29'),
+(452, '3', '1', 'album', '2023-08-01 14:10:25'),
+(453, '1', '1', 'song', '2023-08-01 14:16:28');
 
 -- --------------------------------------------------------
 
@@ -547,23 +556,24 @@ CREATE TABLE IF NOT EXISTS `likes` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `content_type` varchar(50) NOT NULL,
   PRIMARY KEY (`like_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=69 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=72 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `likes`
 --
 
 INSERT INTO `likes` (`like_id`, `content_id`, `user_id`, `timestamp`, `content_type`) VALUES
+(71, '1', '1', '2023-08-01 14:12:52', 'song'),
 (48, '1', '2', '2023-06-26 11:56:16', 'album'),
-(62, '1', '1', '2023-07-17 10:41:18', 'song'),
 (31, '1', '1', '2023-06-25 11:49:09', 'album'),
 (49, '3', '2', '2023-06-26 13:08:46', 'song'),
 (59, '3', '1', '2023-07-17 08:54:21', 'song'),
-(52, '3', '1', '2023-07-01 11:55:03', 'album'),
+(69, '3', '1', '2023-08-01 14:06:37', 'album'),
 (38, '1', '1', '2023-06-25 15:38:22', 'artist'),
 (68, '4', '2', '2023-07-26 09:11:16', 'song'),
 (42, '4', '1', '2023-06-25 18:15:49', 'song'),
 (47, '1', '2', '2023-06-26 11:56:13', 'song'),
+(70, '2', '1', '2023-08-01 14:06:51', 'song'),
 (51, '3', '2', '2023-07-01 10:27:05', 'album'),
 (53, '2', '2', '2023-07-01 13:37:53', 'artist'),
 (63, '1', '2', '2023-07-17 10:47:58', 'artist');
@@ -669,7 +679,7 @@ INSERT INTO `playlist` (`playlist_id`, `playlist_name`, `image_loc`, `user_id`, 
 (1, 'My Songs', 'uploads/playlist/1.jpg', '1', 'active', 'private'),
 (2, 'Romantic songs', 'uploads/playlist/2.jpg', '1', 'active', 'private'),
 (11, 'Daily', 'uploads/playlist/11.jpg', '0', 'active', 'public'),
-(10, 'Discover Weekly', 'uploads/playlist/10.jpg', '0', 'deactive', 'public');
+(10, 'Discover Weekly', 'uploads/playlist/10.jpg', '0', 'active', 'public');
 
 -- --------------------------------------------------------
 
@@ -683,7 +693,7 @@ CREATE TABLE IF NOT EXISTS `playlisttrack` (
   `playlist_id` varchar(50) NOT NULL,
   `song_id` varchar(50) NOT NULL,
   PRIMARY KEY (`playlisttrack_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `playlisttrack`
@@ -697,7 +707,10 @@ INSERT INTO `playlisttrack` (`playlisttrack_id`, `playlist_id`, `song_id`) VALUE
 (23, '11', '1'),
 (21, '10', '3'),
 (25, '10', '1'),
-(24, '11', '4');
+(24, '11', '4'),
+(30, '1', '1'),
+(28, '2', '3'),
+(29, '2', '4');
 
 -- --------------------------------------------------------
 
@@ -711,14 +724,14 @@ CREATE TABLE IF NOT EXISTS `songartist` (
   `song_id` varchar(25) NOT NULL,
   `artist_id` varchar(25) NOT NULL,
   PRIMARY KEY (`songartist_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=41 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `songartist`
 --
 
 INSERT INTO `songartist` (`songartist_id`, `song_id`, `artist_id`) VALUES
-(28, '3', '1'),
+(40, '3', '1'),
 (26, '4', '2'),
 (25, '2', '2'),
 (31, '1', '1');
@@ -781,7 +794,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 INSERT INTO `user` (`user_id`, `login_id`, `fname`, `lname`, `email`, `mobile`, `image_loc`, `status`) VALUES
 (1, '2', 'Akshay', 'K S', 'akshaykeenath@gmail.com', '8848223249', 'uploads/users/1.jpg', 'active'),
-(2, '3', 'Anju', 'K', 'anjugangadharan00@gmail.com', '8765986451', 'uploads/Anju3.jpg', 'active');
+(2, '3', 'Anju', 'K Gangadharan', 'anjugangadharan00@gmail.com', '8765986451', 'uploads/users/2.jpg', 'active');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

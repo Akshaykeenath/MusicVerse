@@ -106,12 +106,17 @@ class _Genre_Recognition_Service:
 
         # predict on each chunk, extract the class with highest probability
         prediction_indices = np.argmax(self.model.predict(mfcc), axis=1)
+        print("prediction_indices",prediction_indices)
 
         # ideally, each chunk will have the same prediction.
         # Some might be different, so take the most common element.
         prediction_idx = int(np.bincount(prediction_indices).argmax())
+        print("prediction_idx",prediction_idx)
+
 
         prediction = self._mappings[prediction_idx]
+        print("prediction",prediction)
+
 
         return prediction
 

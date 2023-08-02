@@ -44,7 +44,10 @@ def home():
         data['recentsongdata']=recentsongdata
         q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id AND s.user_id = '%s')) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id AND a.user_id = '%s')) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id AND ar.user_id = '%s')) GROUP BY DATE(TIMESTAMP)"%(uid,uid,uid)
         totalclicks=select(q)
-        clicks, dates = getClicksDatesInc(totalclicks)
+        if len(totalclicks) > 0:
+            clicks, dates = getClicksDatesInc(totalclicks)
+        else:
+            clicks=dates=''
         data['chartdata']={'clicks':clicks,'dates':dates}
         q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' AND s.user_id='%s' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' AND a.user_id='%s' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' AND a.user_id='%s' GROUP BY name"%(uid,uid,uid)
         clickdata=select(q)
@@ -343,7 +346,10 @@ def analytics():
         data['songdata']=songdata
         q="SELECT DATE(TIMESTAMP) AS dates, COUNT(*) AS clicks FROM clicks c WHERE (content_type = 'song' AND EXISTS (SELECT 1 FROM songs s WHERE s.song_id = c.content_id AND s.user_id = '%s')) OR (content_type = 'album' AND EXISTS (SELECT 1 FROM album a WHERE a.album_id = c.content_id AND a.user_id = '%s')) OR (content_type = 'artist' AND EXISTS (SELECT 1 FROM artist ar WHERE ar.artist_id = c.content_id AND ar.user_id = '%s')) GROUP BY DATE(TIMESTAMP)"%(uid,uid,uid)
         totalclicks=select(q)
-        clicks, dates = getClicksDatesInc(totalclicks)
+        if len(totalclicks) > 0:
+            clicks, dates = getClicksDatesInc(totalclicks)
+        else:
+            clicks=dates=''
         data['chartdata']={'clicks':clicks,'dates':dates}
         q="SELECT 'Songs' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN songs s ON c.content_id=s.song_id AND c.content_type='song' AND s.user_id='%s' GROUP BY name UNION SELECT 'Albums' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN album a ON c.content_id=a.album_id AND c.content_type='album' AND a.user_id='%s' GROUP BY name UNION SELECT 'Artists' AS name,COUNT(c.content_type) AS clicks FROM clicks c INNER JOIN artist a ON c.content_id=a.artist_id AND c.content_type='artist' AND a.user_id='%s' GROUP BY name"%(uid,uid,uid)
         clickdata=select(q)
@@ -760,25 +766,29 @@ def uploadmusic():
             data['userdetails'] = res[0]
             if request.method == 'POST':
                 file = request.files['file']
-                if file and file.filename.endswith('.mp3'):
-                    audio_file = file
-                    prediction = genrePrediction(audio_file)
-                    audio = MP3(file)
-                    duration_in_seconds = str(int(audio.info.length))
-                    file_extension = os.path.splitext(file.filename)[1]
-                    songpath='uploads/songs/' +res[0]['fname']+str(uuid.uuid4()) + file_extension
-                    file.save('static/'+songpath)
-                    songpathdb='/static/'+songpath # To store in database with /static as it may sometimes conflict with the save if given in .save
-                    session['songpath']=songpathdb
-                    session['predictedgenre']=prediction
-                    duration_in_min=secondstominute(int(duration_in_seconds))
-                    session['songduration']=duration_in_min
-                    flash("success: saved the song.")
-                    flash("info: Predicted Genre is "+prediction)
-                    return redirect(url_for('uploader.uploadsong'))
+                if file.filename != '':
+                    if file and file.filename.endswith('.mp3'):
+                        audio_file = file
+                        prediction = genrePrediction(audio_file)
+                        audio = MP3(file)
+                        duration_in_seconds = str(int(audio.info.length))
+                        file_extension = os.path.splitext(file.filename)[1]
+                        songpath='uploads/songs/' +res[0]['fname']+str(uuid.uuid4()) + file_extension
+                        file.save('static/'+songpath)
+                        songpathdb='/static/'+songpath # To store in database with /static as it may sometimes conflict with the save if given in .save
+                        session['songpath']=songpathdb
+                        session['predictedgenre']=prediction
+                        duration_in_min=secondstominute(int(duration_in_seconds))
+                        session['songduration']=duration_in_min
+                        flash("success: saved the song.")
+                        flash("info: Predicted Genre is "+prediction)
+                        return redirect(url_for('uploader.uploadsong'))
+                    else:
+                        flash("Invalid file format. Please upload an MP3 file.")
+                        return render_template('uploader/home.html', data=data,count=count)
                 else:
-                    flash("Invalid file format. Please upload an MP3 file.")
-                    return render_template('uploader/home.html', data=data,count=count)
+                    flash("danger: Please select a file before upload")
+                    return redirect(url_for('uploader.allsongs'))
             return render_template('uploader/home.html', data=data,count=count)
         
 

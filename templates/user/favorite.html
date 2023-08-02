@@ -54,6 +54,15 @@
 <!-- End Side Bar -->
   </div>
   <div class="col col-10 ml-5">
+    {% if data['favoritesongdata'] == [] and data['favoritealbumdata'] == [] and data['favoriteartistdata'] == [] %}
+    <div class="page-header header-filter">
+      <div class="container">
+        <div class="content-center brand">
+          <h1 class="h1-seo">Add some contents as favorite</h1>
+        </div>
+      </div>
+    </div>
+    {% endif %}
       <!-- Made For -->
       {% if data['favoritesongdata'] != [] %}
       <div class="row">

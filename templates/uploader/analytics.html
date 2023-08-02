@@ -118,36 +118,32 @@
       </ol>
     </nav>
   </div><!-- End Page Title -->
-
   <section class="section dashboard">
     <div class="row">
       <!-- Left side columns -->
       <div class="col-lg-7">
         <div class="row">
-
           <!-- Reports -->
           <div class="col-12">
             <div class="card">
-
               <div class="filter">
                 <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <li class="dropdown-header text-start">
                     <h6>Filter</h6>
                   </li>
-
                   <li><a id="thisWeekLink" class="dropdown-item" href="#">This week</a></li>
                   <li><a id="thisMonthLink" class="dropdown-item" href="#">This Month</a></li>
                   <li><a id="lifetimeLink" class="dropdown-item" href="#">Lifetime</a></li>
                 </ul>
               </div>
-
               <div class="card-body">
                 <h5 id="ReportData" class="card-title">Report <span id="Reportdataduration">| This week</span></h5>
-
                 <!-- Line Chart -->
+                {% if data['chartdata']['clicks'] | length == 0 %}
+                  <h1> <span class="badge bg-secondary">Add Some Contents to show analytics</span></h1>
+                  {% endif %}
                 <div id="reportsChart"></div>
-
                 <script>
                   function initializeChart(clicks, dates) {
                     if (!window.chart) {
@@ -324,7 +320,9 @@
             <div class="card-body pb-0">
               <h5 class="card-title">Total Clicks <span class="badge rounded-pill bg-secondary text-light"> {% if data['chartdata']['clicks'][-1] %} {{
                   data['chartdata']['clicks'][-1] }} {% endif %}</span></h5>
-
+                  {% if clickdata | length == 0 %}
+                  <h3> <span class="badge bg-secondary">Add Some Contents to show analytics</span></h3>
+                  {% endif %}
               <div id="trafficChart" style="min-height: 380px;" class="echart"></div>
 
               <script>

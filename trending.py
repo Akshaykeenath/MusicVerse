@@ -5,7 +5,7 @@ def get_album_data():
     albums = select(q)
     for album in albums:
         album_id = album['album_id']
-        q="select * from songs where album_id='%s'"%(album_id)
+        q="select * from songs where privacy='public' and status='approved' and album_id='%s'"%(album_id)
         song_data=select(q)
         if song_data == []:
             continue
@@ -38,7 +38,7 @@ def get_artist_data():
     artists = select(q)
     for artist in artists:
         artist_id = artist['artist_id']
-        q="select * from songartist where artist_id='%s'"%(artist_id)
+        q="SELECT * FROM songartist INNER JOIN songs USING (song_id) WHERE artist_id='%s' AND privacy='public' AND STATUS='approved'"%(artist_id)
         song_data=select(q)
         if song_data == []:
             continue
@@ -68,7 +68,7 @@ def get_artist_data():
 #Top 10 songs with all the song details and likes, clicks, liked(yes or no), score
 def get_song_data(uid):
     song_data = []
-    q = "select * from songs"
+    q = "select * from songs where status='approved' and privacy='public'"
     songs = select(q)
     for song in songs:
         song_id = song['song_id']
@@ -115,5 +115,5 @@ def get_song_data(uid):
         })
 
     sorted_songdata = sorted(song_data, key=lambda x: int(x['score']), reverse=True)
-    top_10_songs = sorted_songdata[:10]
-    return top_10_songs
+    top_5_songs = sorted_songdata[:5]
+    return top_5_songs

@@ -921,6 +921,7 @@ def update_profile():
 @uploader.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
+    flash("warning: You have logged out")
     return redirect(url_for('public.home'))
 
 def secondstominute(seconds):

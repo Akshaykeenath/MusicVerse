@@ -1,4 +1,4 @@
-![App Screenshot]([https://github.com/Akshaykeenath/MusicVerse/blob/master/screenshots/landing%20page.png])
+![App Screenshot](https://github.com/Akshaykeenath/MusicVerse/blob/master/screenshots/landing%20page.png?raw=true)
 
 # MusicVerse
 

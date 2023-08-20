@@ -2,21 +2,21 @@ import datetime
 
 def getClicksDatesInc(clickdata):
     current_date = datetime.date.today()
-    first_date = clickdata[0]['dates']
-    
     dates = []
     clicks = []
-    accumulated_clicks = 0  # Variable to accumulate the clicks per day
+    if len(clickdata)>0:
+        first_date = clickdata[0]['dates']
+        accumulated_clicks = 0  # Variable to accumulate the clicks per day
 
-    # Iterate over the date range from the first date to the current date
-    for single_date in range((current_date - first_date).days + 1):
-        date = first_date + datetime.timedelta(days=single_date)
-        dates.append(date)
+        # Iterate over the date range from the first date to the current date
+        for single_date in range((current_date - first_date).days + 1):
+            date = first_date + datetime.timedelta(days=single_date)
+            dates.append(date)
 
-        # Check if the date exists in the songclickdata
-        clicks_value = next((item['clicks'] for item in clickdata if item['dates'] == date), 0)
-        accumulated_clicks += clicks_value  # Accumulate the clicks per day
-        clicks.append(accumulated_clicks)
+            # Check if the date exists in the songclickdata
+            clicks_value = next((item['clicks'] for item in clickdata if item['dates'] == date), 0)
+            accumulated_clicks += clicks_value  # Accumulate the clicks per day
+            clicks.append(accumulated_clicks)
 
     return clicks, dates
 

@@ -2,7 +2,7 @@
 
 # MusicVerse
 
-The music streaming platform is an application where the users sharetheir music with other users in the system. The major modules in theapplication are :
+The music streaming platform is an application where the users sharetheir music with other users in the system. The major modules in the application are :
 - Music Upload Module.
 - Genre Classification System based on CNN.
 - Music Search system.
